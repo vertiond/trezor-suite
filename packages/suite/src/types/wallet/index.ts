@@ -20,6 +20,7 @@ import { ArrayElement } from '../utils';
 
 export type Network = ArrayElement<typeof NETWORKS>;
 // reexport
+export type { CardanoMergedUtxo } from './cardano';
 export type { NetworkToken, Token } from './tokenTypes';
 export type { Icon } from './iconTypes';
 export type { Account } from '@wallet-reducers/accountsReducer';

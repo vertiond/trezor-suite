@@ -2192,6 +2192,14 @@ const definedMessages = defineMessages({
         defaultMessage: 'Cardano',
         id: 'TR_NETWORK_CARDANO',
     },
+    TR_ACCOUNT_TYPE_SHELLEY: {
+        defaultMessage: 'Shelley',
+        id: 'TR_ACCOUNT_TYPE_SHELLEY',
+    },
+    TR_NETWORK_CARDANO_TESTNET: {
+        defaultMessage: 'Cardano Testnet',
+        id: 'TR_NETWORK_CARDANO_TESTNET',
+    },
     TR_NETWORK_DASH: {
         defaultMessage: 'Dash',
         id: 'TR_NETWORK_DASH',

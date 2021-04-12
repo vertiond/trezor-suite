@@ -1,5 +1,5 @@
 import { State as TransactionsState } from '@wallet-reducers/transactionReducer';
-import { AccountInfo, AccountAddress, PrecomposedTransaction } from 'trezor-connect';
+import { AccountInfo, AccountAddresses, PrecomposedTransaction } from 'trezor-connect';
 import BigNumber from 'bignumber.js';
 import { ACCOUNT_TYPE } from '@wallet-constants/account';
 import { Account, Network, CoinFiatRates, WalletParams, Discovery } from '@wallet-types';
@@ -7,6 +7,9 @@ import { PrecomposedTransactionFinal } from '@wallet-types/sendForm';
 import { AppState } from '@suite-types';
 import { NETWORKS } from '@wallet-config';
 import { toFiatCurrency } from './fiatConverterUtils';
+
+export const isUtxoBased = (account: Account) =>
+    account.networkType === 'bitcoin' || account.networkType === 'cardano';
 
 export const parseBIP44Path = (path: string) => {
     const regEx = /m\/(\d+'?)\/(\d+'?)\/(\d+'?)\/([0,1])\/(\d+)/;
@@ -73,6 +76,8 @@ export const getTitleForNetwork = (symbol: Account['symbol']) => {
             return 'TR_NETWORK_XRP';
         case 'txrp':
             return 'TR_NETWORK_XRP_TESTNET';
+        case 'tada':
+            return 'TR_NETWORK_CARDANO_TESTNET';
         default:
             return 'TR_NETWORK_UNKNOWN';
     }
@@ -89,6 +94,8 @@ export const getBip43Shortcut = (path: string) => {
             return 'p2sh';
         case `44'`:
             return 'p2pkh';
+        case `1852'`:
+            return 'shelley';
         default:
             return 'unknown';
     }
@@ -98,6 +105,7 @@ export const getAccountTypeIntl = (path: string) => {
     const bip43 = getBip43Shortcut(path);
     if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_NATIVE_SEGWIT';
     if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_SEGWIT';
+    if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
     return 'TR_ACCOUNT_TYPE_LEGACY';
 };
 
@@ -105,6 +113,7 @@ export const getBip43Intl = (path: string) => {
     const bip43 = getBip43Shortcut(path);
     if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_BECH32';
     if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_P2SH';
+    if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
     return 'TR_ACCOUNT_TYPE_P2PKH';
 };
 
@@ -259,6 +268,48 @@ export const enhanceTokens = (tokens: Account['tokens']) => {
             symbol: t.symbol!.toLowerCase(),
             balance: formatAmount(t.balance!, t.decimals),
         }));
+};
+
+export const enhanceAddresses = (
+    addresses: AccountAddresses | undefined,
+    networkType: Account['networkType'],
+    accountIndex: Account['index'],
+): AccountAddresses | undefined => {
+    if (!addresses) return undefined;
+    if (networkType !== 'cardano') return addresses;
+
+    const accountIndexStr = accountIndex.toString();
+    const used = addresses.used.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+    const unused = addresses.unused.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+    const change = addresses.change.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+
+    return { used, unused, change };
+};
+
+export const enhanceUtxo = (
+    utxos: Account['utxo'],
+    networkType: Account['networkType'],
+    accountIndex: Account['index'],
+): Account['utxo'] => {
+    if (!utxos) return undefined;
+    if (networkType !== 'cardano') return utxos;
+
+    const accountIndexStr = accountIndex.toString();
+    const enhancedUtxos = utxos.map(utxo => ({
+        ...utxo,
+        path: utxo.path.replace('i', accountIndexStr),
+    }));
+
+    return enhancedUtxos;
 };
 
 export const getAccountFiatBalance = (

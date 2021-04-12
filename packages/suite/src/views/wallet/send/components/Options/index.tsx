@@ -5,6 +5,7 @@ import { useSendFormContext } from '@wallet-hooks';
 import BitcoinOptions from './components/BitcoinOptions';
 import EthereumOptions from './components/EthereumOptions';
 import RippleOptions from './components/RippleOptions';
+import CardanoOptions from './components/CardanoOptions';
 
 const Wrapper = styled.div`
     display: flex;
@@ -35,6 +36,7 @@ const Options = () => {
                 {networkType === 'bitcoin' && <BitcoinOptions />}
                 {networkType === 'ethereum' && <EthereumOptions />}
                 {networkType === 'ripple' && <RippleOptions />}
+                {networkType === 'cardano' && <CardanoOptions />}
             </Content>
         </Wrapper>
     );

@@ -12,7 +12,7 @@ module.exports = {
         index: [`${SRC}/index.ts`],
     },
     output: {
-        filename: '[name].js',
+        filename: '[name]-[hash].js',
         path: BUILD,
     },
     devServer: {
@@ -26,7 +26,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: [/ripple\/index.ts$/, /blockbook\/index.ts$/],
+                test: [/ripple\/index.ts$/, /blockbook\/index.ts$/, /cardano\/index.ts$/],
                 use: ['worker-loader'],
             },
             {

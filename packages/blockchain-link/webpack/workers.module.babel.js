@@ -6,6 +6,7 @@ module.exports = {
     entry: {
         'blockbook-worker': `${SRC}workers/blockbook/index.ts`,
         'ripple-worker': `${SRC}workers/ripple/index.ts`,
+        'cardano-worker': `${SRC}workers/cardano/index.ts`,
     },
     output: {
         filename: '[name].js',
@@ -18,7 +19,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: [/blockbook\/index.ts?$/, /ripple\/index.ts?$/],
+                test: [/blockbook\/index.ts?$/, /ripple\/index.ts?$/, /cardano\/index.ts?$/],
                 exclude: /node_modules/,
                 use: ['module-worker-loader'],
             },

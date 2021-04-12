@@ -37,7 +37,11 @@ const AccountNavigation = (props: Props) => {
             },
             title: <Translation id="TR_NAV_DETAILS" />,
             position: 'primary',
-            isHidden: () => account?.networkType !== 'bitcoin',
+            isHidden: () => {
+                if (!account) return false;
+                const hasAccountDetails = ['bitcoin', 'cardano'];
+                return !hasAccountDetails.includes(account.networkType);
+            },
         },
         {
             id: 'wallet-tokens',
@@ -46,7 +50,11 @@ const AccountNavigation = (props: Props) => {
             },
             title: <Translation id="TR_NAV_TOKENS" />,
             position: 'primary',
-            isHidden: () => account?.networkType !== 'ethereum',
+            isHidden: () => {
+                if (!account) return false;
+                const coinsWithTokens = ['ethereum', 'cardano'];
+                return !coinsWithTokens.includes(account.networkType);
+            },
         },
         {
             id: 'wallet-send',

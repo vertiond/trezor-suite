@@ -197,6 +197,7 @@ export const getFiatRate = (fiatRates: CoinFiatRates | undefined, currency: stri
 export const getFeeUnits = (networkType: Network['networkType']) => {
     if (networkType === 'ethereum') return 'GWEI';
     if (networkType === 'ripple') return 'Drops';
+    if (networkType === 'cardano') return 'Lovelaces/B';
     return 'sat/B';
 };
 
@@ -240,13 +241,6 @@ export const getBitcoinComposeOutputs = (values: Partial<FormState>, symbol: Acc
 
     values.outputs.forEach((output, index) => {
         if (!output || typeof output !== 'object') return; // skip invalid object
-
-        if (output.type === 'opreturn' && output.dataHex) {
-            result.push({
-                type: 'opreturn',
-                dataHex: output.dataHex,
-            });
-        }
 
         const { address } = output;
         const isMaxActive = setMaxOutputId === index;

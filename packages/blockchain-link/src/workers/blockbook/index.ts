@@ -2,7 +2,6 @@ import { CustomError } from '../../constants/errors';
 import { MESSAGES, RESPONSES } from '../../constants';
 import Connection from './websocket';
 import * as utils from './utils';
-
 import { Message, Response, SubscriptionAccountInfo } from '../../types';
 import {
     AddressNotification,
@@ -100,8 +99,13 @@ const getInfo = async (data: { id: number } & MessageTypes.GetInfo): Promise<voi
 
 const getBlockHash = async (data: { id: number } & MessageTypes.GetBlockHash): Promise<void> => {
     try {
+        const blockNumber = data.payload;
+
+        // common param blockNumber is string in cardano worker
+        if (typeof blockNumber === 'string') return;
+
         const socket = await connect();
-        const info = await socket.getBlockHash(data.payload);
+        const info = await socket.getBlockHash(blockNumber);
         common.response({
             id: data.id,
             type: RESPONSES.GET_BLOCK_HASH,
@@ -242,6 +246,7 @@ const pushTransaction = async (
 ): Promise<void> => {
     try {
         const socket = await connect();
+
         const resp = await socket.pushTransaction(data.payload);
         common.response({
             id: data.id,

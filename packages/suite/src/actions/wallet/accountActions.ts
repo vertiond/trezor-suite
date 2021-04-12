@@ -45,8 +45,16 @@ export const create = (
             discoveryItem.coin,
         ),
         tokens: accountUtils.enhanceTokens(accountInfo.tokens),
-        addresses: accountInfo.addresses,
-        utxo: accountInfo.utxo,
+        addresses: accountUtils.enhanceAddresses(
+            accountInfo.addresses,
+            discoveryItem.networkType,
+            discoveryItem.index,
+        ),
+        utxo: accountUtils.enhanceUtxo(
+            accountInfo.utxo,
+            discoveryItem.networkType,
+            discoveryItem.index,
+        ),
         history: accountInfo.history,
         metadata: {
             key: accountInfo.legacyXpub || accountInfo.descriptor,
@@ -72,6 +80,7 @@ export const update = (account: Account, accountInfo: AccountInfo): AccountActio
             account.networkType === 'ripple' ? accountInfo.balance : accountInfo.availableBalance,
             account.symbol,
         ),
+        utxo: accountUtils.enhanceUtxo(accountInfo.utxo, account.networkType, account.index),
         tokens: accountUtils.enhanceTokens(accountInfo.tokens),
         ...accountUtils.getAccountSpecific(accountInfo, account.networkType),
     },

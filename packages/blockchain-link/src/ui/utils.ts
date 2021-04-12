@@ -17,11 +17,13 @@ export const setInputValue = (id: string, value: string): void => {
 };
 
 export const fillValues = (data: any) => {
+    console.log('data', data);
     setInputValue('get-account-info-address', data.address);
     setInputValue('get-account-info-options', JSON.stringify(data.accountInfoOptions, null, 2));
     setInputValue('get-account-utxo-address', data.address);
     setInputValue('estimate-fee-options', JSON.stringify(data.estimateFeeOptions, null, 2));
     setInputValue('get-tx-id', data.txid);
     setInputValue('push-transaction-tx', data.tx);
+    setInputValue('blockhash-hashOrNumber', data.blockHashOrNumber);
     setInputValue('subscribe-addresses', data.subscribe);
 };

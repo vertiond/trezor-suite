@@ -20,6 +20,12 @@ type AccountNetworkSpecific =
           page: undefined;
       }
     | {
+          networkType: 'cardano';
+          marker: undefined;
+          misc: undefined;
+          page: AccountInfo['page'];
+      }
+    | {
           networkType: 'ethereum';
           misc: { nonce: string };
           marker: undefined;

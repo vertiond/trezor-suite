@@ -6,7 +6,6 @@ import TrezorConnect, {
 } from 'trezor-connect';
 import { SUITE } from '@suite-actions/constants';
 import { lockDevice } from '@suite-actions/suiteActions';
-import { resolveStaticPath } from '@suite-utils/build';
 import { Dispatch, GetState } from '@suite-types';
 import { isWeb } from '@suite-utils/env';
 
@@ -38,12 +37,14 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
         'getAddress',
         'ethereumGetAddress',
         'rippleGetAddress',
+        'cardanoGetAddress',
         'applySettings',
         'changePin',
         'pushTransaction',
         'ethereumSignTransaction',
         'signTransaction',
         'rippleSignTransaction',
+        'cardanoSignTransaction',
         'backupDevice',
         'recoveryDevice',
     ] as const;
@@ -60,8 +61,8 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
     });
 
     try {
-        const connectSrc = resolveStaticPath('connect/');
-        // 'https://localhost:8088/';
+        // const connectSrc = resolveStaticPath('connect/');
+        const connectSrc = 'https://localhost:8088/';
         // 'https://connect.corp.sldev.cz/develop/';
 
         await TrezorConnect.init({
