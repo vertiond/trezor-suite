@@ -1,16 +1,16 @@
 import BlockchainLink from '@trezor/blockchain-link';
 import createServer from '../websocket';
-import { blockbookWorkerFactory } from './worker';
+import { cardanoWorkerFactory } from './worker';
 
-describe('Blockbook', () => {
+describe('Cardano', () => {
     let server;
     let blockchain;
 
     beforeEach(async () => {
-        server = await createServer('blockbook');
+        server = await createServer('cardano');
         blockchain = new BlockchainLink({
-            name: 'Tests:Blockbook',
-            worker: blockbookWorkerFactory,
+            name: 'Tests:Cardano',
+            worker: cardanoWorkerFactory,
             server: [`ws://localhost:${server.options.port}`],
             debug: false,
         });
@@ -94,9 +94,9 @@ describe('Blockbook', () => {
     it('Get info', async () => {
         const result = await blockchain.getInfo();
         expect(result).toEqual({
-            name: 'Test',
-            shortcut: 'test',
-            decimals: 9,
+            name: 'Cardano',
+            shortcut: 'ada',
+            decimals: 6,
             blockHeight: 1,
         });
     });

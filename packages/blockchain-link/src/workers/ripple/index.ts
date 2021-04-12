@@ -2,7 +2,6 @@ import { RippleAPI } from 'ripple-lib';
 import BigNumber from 'bignumber.js';
 import { CustomError } from '../../constants/errors';
 import { MESSAGES, RESPONSES } from '../../constants';
-
 import * as MessageTypes from '../../types/messages';
 import { Message, Response, SubscriptionAccountInfo, AccountInfo } from '../../types';
 import * as utils from './utils';
@@ -172,6 +171,7 @@ interface RawTxData {
     limit: number;
     transactions: any[];
 }
+
 const getRawTransactionsData = async (options: any): Promise<RawTxData> => {
     const api = await connect();
     return api.request('account_tx', options);
@@ -342,6 +342,7 @@ const pushTransaction = async (
 ): Promise<void> => {
     try {
         const api = await connect();
+        if (typeof data.payload !== 'string') return;
         // tx_blob hex must be in upper case
         const info = await api.submit(data.payload.toUpperCase());
 
@@ -426,6 +427,7 @@ const subscribeAccounts = async (accounts: SubscriptionAccountInfo[]) => {
             accounts_proposed: uniqueAddresses,
         });
     }
+
     return { subscribed: common.getAddresses().length > 0 };
 };
 

@@ -14,6 +14,7 @@ import * as MESSAGES from '../constants/messages';
 export interface Connect {
     type: typeof MESSAGES.CONNECT;
 }
+
 export interface Disconnect {
     type: typeof MESSAGES.DISCONNECT;
 }
@@ -24,7 +25,7 @@ export interface GetInfo {
 
 export interface GetBlockHash {
     type: typeof MESSAGES.GET_BLOCK_HASH;
-    payload: number;
+    payload: number | string;
 }
 
 export interface GetAccountInfo {
@@ -108,7 +109,7 @@ export interface Unsubscribe {
 
 export interface PushTransaction {
     type: typeof MESSAGES.PUSH_TRANSACTION;
-    payload: string;
+    payload: string | Uint8Array;
 }
 
 export type Message =
