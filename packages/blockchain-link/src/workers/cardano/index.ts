@@ -37,6 +37,7 @@ const connect = async (): Promise<Connection> => {
     }
 
     common.debug('Connecting to cardano', endpoints[0]);
+
     const connection = new Connection({
         url: endpoints[0],
         timeout,
@@ -50,13 +51,7 @@ const connect = async (): Promise<Connection> => {
     } catch (error) {
         common.debug('Websocket connection failed');
         api = undefined;
-        // connection error. remove endpoint
-        endpoints.splice(0, 1);
-        // and try another one or throw error
-        if (endpoints.length < 1) {
-            throw new CustomError('connect', 'All backends are down');
-        }
-        return connect();
+        throw new CustomError('connect', 'All backends are down');
     }
 
     connection.on('disconnected', () => {
@@ -102,6 +97,22 @@ const getTransaction = async (
                 type: 'cardano',
                 tx,
             },
+        });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
+const pushTransaction = async (
+    data: { id: number } & MessageTypes.PushTransaction
+): Promise<void> => {
+    try {
+        const socket = await connect();
+        const resp = await socket.pushTransaction(data.payload);
+        common.response({
+            id: data.id,
+            type: RESPONSES.PUSH_TRANSACTION,
+            payload: resp.result,
         });
     } catch (error) {
         common.errorHandler({ id: data.id, error });
@@ -165,6 +176,9 @@ onmessage = (event: { data: Message }) => {
             break;
         case MESSAGES.GET_ACCOUNT_UTXO:
             getAccountUtxo(data);
+            break;
+        case MESSAGES.PUSH_TRANSACTION:
+            pushTransaction(data);
             break;
         case MESSAGES.GET_TRANSACTION:
             getTransaction(data);

@@ -1,8 +1,14 @@
 import { AccountInfoParams } from './params';
+import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface Subscribe {
     subscribed: boolean;
 }
+
+export type BlockfrostUtxos = {
+    address: string;
+    data: Responses['address_utxo_content'];
+}[];
 
 export interface ServerInfo {
     url: string;
@@ -13,16 +19,6 @@ export interface ServerInfo {
     decimals: number;
     blockHeight: number;
     blockHash: string;
-}
-
-export interface XPUBAddress {
-    type: 'XPUBAddress';
-    name: string;
-    path: string;
-    transfers: number;
-    balance: string;
-    totalSent: string;
-    totalReceived: string;
 }
 
 export type AccountInfo = any;
@@ -42,107 +38,13 @@ export type AccountUtxo = {
     coinbase?: boolean;
 }[];
 
-export interface VinVout {
-    n: number;
-    addresses?: string[];
-    isAddress: boolean;
-    value?: string;
-    coinbase?: string;
-    txid?: string;
-    vout?: number;
-    sequence?: number;
-    hex?: string;
-}
-
-export interface Transaction {
-    txid: string;
-    version?: number;
-    vin: VinVout[];
-    vout: VinVout[];
-    blockHeight: number;
-    blockHash?: string;
-    confirmations: number;
-    blockTime: number;
-    value: string;
-    valueIn: string;
-    fees: string;
-    hex: string;
-    lockTime?: number;
-    ethereumSpecific?: {
-        status: number;
-        nonce: number;
-        data?: string;
-        gasLimit: number;
-        gasUsed?: number;
-        gasPrice: string;
-    };
-    tokenTransfers?: {
-        from?: string;
-        to?: string;
-        value: string;
-        token: string;
-        name: string;
-        symbol: string;
-        decimals?: number;
-    }[];
-}
-
-export interface Push {
-    result: string;
-}
-
-export type Fee = {
-    feePerUnit: string;
-    feePerTx?: string;
-    feeLimit?: string;
-}[];
-
-export interface FiatRates {
-    [symbol: string]: number | undefined;
-}
-
-export interface BlockNotification {
-    height: number;
-    hash: string;
-}
-
-export interface AddressNotification {
-    address: string;
-    tx: Transaction;
-}
-
-export interface FiatRatesNotification {
-    rates: FiatRates;
-}
-
-export interface TimestampedFiatRates {
-    ts: number;
-    rates: FiatRates;
-}
-
-export interface FiatRatesForTimestamp {
-    tickers: TimestampedFiatRates[];
-}
-
-export interface AccountBalanceHistory {
-    time: number;
-    txs: number;
-    received: string;
-    sent: string;
-    sentToSelf?: string; // should always be there for blockbook >= 0.3.3
-    rates: FiatRates;
-}
-
-export interface AvailableCurrencies {
-    ts: number;
-    // eslint-disable-next-line camelcase
-    available_currencies: string[];
-}
+export type Transaction = any;
 
 declare function FSend(method: 'GET_SERVER_INFO'): Promise<ServerInfo>;
 declare function FSend(method: 'GET_ACCOUNT_INFO', params: AccountInfoParams): Promise<AccountInfo>;
 declare function FSend(method: 'GET_ACCOUNT_UTXO', params: AccountUtxoParams): Promise<AccountUtxo>;
 declare function FSend(method: 'GET_TRANSACTION', params: { txId: string }): Promise<Transaction>;
-declare function FSend(method: 'PUSH_TRANSACTION', params: { hex: string }): Promise<Push>;
+declare function FSend(method: 'PUSH_TRANSACTION', params: { hex: string }): Promise<any>;
+declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<any>;
 
 export type Send = typeof FSend;

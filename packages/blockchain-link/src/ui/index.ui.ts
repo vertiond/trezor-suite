@@ -20,6 +20,8 @@ const handleClick = (event: MouseEvent) => {
     const blockchain = instances.find(b => b.settings.name === network);
     if (!blockchain) return;
 
+    console.log('blockchain', blockchain);
+
     const parentContainer = target.parentElement;
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const onResponse = handleResponse.bind(null, parentContainer);
@@ -337,9 +339,9 @@ CONFIG.forEach(i => {
     console.log(i);
     let worker: any = BlockbookWorker;
 
-    if (i.blockchain.worker.includes('ripple')) {
-        worker = RippleWorker;
-    }
+    // if (i.blockchain.worker.includes('ripple')) {
+    //     worker = RippleWorker;
+    // }
 
     if (i.blockchain.worker.includes('cardano')) {
         worker = CardanoWorker;

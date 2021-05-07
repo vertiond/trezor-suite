@@ -444,8 +444,9 @@ export default [
                 contractFilter: undefined,
             },
             address:
-                'addr1q99hnk2vnx708l86mujpfs9end50em9s95grhe3v4933m259ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usr7qlze',
+                '6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2',
             txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
+            blockId: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
         },
     },
     {
@@ -462,8 +463,9 @@ export default [
                 contractFilter: undefined,
             },
             address:
-                'addr1q99hnk2vnx708l86mujpfs9end50em9s95grhe3v4933m259ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usr7qlze',
+                '6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2',
             txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
+            blockId: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
         },
     },
 ];

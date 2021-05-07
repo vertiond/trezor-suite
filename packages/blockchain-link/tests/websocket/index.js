@@ -3,10 +3,12 @@ import * as assert from 'assert';
 import getFreePort from './freePort';
 import defaultBlockbookResponses from './fixtures/blockbook';
 import defaultRippleResponses from './fixtures/ripple';
+import defaultCardanoResponses from './fixtures/cardano';
 
 const RESPONSES = {
     blockbook: defaultBlockbookResponses,
     ripple: defaultRippleResponses,
+    cardano: defaultCardanoResponses,
 };
 
 const create = async type => {
@@ -72,6 +74,11 @@ const create = async type => {
                     throw new Error('Unknown ripple request without command');
                 }
                 server.emit(`ripple_${request.command}`, request);
+            } else if (type === 'cardano') {
+                if (typeof request.command !== 'string') {
+                    throw new Error('Unknown cardano request without command');
+                }
+                server.emit(`cardano_${request.command}`, request);
             }
         } catch (error) {
             assert(false, error.message);

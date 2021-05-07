@@ -1,16 +1,16 @@
 import BlockchainLink from '@trezor/blockchain-link';
 import createServer from '../websocket';
-import { blockbookWorkerFactory } from './worker';
+import { cardanoWorkerFactory } from './worker';
 
-describe('Blockbook', () => {
+describe('Cardano', () => {
     let server;
     let blockchain;
 
     beforeEach(async () => {
-        server = await createServer('blockbook');
+        server = await createServer('cardano');
         blockchain = new BlockchainLink({
-            name: 'Tests:Blockbook',
-            worker: blockbookWorkerFactory,
+            name: 'Tests:Cardano',
+            worker: cardanoWorkerFactory,
             server: [`ws://localhost:${server.options.port}`],
             debug: false,
         });

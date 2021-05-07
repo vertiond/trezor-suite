@@ -1,4 +1,5 @@
 import { Transaction as BlockbookTransaction, VinVout } from './blockbook';
+import { Transaction as CardanoTransaction } from './cardano';
 import { FormattedTransactionType as RippleTransaction } from 'ripple-lib';
 
 /* Common types used in both params and responses */
@@ -43,6 +44,10 @@ export type TypedRawTransaction =
     | {
           type: 'ripple';
           tx: RippleTransaction;
+      }
+    | {
+          type: 'cardano';
+          tx: CardanoTransaction;
       };
 
 export type TransactionDetail = {
@@ -100,12 +105,16 @@ export interface TokenInfo {
     // transfers: number, // total transactions?
 }
 
+export interface TokenInfoCardano {
+    balance: string;
+}
+
 export interface AccountInfo {
     descriptor: string;
     balance: string;
     availableBalance: string;
     empty: boolean;
-    tokens?: TokenInfo[]; // ethereum tokens
+    tokens?: TokenInfo[] | TokenInfoCardano[]; // ethereum and cardano tokens
     addresses?: AccountAddresses; // bitcoin addresses
     history: {
         total: number; // total transactions (unknown in ripple)
@@ -123,7 +132,7 @@ export interface AccountInfo {
         reserve?: string;
     };
     page?: {
-        // blockbook
+        // blockbook and cardano
         index: number;
         size: number;
         total: number;

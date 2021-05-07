@@ -2,14 +2,14 @@ import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { CustomError } from '../../constants/errors';
 import { create as createDeferred, Deferred } from '../../utils/deferred';
-import { AccountUtxo, Send } from '../../types/cardano';
+import { Send } from '../../types/cardano';
 import { AccountInfoParams } from '../../types/params';
 
 const NOT_INITIALIZED = new CustomError('websocket_not_initialized');
 
 interface Subscription {
     id: string;
-    type: 'notification' | 'block';
+    type: 'BLOCK';
     callback: (result: any) => void;
 }
 
@@ -21,7 +21,7 @@ interface Options {
 }
 
 const DEFAULT_TIMEOUT = 20 * 1000;
-const DEFAULT_PING_TIMEOUT = 50 * 1000;
+const DEFAULT_PING_TIMEOUT = 20 * 1000;
 
 export default class Socket extends EventEmitter {
     options: Options;
@@ -186,6 +186,25 @@ export default class Socket extends EventEmitter {
             this.emit('disconnected');
             this.dispose();
         });
+    }
+
+    subscribeBlock() {
+        const index = this.subscriptions.findIndex(s => s.type === 'BLOCK');
+        if (index >= 0) {
+            // remove previous subscriptions
+            this.subscriptions.splice(index, 1);
+        }
+
+        // add new subscription
+        const id = this.messageID.toString();
+        this.subscriptions.push({
+            id,
+            type: 'BLOCK',
+            callback: (result: any) => {
+                this.emit('GET_LATEST_BLOCK', result);
+            },
+        });
+        return this.send('SUBSCRIBE_BLOCK');
     }
 
     disconnect() {
