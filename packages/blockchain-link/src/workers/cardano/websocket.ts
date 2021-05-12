@@ -222,6 +222,10 @@ export default class Socket extends EventEmitter {
         return this.send('GET_SERVER_INFO');
     }
 
+    getBlockHash(hashOrNumber: string | number) {
+        return this.send('GET_BLOCK', { hashOrNumber });
+    }
+
     getAccountInfo(payload: AccountInfoParams) {
         return this.send('GET_ACCOUNT_INFO', payload);
     }

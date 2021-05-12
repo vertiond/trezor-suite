@@ -34,4 +34,19 @@ export default {
             error: 'Unknown message type: m_get_block_hash',
         },
     ],
+    cardano: [
+        {
+            description: 'Successful',
+            params: 0,
+            serverFixtures: [
+                {
+                    method: 'getBlockHash',
+                    response: {
+                        data: { hash: 'A' },
+                    },
+                },
+            ],
+            response: 'A',
+        },
+    ],
 };

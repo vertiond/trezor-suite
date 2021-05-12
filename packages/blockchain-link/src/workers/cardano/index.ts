@@ -4,6 +4,7 @@ import * as MessageTypes from '../../types/messages';
 import Connection from './websocket';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
+import { transformUtxos } from './utils';
 
 declare function postMessage(data: Response): void;
 
@@ -82,6 +83,20 @@ const getInfo = async (data: { id: number } & MessageTypes.GetInfo): Promise<voi
     }
 };
 
+const getBlockHash = async (data: { id: number } & MessageTypes.GetBlockHash): Promise<void> => {
+    try {
+        const socket = await connect();
+        const blockMessage = await socket.getBlockHash(data.payload);
+        common.response({
+            id: data.id,
+            type: RESPONSES.GET_BLOCK_HASH,
+            payload: blockMessage.hash,
+        });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
 const getTransaction = async (
     data: { id: number } & MessageTypes.GetTransaction
 ): Promise<void> => {
@@ -143,11 +158,11 @@ const getAccountUtxo = async (
     try {
         const socket = await connect();
         const utxos = await socket.getAccountUtxo(payload);
-        // @ts-ignore
+
         common.response({
             id: data.id,
             type: RESPONSES.GET_ACCOUNT_UTXO,
-            payload: utxos,
+            payload: transformUtxos(utxos),
         });
     } catch (error) {
         common.errorHandler({ id: data.id, error });
@@ -179,6 +194,9 @@ onmessage = (event: { data: Message }) => {
             break;
         case MESSAGES.PUSH_TRANSACTION:
             pushTransaction(data);
+            break;
+        case MESSAGES.GET_BLOCK_HASH:
+            getBlockHash(data);
             break;
         case MESSAGES.GET_TRANSACTION:
             getTransaction(data);

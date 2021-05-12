@@ -197,7 +197,6 @@ export default [
             subscribe: '1G47mSr3oANXMafVrR8UC4pzV7FEAzo3r9', // Poloniex: https://www.walletexplorer.com/wallet/Poloniex.com
             // subscribe: '0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208', // Poloniex: https://www.walletexplorer.com/wallet/Poloniex.com
         },
-        selected: true,
     },
     {
         blockchain: {
@@ -446,8 +445,9 @@ export default [
             address:
                 '6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2',
             txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
-            blockId: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
+            blockHashOrNumber: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
         },
+        selected: true,
     },
     {
         blockchain: {
@@ -465,7 +465,7 @@ export default [
             address:
                 '6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2',
             txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
-            blockId: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
+            blockHashOrNumber: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
         },
     },
 ];
