@@ -2,7 +2,6 @@ import { CustomError } from '../../constants/errors';
 import { MESSAGES, RESPONSES } from '../../constants';
 import Connection from './websocket';
 import * as utils from './utils';
-
 import { Message, Response, SubscriptionAccountInfo } from '../../types';
 import {
     AddressNotification,

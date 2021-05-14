@@ -1,5 +1,5 @@
 import WebSocket, { Server } from 'ws';
-import * as assert from 'assert';
+import assert from 'assert';
 import getFreePort from './freePort';
 import defaultBlockbookResponses from './fixtures/blockbook';
 import defaultRippleResponses from './fixtures/ripple';
@@ -26,6 +26,7 @@ const create = async type => {
         const method = type === 'blockbook' ? request.method : request.command;
         let data;
         let delay = 0;
+
         if (Array.isArray(fixtures)) {
             // find nearest predefined fixture with this method
             const fid = fixtures.findIndex(f => f && f.method === method);
@@ -38,6 +39,7 @@ const create = async type => {
                 fixtures.splice(fid, 1);
             }
         }
+
         if (!data) {
             data = defaultResponses[method] || {
                 error: { message: `unknown response for ${method}` },
@@ -69,16 +71,17 @@ const create = async type => {
                     throw new Error('Unknown blockbook request without method');
                 }
                 server.emit(`blockbook_${request.method}`, request);
+            } else if (type === 'cardano') {
+                if (typeof request.command !== 'string') {
+                    throw new Error('Unknown cardano request without method');
+                }
+                console.log('request', request);
+                server.emit(`cardano_${request.command}`, request);
             } else if (type === 'ripple') {
                 if (typeof request.command !== 'string') {
                     throw new Error('Unknown ripple request without command');
                 }
                 server.emit(`ripple_${request.command}`, request);
-            } else if (type === 'cardano') {
-                if (typeof request.command !== 'string') {
-                    throw new Error('Unknown cardano request without command');
-                }
-                server.emit(`cardano_${request.command}`, request);
             }
         } catch (error) {
             assert(false, error.message);
@@ -124,6 +127,10 @@ const create = async type => {
         addresses = undefined;
         sendResponse(request);
     });
+
+    // Cardano
+    server.on('cardano_GET_BLOCK', request => sendResponse(request));
+    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
 
     // Ripple
 
@@ -203,7 +210,7 @@ const create = async type => {
 
 export default create;
 
-const connectToServer = async server => {
+const connectToServer = server => {
     return new Promise((resolve, reject) => {
         const ws = new WebSocket(`ws://localhost:${server.options.port}`);
         const dfd = ws.once('error', reject);
@@ -211,7 +218,7 @@ const connectToServer = async server => {
     });
 };
 
-const receiveMessage = async ws => {
+const receiveMessage = ws => {
     return new Promise(resolve => {
         ws.on('close', () => setTimeout(resolve, 100));
         // ws.on('close', resolve);

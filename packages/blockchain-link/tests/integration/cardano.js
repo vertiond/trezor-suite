@@ -94,9 +94,9 @@ describe('Cardano', () => {
     it('Get info', async () => {
         const result = await blockchain.getInfo();
         expect(result).toEqual({
-            name: 'Test',
-            shortcut: 'test',
-            decimals: 9,
+            name: 'Cardano',
+            shortcut: 'ada',
+            decimals: 6,
             blockHeight: 1,
         });
     });

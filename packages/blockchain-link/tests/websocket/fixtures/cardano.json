@@ -1,68 +1,18 @@
 {
-    "getInfo": {
+    "GET_SERVER_INFO": {
         "data": {
-            "name": "Test",
-            "shortcut": "test",
-            "decimals": 9,
-            "bestHeight": 1
+            "name": "Cardano",
+            "shortcut": "ada",
+            "decimals": 6,
+            "testnet": false,
+            "version": "1.4.0",
+            "blockHash": "test_block_hash-hash",
+            "blockHeight": 1
         }
     },
-    "getBlockHash": {
+    "GET_BLOCK": {
         "data": {
-            "hash": "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048"
-        }
-    },
-    "subscribeNewBlock": {
-        "data": {
-            "subscribed": true
-        }
-    },
-    "unsubscribeNewBlock": {
-        "data": {
-            "subscribed": false
-        }
-    },
-    "subscribeAddresses": {
-        "data": {
-            "subscribed": true
-        }
-    },
-    "unsubscribeAddresses": {
-        "data": {
-            "subscribed": false
-        }
-    },
-    "getAccountInfo": {
-        "data": {
-            "address": "0",
-            "balance": "0",
-            "txs": 0,
-            "unconfirmedBalance": 0,
-            "unconfirmedTxs": 0,
-            "nonce": "0",
-            "totalReceived": "0",
-            "totalSent": "0",
-            "usedTokens": 0
-        }
-    },
-    "getAccountUtxo": {
-        "data": []
-    },
-    "sendTransaction": {
-        "data": {
-            "error": {
-                "message": "-22: TX decode failed"
-            }
-        }
-    },
-    "estimateFee": {
-        "data": []
-    },
-    "getTransaction": {
-        "data": {
-            "error": {
-                "message": "Transaction not found"
-            }
+            "hash": "test_hash_value"
         }
     }
 }

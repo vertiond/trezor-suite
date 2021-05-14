@@ -76,7 +76,10 @@ const getInfo = async (data: { id: number } & MessageTypes.GetInfo): Promise<voi
         common.response({
             id: data.id,
             type: RESPONSES.GET_INFO,
-            payload: info,
+            payload: {
+                url: socket.options.url,
+                ...info,
+            },
         });
     } catch (error) {
         common.errorHandler({ id: data.id, error });
@@ -104,7 +107,6 @@ const getTransaction = async (
     try {
         const socket = await connect();
         const tx = await socket.getTransaction(payload);
-        // @ts-ignore
         common.response({
             id: data.id,
             type: RESPONSES.GET_TRANSACTION,

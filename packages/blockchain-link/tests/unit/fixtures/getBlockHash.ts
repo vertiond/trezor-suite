@@ -40,13 +40,26 @@ export default {
             params: 0,
             serverFixtures: [
                 {
-                    method: 'getBlockHash',
+                    method: 'GET_BLOCK',
                     response: {
-                        data: { hash: 'A' },
+                        data: { hash: 'test_hash_value' },
                     },
                 },
             ],
-            response: 'A',
+            response: 'test_hash_value',
+        },
+        {
+            description: 'Error',
+            params: 0,
+            serverFixtures: [
+                {
+                    method: 'GET_BLOCK',
+                    response: {
+                        data: { error: { message: 'Error message' } },
+                    },
+                },
+            ],
+            error: 'Error message',
         },
     ],
 };

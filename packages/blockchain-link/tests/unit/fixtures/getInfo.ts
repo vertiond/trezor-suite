@@ -55,7 +55,7 @@ export default {
             description: 'Success',
             response: {
                 blockHeight: 1,
-                blockHash: '1',
+                blockHash: 'test_block_hash-hash',
                 decimals: 6,
                 name: 'Cardano',
                 shortcut: 'ada',
@@ -67,11 +67,11 @@ export default {
             description: 'Error',
             serverFixtures: [
                 {
-                    method: 'server_info',
+                    method: 'GET_SERVER_INFO',
                     response: {
-                        status: 'error',
-                        type: 'response',
-                        error_message: 'Error msg',
+                        data: {
+                            error: { message: 'CardanoError Error msg' },
+                        },
                     },
                 },
             ],

@@ -1,4 +1,4 @@
-import { BlockfrostUtxos } from '../../types/cardano';
+import { BlockfrostUtxos, BlockfrostTransaction } from '../../types/cardano';
 import { Utxo } from '../../types/responses';
 
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
@@ -6,7 +6,6 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
 
     utxos.forEach(utxo => {
         const lovelaceBalance = utxo.utxoData.amount.find(b => b.unit === 'lovelace');
-
         if (!lovelaceBalance) return;
 
         result.push({
@@ -15,10 +14,13 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
             confirmations: utxo.blockInfo.confirmations,
             blockHeight: utxo.blockInfo.height || 0,
             amount: lovelaceBalance?.quantity || '0',
-            vout: -1, // bitcoin only
+            // blockbook only
+            vout: -1,
             path: '-1',
         });
     });
 
     return result;
 };
+
+export const transformTransaction = (transactions: BlockfrostTransaction[]): any => {};

@@ -7,7 +7,6 @@ export interface Subscribe {
 }
 
 export interface ServerInfo {
-    url: string;
     name: string;
     shortcut: string;
     testnet: boolean;
@@ -18,6 +17,7 @@ export interface ServerInfo {
 }
 
 export type AccountInfo = any;
+export type BlockfrostTransaction = any;
 
 export interface AccountUtxoParams {
     descriptor: string;
@@ -57,8 +57,6 @@ export interface BlockfrostUtxos {
     blockInfo: Responses['block_content'];
 }
 
-export type Transaction = any;
-
 declare function FSend(method: 'GET_SERVER_INFO'): Promise<ServerInfo>;
 declare function FSend(
     method: 'GET_BLOCK',
@@ -69,7 +67,7 @@ declare function FSend(
     method: 'GET_ACCOUNT_UTXO',
     params: AccountUtxoParams
 ): Promise<BlockfrostUtxos[]>;
-declare function FSend(method: 'GET_TRANSACTION', params: { txId: string }): Promise<Transaction>;
+declare function FSend(method: 'GET_TRANSACTION', params: { txId: string }): Promise<any>;
 declare function FSend(method: 'PUSH_TRANSACTION', params: { hex: string }): Promise<any>;
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<any>;
 
