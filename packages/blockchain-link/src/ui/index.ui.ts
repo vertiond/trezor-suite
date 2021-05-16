@@ -79,12 +79,20 @@ const handleClick = (event: MouseEvent) => {
             blockchain.estimateFee(options).then(onResponse).catch(onError);
             break;
         }
-        case 'push-transaction':
-            blockchain
-                .pushTransaction(getInputValue('push-transaction-tx'))
-                .then(onResponse)
-                .catch(onError);
+
+        case 'push-transaction': {
+            const hexString = getInputValue('push-transaction-tx');
+
+            if (blockchain.settings.name.toLocaleLowerCase().includes('cardano')) {
+                console.log('aaaaaa', network);
+                const uint8array = Uint8Array.from(Buffer.from(hexString, 'hex'));
+                blockchain.pushTransaction(uint8array).then(onResponse).catch(onError);
+                break;
+            }
+
+            blockchain.pushTransaction(hexString).then(onResponse).catch(onError);
             break;
+        }
 
         case 'subscribe-block':
             blockchain
@@ -337,18 +345,19 @@ CONFIG.forEach(i => {
     console.log(i);
     let worker: any = BlockbookWorker;
 
-    // if (i.blockchain.worker.includes('ripple')) {
-    //     worker = RippleWorker;
-    // }
-
     if (i.blockchain.worker.includes('cardano')) {
         worker = CardanoWorker;
     }
+
+    // if (i.blockchain.worker.includes('ripple')) {
+    //     worker = RippleWorker;
+    // }
 
     const b = new BlockchainLink({
         ...i.blockchain,
         worker,
     });
+
     b.on('connected', handleConnectionEvent.bind(null, b, true));
     b.on('disconnected', handleConnectionEvent.bind(null, b, false));
     b.on('error', handleErrorEvent.bind(null, b, false));

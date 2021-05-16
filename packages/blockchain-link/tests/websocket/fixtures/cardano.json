@@ -17,5 +17,12 @@
     },
     "GET_ACCOUNT_UTXO": {
         "data": []
+    },
+    "GET_TRANSACTION": {
+        "data": {
+            "error": {
+                "message": "Transaction not found"
+            }
+        }
     }
 }

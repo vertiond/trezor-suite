@@ -131,6 +131,7 @@ const create = async type => {
     server.on('cardano_GET_BLOCK', request => sendResponse(request));
     server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
     server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
+    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
 
     // Ripple
 

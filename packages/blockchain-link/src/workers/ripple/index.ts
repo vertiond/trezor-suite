@@ -342,6 +342,7 @@ const pushTransaction = async (
 ): Promise<void> => {
     try {
         const api = await connect();
+        if (typeof data.payload !== 'string') return;
         // tx_blob hex must be in upper case
         const info = await api.submit(data.payload.toUpperCase());
 

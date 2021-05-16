@@ -70,7 +70,10 @@ declare function FSend(
     params: AccountUtxoParams
 ): Promise<BlockfrostUtxos[]>;
 declare function FSend(method: 'GET_TRANSACTION', params: { txId: string }): Promise<any>;
-declare function FSend(method: 'PUSH_TRANSACTION', params: { hex: string }): Promise<any>;
+declare function FSend(
+    method: 'PUSH_TRANSACTION',
+    params: { transaction: Uint8Array }
+): Promise<any>;
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<any>;
 
 export type Send = typeof FSend;

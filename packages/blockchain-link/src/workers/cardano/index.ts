@@ -125,6 +125,9 @@ const pushTransaction = async (
 ): Promise<void> => {
     try {
         const socket = await connect();
+
+        if (typeof data.payload === 'string') return;
+
         const resp = await socket.pushTransaction(data.payload);
         common.response({
             id: data.id,

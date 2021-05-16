@@ -20,7 +20,7 @@ interface Options {
     keepAlive?: boolean;
 }
 
-const DEFAULT_TIMEOUT = 20 * 1000;
+const DEFAULT_TIMEOUT = 30 * 1000;
 const DEFAULT_PING_TIMEOUT = 20 * 1000;
 
 export default class Socket extends EventEmitter {
@@ -238,8 +238,8 @@ export default class Socket extends EventEmitter {
         return this.send('GET_TRANSACTION', { txId });
     }
 
-    pushTransaction(hex: string) {
-        return this.send('PUSH_TRANSACTION', { hex });
+    pushTransaction(transaction: Uint8Array) {
+        return this.send('PUSH_TRANSACTION', { transaction });
     }
 
     dispose() {
