@@ -53,9 +53,6 @@ export interface Utxo {
     coinbase?: boolean;
 }
 
-export type Transaction = any;
-export type BlockfrostTransaction = any;
-
 export interface GetAccountUtxo {
     type: typeof RESPONSES.GET_ACCOUNT_UTXO;
     payload: Utxo[];

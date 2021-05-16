@@ -34,13 +34,15 @@ export type AccountUtxo = {
     coinbase?: boolean;
 }[];
 
+export type Transaction = any;
+
 type UtxoContent = Responses['address_utxo_content'];
 
 export interface UtxosData extends UtxoContent {
     blockInformation: Responses['block_content'];
 }
 
-export interface Utxo {
+export interface BlockfrostUtxoData {
     tx_hash: string;
     tx_index: number;
     output_index: number;
@@ -53,7 +55,7 @@ export interface Utxo {
 
 export interface BlockfrostUtxos {
     address: string;
-    utxoData: Utxo;
+    utxoData: BlockfrostUtxoData;
     blockInfo: Responses['block_content'];
 }
 

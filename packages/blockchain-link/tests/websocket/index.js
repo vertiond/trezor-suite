@@ -65,7 +65,6 @@ const create = async type => {
             if (!request) {
                 throw new Error('Unknown request');
             }
-            // console.log('REQUEST', request);
             if (type === 'blockbook') {
                 if (typeof request.method !== 'string') {
                     throw new Error('Unknown blockbook request without method');
@@ -75,7 +74,7 @@ const create = async type => {
                 if (typeof request.command !== 'string') {
                     throw new Error('Unknown cardano request without method');
                 }
-                console.log('request', request);
+
                 server.emit(`cardano_${request.command}`, request);
             } else if (type === 'ripple') {
                 if (typeof request.command !== 'string') {
@@ -131,6 +130,7 @@ const create = async type => {
     // Cardano
     server.on('cardano_GET_BLOCK', request => sendResponse(request));
     server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
 
     // Ripple
 

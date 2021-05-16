@@ -20,8 +20,6 @@ const handleClick = (event: MouseEvent) => {
     const blockchain = instances.find(b => b.settings.name === network);
     if (!blockchain) return;
 
-    console.log('blockchain', blockchain);
-
     const parentContainer = target.parentElement;
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const onResponse = handleResponse.bind(null, parentContainer);
