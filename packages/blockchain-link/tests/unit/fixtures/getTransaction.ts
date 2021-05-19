@@ -95,7 +95,6 @@ export default {
             error: 'Transaction not found',
         },
     ],
-
     ripple: [
         {
             description: 'Successful',
@@ -151,7 +150,10 @@ export default {
                     response: cardanoTx,
                 },
             ],
-            response: { type: 'cardano', tx: cardanoTx },
+            response: {
+                type: 'cardano',
+                tx: cardanoTx,
+            },
         },
         {
             description: 'Not found',

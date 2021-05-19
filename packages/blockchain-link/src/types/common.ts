@@ -1,5 +1,5 @@
 import { Transaction as BlockbookTransaction, VinVout } from './blockbook';
-import { Transaction as CardanoTransaction } from './cardano';
+import { BlockfrostTransaction } from './cardano';
 import { FormattedTransactionType as RippleTransaction } from 'ripple-lib';
 
 /* Common types used in both params and responses */
@@ -47,7 +47,7 @@ export type TypedRawTransaction =
       }
     | {
           type: 'cardano';
-          tx: CardanoTransaction;
+          tx: BlockfrostTransaction;
       };
 
 export type TransactionDetail = {

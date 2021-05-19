@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { CustomError } from '../../constants/errors';
+import { Responses } from '@blockfrost/blockfrost-js';
 import { create as createDeferred, Deferred } from '../../utils/deferred';
 import { Send } from '../../types/cardano';
 import { AccountInfoParams } from '../../types/params';
@@ -9,7 +10,7 @@ const NOT_INITIALIZED = new CustomError('websocket_not_initialized');
 
 interface Subscription {
     id: string;
-    type: 'BLOCK';
+    type: 'LATEST_BLOCK' | 'ACCOUNT';
     callback: (result: any) => void;
 }
 
@@ -188,25 +189,6 @@ export default class Socket extends EventEmitter {
         });
     }
 
-    subscribeBlock() {
-        const index = this.subscriptions.findIndex(s => s.type === 'BLOCK');
-        if (index >= 0) {
-            // remove previous subscriptions
-            this.subscriptions.splice(index, 1);
-        }
-
-        // add new subscription
-        const id = this.messageID.toString();
-        this.subscriptions.push({
-            id,
-            type: 'BLOCK',
-            callback: (result: any) => {
-                this.emit('GET_LATEST_BLOCK', result);
-            },
-        });
-        return this.send('SUBSCRIBE_BLOCK');
-    }
-
     disconnect() {
         if (this.ws) {
             this.ws.close();
@@ -240,6 +222,36 @@ export default class Socket extends EventEmitter {
 
     pushTransaction(transaction: Uint8Array) {
         return this.send('PUSH_TRANSACTION', { transaction });
+    }
+
+    subscribeBlock() {
+        const index = this.subscriptions.findIndex(s => s.type === 'LATEST_BLOCK');
+        if (index >= 0) {
+            // remove previous subscriptions
+            this.subscriptions.splice(index, 1);
+        }
+        // add new subscription
+        const id = this.messageID.toString();
+        this.subscriptions.push({
+            id,
+            type: 'LATEST_BLOCK',
+            callback: (result: Responses['block_content']) => {
+                this.emit('GET_LATEST_BLOCK', result);
+            },
+        });
+        return this.send('SUBSCRIBE_BLOCK');
+    }
+
+    unsubscribeBlock() {
+        const index = this.subscriptions.findIndex(s => s.type === 'LATEST_BLOCK');
+        if (index >= 0) {
+            // remove previous subscriptions
+            this.subscriptions.splice(index, 1);
+            return this.send('UNSUBSCRIBE_BLOCK');
+        }
+        return {
+            subscribed: false,
+        };
     }
 
     dispose() {

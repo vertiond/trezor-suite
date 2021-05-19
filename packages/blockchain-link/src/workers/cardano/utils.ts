@@ -1,7 +1,14 @@
-import { BlockfrostUtxos, BlockfrostTransaction } from '../../types/cardano';
+import {
+    BlockfrostUtxos,
+    BlockfrostTransaction,
+    Balance,
+    Input,
+    Output,
+    BlockfrostAccountInfo,
+} from '../../types/cardano';
 import { Utxo } from '../../types/responses';
 import BigNumber from 'bignumber.js';
-import { Transaction } from '../../types/common';
+import { Transaction, AccountInfo } from '../../types/common';
 
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
@@ -25,59 +32,58 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     return result;
 };
 
+export const countBalances = (InputOrOutput: Input[] | Output[]): Balance[] => {
+    const balances: Balance[] = [];
+    InputOrOutput.forEach(inputOrOutput => {
+        inputOrOutput.amount.forEach(balance => {
+            if (balance.quantity && balance.unit) {
+                const balanceRow = balances.find(
+                    balanceResult => balanceResult.unit === balance.unit
+                );
+
+                if (!balanceRow) {
+                    balances.push({
+                        unit: balance.unit,
+                        quantity: balance.quantity,
+                    });
+                } else {
+                    balanceRow.quantity = new BigNumber(balanceRow.quantity)
+                        .plus(balance.quantity)
+                        .toString();
+                }
+            }
+        });
+    });
+
+    return balances;
+};
+
+const getTxType = (
+    blockfrostTxData: BlockfrostTransaction,
+    accountAddress: string[]
+): 'self' | 'recv' | 'sent' => {
+    return 'self';
+};
+
 export const transformTransaction = (
     descriptor: string,
-    tx: BlockfrostTransaction
+    accountAddress: string[],
+    blockfrostTxData: BlockfrostTransaction
 ): Transaction => {
-    if (tx.TransactionType !== 'Payment') {
-        // TODO: https://github.com/ripple/ripple-lib/blob/develop/docs/index.md#transaction-types
-        return {
-            type: 'unknown',
-            txid: tx.hash,
-            amount: '0',
-            fee: '0',
-            totalSpent: '0',
-            blockTime: tx.date,
-            blockHeight: tx.ledger_index,
-            blockHash: tx.hash,
-            targets: [],
-            tokens: [],
-            details: {
-                vin: [],
-                vout: [],
-                size: 0,
-                totalInput: '0',
-                totalOutput: '0',
-            },
-        };
-    }
-    const type = tx.Account === descriptor ? 'sent' : 'recv';
-    const addresses = [tx.Destination];
-    const amount = tx.Amount;
-    const fee = tx.Fee;
-    const amountBn = new BigNumber(amount);
-    // TODO: proper types for tx would prevent this mess
-    const totalSpent = amountBn.isNaN() ? '0' : amountBn.plus(tx.Fee ?? 0).toString();
+    const lovelaceBalance = blockfrostTxData.txData.output_amount.find(b => b.unit === 'lovelace');
+    const fee = blockfrostTxData.txData.fees;
+    const totalSpent = new BigNumber(lovelaceBalance?.quantity || '0').plus(fee).toString();
 
     return {
-        type,
-
-        txid: tx.hash,
-        blockTime: tx.date,
-        blockHeight: tx.ledger_index,
-        blockHash: tx.hash,
-
-        amount,
+        type: getTxType(blockfrostTxData, accountAddress),
+        txid: blockfrostTxData.txHash,
+        blockTime: blockfrostTxData.blockInfo.time,
+        blockHeight: blockfrostTxData.blockInfo.height || undefined,
+        blockHash: blockfrostTxData.blockInfo.hash,
+        amount: lovelaceBalance?.quantity || '0',
         fee,
         totalSpent,
-        targets: [
-            {
-                addresses,
-                isAddress: true,
-                amount,
-                n: 0, // no multi-targets in ripple
-            },
-        ],
+        targets: [],
         tokens: [],
         details: {
             vin: [],
@@ -87,4 +93,23 @@ export const transformTransaction = (
             totalOutput: '0',
         },
     };
+};
+
+export const transformAccountInfo = (info: BlockfrostAccountInfo): AccountInfo => {
+    const cardanoTxs = info.history.transactions;
+
+    const result = {
+        ...info,
+        tokens: [],
+        history: {
+            transactions: !cardanoTxs
+                ? []
+                : cardanoTxs.map((tx: any) =>
+                      transformTransaction(info.descriptor, info.addresses, tx)
+                  ),
+        },
+    };
+
+    // @ts-ignore
+    return result;
 };

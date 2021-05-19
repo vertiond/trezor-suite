@@ -4,7 +4,8 @@ import * as MessageTypes from '../../types/messages';
 import Connection from './websocket';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
-import { transformUtxos } from './utils';
+import { Responses } from '@blockfrost/blockfrost-js';
+import { transformUtxos, transformAccountInfo } from './utils';
 
 declare function postMessage(data: Response): void;
 
@@ -149,7 +150,7 @@ const getAccountInfo = async (
         common.response({
             id: data.id,
             type: RESPONSES.GET_ACCOUNT_INFO,
-            payload: info,
+            payload: transformAccountInfo(info),
         });
     } catch (error) {
         common.errorHandler({ id: data.id, error });
@@ -168,6 +169,82 @@ const getAccountUtxo = async (
             id: data.id,
             type: RESPONSES.GET_ACCOUNT_UTXO,
             payload: transformUtxos(utxos),
+        });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
+const onNewBlock = (event: Responses['block_content']) => {
+    console.log('aaaa', event);
+    common.response({
+        id: -1,
+        type: RESPONSES.NOTIFICATION,
+        payload: {
+            type: 'block',
+            payload: {
+                blockHeight: event.height || 0,
+                blockHash: event.hash,
+            },
+        },
+    });
+};
+
+const subscribeBlock = async () => {
+    console.log('aaa');
+    if (common.getSubscription('block')) return { subscribed: true };
+    const socket = await connect();
+    common.addSubscription('block');
+    socket.on('LATEST_BLOCK', onNewBlock);
+    return socket.subscribeBlock();
+};
+
+const subscribe = async (data: { id: number } & MessageTypes.Subscribe): Promise<void> => {
+    const { payload } = data;
+    try {
+        let response;
+        if (payload.type === 'accounts') {
+            console.log('a');
+        } else if (payload.type === 'block') {
+            response = await subscribeBlock();
+        } else {
+            throw new CustomError('invalid_param', '+type');
+        }
+
+        common.response({
+            id: data.id,
+            type: RESPONSES.SUBSCRIBE,
+            payload: response,
+        });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
+const unsubscribeBlock = async () => {
+    if (!common.getSubscription('block')) return { subscribed: false };
+    const socket = await connect();
+    socket.removeListener('block', onNewBlock);
+    common.removeSubscription('block');
+    return socket.unsubscribeBlock();
+};
+
+const unsubscribe = async (data: { id: number } & MessageTypes.Unsubscribe): Promise<void> => {
+    const { payload } = data;
+    try {
+        let response;
+        if (payload.type === 'accounts') {
+            console.log('acc');
+        } else if (payload.type === 'block') {
+            response = await unsubscribeBlock();
+        } else {
+            throw new CustomError('invalid_param', '+type');
+        }
+
+        common.response({
+            id: data.id,
+            type: RESPONSES.UNSUBSCRIBE,
+            payload: response,
         });
     } catch (error) {
         common.errorHandler({ id: data.id, error });
@@ -209,6 +286,13 @@ onmessage = (event: { data: Message }) => {
         case MESSAGES.GET_ACCOUNT_INFO:
             getAccountInfo(data);
             break;
+        case MESSAGES.SUBSCRIBE:
+            subscribe(data);
+            break;
+        case MESSAGES.UNSUBSCRIBE:
+            unsubscribe(data);
+            break;
+
         // @ts-ignore this message is used in tests
         case 'terminate':
             cleanup();
