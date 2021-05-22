@@ -105,17 +105,13 @@ export interface TokenInfo {
     // transfers: number, // total transactions?
 }
 
-export interface TokenInfoCardano {
-    balance: string;
-}
-
 export interface AccountInfo {
     descriptor: string;
     balance: string;
     availableBalance: string;
     empty: boolean;
-    tokens?: TokenInfo[] | TokenInfoCardano[]; // ethereum and cardano tokens
-    addresses?: AccountAddresses; // bitcoin addresses
+    tokens?: TokenInfo[]; // ethereum and cardano tokens
+    addresses?: AccountAddresses; // bitcoin and cardano addresses
     history: {
         total: number; // total transactions (unknown in ripple)
         tokens?: number; // tokens transactions

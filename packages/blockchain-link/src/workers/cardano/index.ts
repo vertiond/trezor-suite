@@ -2,10 +2,11 @@ import { CustomError } from '../../constants/errors';
 import { MESSAGES, RESPONSES } from '../../constants';
 import * as MessageTypes from '../../types/messages';
 import Connection from './websocket';
+import { SubscriptionAccountInfo } from '../../types/common';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { transformUtxos, transformAccountInfo } from './utils';
+import { transformUtxos, transformAccountInfo, transformTransaction } from './utils';
 
 declare function postMessage(data: Response): void;
 
@@ -20,6 +21,7 @@ const cleanup = () => {
         api.removeAllListeners();
         api = undefined;
     }
+
     endpoints = [];
     common.removeAccounts(common.getAccounts());
     common.removeAddresses(common.getAddresses());
@@ -34,14 +36,11 @@ const connect = async (): Promise<Connection> => {
         throw new CustomError('connect', 'Endpoint not set');
     }
 
-    if (endpoints.length < 1) {
-        endpoints = common.shuffleEndpoints(server.slice(0));
-    }
-
-    common.debug('Connecting to cardano', endpoints[0]);
+    common.debug('Connecting to cardano', server[0]);
 
     const connection = new Connection({
-        url: endpoints[0],
+        // server is load balanced
+        url: server[0],
         timeout,
         pingTimeout,
         keepAlive,
@@ -67,6 +66,7 @@ const connect = async (): Promise<Connection> => {
     });
 
     common.debug('Connected');
+
     return connection;
 };
 
@@ -176,7 +176,6 @@ const getAccountUtxo = async (
 };
 
 const onNewBlock = (event: Responses['block_content']) => {
-    console.log('aaaa', event);
     common.response({
         id: -1,
         type: RESPONSES.NOTIFICATION,
@@ -190,13 +189,54 @@ const onNewBlock = (event: Responses['block_content']) => {
     });
 };
 
+const onTransaction = (event: any) => {
+    if (!event.tx) return;
+    const descriptor = event.address;
+    const account = common.getAccount(descriptor);
+
+    common.response({
+        id: -1,
+        type: RESPONSES.NOTIFICATION,
+        payload: {
+            type: 'notification',
+            payload: {
+                descriptor: account ? account.descriptor : descriptor,
+                tx: account
+                    ? transformTransaction(account.descriptor, account.addresses, event.tx)
+                    : transformTransaction(descriptor, undefined, event.tx),
+            },
+        },
+    });
+};
+
 const subscribeBlock = async () => {
-    console.log('aaa');
     if (common.getSubscription('block')) return { subscribed: true };
     const socket = await connect();
     common.addSubscription('block');
-    socket.on('LATEST_BLOCK', onNewBlock);
+    socket.on('block', onNewBlock);
     return socket.subscribeBlock();
+};
+
+const subscribeAccounts = async (accounts: SubscriptionAccountInfo[]) => {
+    common.addAccounts(accounts);
+    const socket = await connect();
+    if (!common.getSubscription('notification')) {
+        socket.on('notification', onTransaction);
+        common.addSubscription('notification');
+    }
+
+    return socket.subscribeAddresses(common.getAddresses());
+};
+
+const subscribeAddresses = async (addresses: string[]) => {
+    common.addAddresses(addresses);
+    const socket = await connect();
+    if (!common.getSubscription('notification')) {
+        socket.on('notification', onTransaction);
+        common.addSubscription('notification');
+    }
+
+    return socket.subscribeAddresses(common.getAddresses());
 };
 
 const subscribe = async (data: { id: number } & MessageTypes.Subscribe): Promise<void> => {
@@ -204,7 +244,9 @@ const subscribe = async (data: { id: number } & MessageTypes.Subscribe): Promise
     try {
         let response;
         if (payload.type === 'accounts') {
-            console.log('a');
+            response = await subscribeAccounts(payload.accounts);
+        } else if (payload.type === 'addresses') {
+            response = await subscribeAddresses(payload.addresses);
         } else if (payload.type === 'block') {
             response = await subscribeBlock();
         } else {
@@ -229,12 +271,48 @@ const unsubscribeBlock = async () => {
     return socket.unsubscribeBlock();
 };
 
+const unsubscribeAccounts = async (accounts?: SubscriptionAccountInfo[]) => {
+    common.removeAccounts(accounts || common.getAccounts());
+
+    const socket = await connect();
+    const subscribed = common.getAddresses();
+    if (subscribed.length < 1) {
+        // there are no subscribed addresses left
+        // remove listeners
+        socket.removeListener('notification', onTransaction);
+        common.removeSubscription('notification');
+        return socket.unsubscribeAddresses();
+    }
+    // subscribe remained addresses
+    return socket.subscribeAddresses(subscribed);
+};
+
+const unsubscribeAddresses = async (addresses?: string[]) => {
+    const socket = await connect();
+    // remove accounts
+    if (!addresses) {
+        common.removeAccounts(common.getAccounts());
+    }
+    const subscribed = common.removeAddresses(addresses || common.getAddresses());
+    if (subscribed.length < 1) {
+        // there are no subscribed addresses left
+        // remove listeners
+        socket.removeListener('notification', onTransaction);
+        common.removeSubscription('notification');
+        return socket.unsubscribeAddresses();
+    }
+    // subscribe remained addresses
+    return socket.subscribeAddresses(subscribed);
+};
+
 const unsubscribe = async (data: { id: number } & MessageTypes.Unsubscribe): Promise<void> => {
     const { payload } = data;
     try {
         let response;
         if (payload.type === 'accounts') {
-            console.log('acc');
+            response = await unsubscribeAccounts(payload.accounts);
+        } else if (payload.type === 'addresses') {
+            response = await unsubscribeAddresses(payload.addresses);
         } else if (payload.type === 'block') {
             response = await unsubscribeBlock();
         } else {
@@ -257,6 +335,7 @@ onmessage = (event: { data: Message }) => {
     const { id, type } = data;
 
     common.debug('onmessage', data);
+
     switch (data.type) {
         case MESSAGES.HANDSHAKE:
             common.setSettings(data.settings);
@@ -292,7 +371,6 @@ onmessage = (event: { data: Message }) => {
         case MESSAGES.UNSUBSCRIBE:
             unsubscribe(data);
             break;
-
         // @ts-ignore this message is used in tests
         case 'terminate':
             cleanup();

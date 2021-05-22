@@ -6,6 +6,21 @@ export interface Subscribe {
     subscribed: boolean;
 }
 
+export interface Address {
+    address: string;
+    path: string;
+    transfers: number;
+    balance?: string;
+    sent?: string;
+    received?: string;
+}
+
+export interface AccountAddresses {
+    change: Address[];
+    used: Address[];
+    unused: Address[];
+}
+
 export interface BlockfrostTransaction {
     address: string;
     txHash: string;
@@ -16,7 +31,7 @@ export interface BlockfrostTransaction {
 
 export interface BlockfrostAccountInfo {
     balance: string;
-    addresses: string[];
+    addresses: AccountAddresses;
     empty: boolean;
     availableBalance: string;
     descriptor: string;
@@ -32,6 +47,11 @@ export interface BlockfrostAccountInfo {
         total: number;
         index: number;
     };
+}
+
+export interface AddressNotification {
+    address: string;
+    tx: any;
 }
 
 export interface ServerInfo {
@@ -96,34 +116,32 @@ export interface BlockfrostUtxos {
 }
 
 declare function FSend(method: 'GET_SERVER_INFO'): Promise<ServerInfo>;
-
 declare function FSend(
     method: 'GET_BLOCK',
     params: { hashOrNumber: string | number }
 ): Promise<Responses['block_content']>;
-
 declare function FSend(
     method: 'GET_ACCOUNT_INFO',
     params: AccountInfoParams
 ): Promise<BlockfrostAccountInfo>;
-
 declare function FSend(
     method: 'GET_ACCOUNT_UTXO',
     params: AccountUtxoParams
 ): Promise<BlockfrostUtxos[]>;
-
 declare function FSend(
     method: 'GET_TRANSACTION',
     params: { txId: string }
 ): Promise<BlockfrostTransaction>;
-
 declare function FSend(
     method: 'PUSH_TRANSACTION',
     params: { transaction: Uint8Array }
 ): Promise<any>;
-
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<Subscribe>;
-
 declare function FSend(method: 'UNSUBSCRIBE_BLOCK'): Promise<Subscribe>;
+declare function FSend(
+    method: 'SUBSCRIBE_ADDRESSES',
+    params: { addresses: string[] }
+): Promise<Subscribe>;
+declare function FSend(method: 'UNSUBSCRIBE_ADDRESSES'): Promise<Subscribe>;
 
 export type Send = typeof FSend;

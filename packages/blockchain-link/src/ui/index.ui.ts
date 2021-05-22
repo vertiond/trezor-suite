@@ -343,13 +343,17 @@ init(CONFIG);
 
 CONFIG.forEach(i => {
     console.log(i);
-    let worker: any = BlockbookWorker;
+    // UI does not work correctly set the worker here
+    const worker = CardanoWorker;
 
-    if (i.blockchain.worker.includes('cardano')) {
-        worker = CardanoWorker;
-    }
-
-    // if (i.blockchain.worker.includes('ripple')) {
+    // if (i.blockchain.worker.includes('blockbook')) {
+    //     console.log('BlockbookWorker');
+    //     worker = BlockbookWorker;
+    // } else if (i.blockchain.worker.includes('cardano')) {
+    //     console.log('CardanoWorker');
+    //     worker = CardanoWorker;
+    // } else if (i.blockchain.worker.includes('ripple')) {
+    //     console.log('RippleWorker');
     //     worker = RippleWorker;
     // }
 

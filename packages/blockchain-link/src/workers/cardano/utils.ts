@@ -1,14 +1,7 @@
-import {
-    BlockfrostUtxos,
-    BlockfrostTransaction,
-    Balance,
-    Input,
-    Output,
-    BlockfrostAccountInfo,
-} from '../../types/cardano';
+import { BlockfrostUtxos, BlockfrostTransaction, BlockfrostAccountInfo } from '../../types/cardano';
 import { Utxo } from '../../types/responses';
 import BigNumber from 'bignumber.js';
-import { Transaction, AccountInfo } from '../../types/common';
+import { Transaction, AccountInfo, AccountAddresses } from '../../types/common';
 
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
@@ -32,42 +25,16 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     return result;
 };
 
-export const countBalances = (InputOrOutput: Input[] | Output[]): Balance[] => {
-    const balances: Balance[] = [];
-    InputOrOutput.forEach(inputOrOutput => {
-        inputOrOutput.amount.forEach(balance => {
-            if (balance.quantity && balance.unit) {
-                const balanceRow = balances.find(
-                    balanceResult => balanceResult.unit === balance.unit
-                );
-
-                if (!balanceRow) {
-                    balances.push({
-                        unit: balance.unit,
-                        quantity: balance.quantity,
-                    });
-                } else {
-                    balanceRow.quantity = new BigNumber(balanceRow.quantity)
-                        .plus(balance.quantity)
-                        .toString();
-                }
-            }
-        });
-    });
-
-    return balances;
-};
-
 const getTxType = (
     blockfrostTxData: BlockfrostTransaction,
-    accountAddress: string[]
+    accountAddress?: AccountAddresses
 ): 'self' | 'recv' | 'sent' => {
     return 'self';
 };
 
 export const transformTransaction = (
     descriptor: string,
-    accountAddress: string[],
+    accountAddress: AccountAddresses | undefined,
     blockfrostTxData: BlockfrostTransaction
 ): Transaction => {
     const lovelaceBalance = blockfrostTxData.txData.output_amount.find(b => b.unit === 'lovelace');
@@ -105,6 +72,7 @@ export const transformAccountInfo = (info: BlockfrostAccountInfo): AccountInfo =
             transactions: !cardanoTxs
                 ? []
                 : cardanoTxs.map((tx: any) =>
+                      // @ts-ignore
                       transformTransaction(info.descriptor, info.addresses, tx)
                   ),
         },

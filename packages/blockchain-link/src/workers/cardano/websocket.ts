@@ -10,7 +10,7 @@ const NOT_INITIALIZED = new CustomError('websocket_not_initialized');
 
 interface Subscription {
     id: string;
-    type: 'LATEST_BLOCK' | 'ACCOUNT';
+    type: 'block' | 'notification';
     callback: (result: any) => void;
 }
 
@@ -21,8 +21,8 @@ interface Options {
     keepAlive?: boolean;
 }
 
-const DEFAULT_TIMEOUT = 30 * 1000;
-const DEFAULT_PING_TIMEOUT = 20 * 1000;
+const DEFAULT_TIMEOUT = 90 * 1000;
+const DEFAULT_PING_TIMEOUT = 30 * 1000;
 
 export default class Socket extends EventEmitter {
     options: Options;
@@ -126,6 +126,7 @@ export default class Socket extends EventEmitter {
             const resp = JSON.parse(message);
             const { id, data } = resp;
             const dfd = this.messages.find(m => m.id === id);
+
             if (dfd) {
                 if (data.error) {
                     dfd.reject(new CustomError('websocket_error_message', data.error.message));
@@ -135,6 +136,7 @@ export default class Socket extends EventEmitter {
                 this.messages.splice(this.messages.indexOf(dfd), 1);
             } else {
                 const subs = this.subscriptions.find(s => s && s.id === id);
+
                 if (subs) {
                     subs.callback(data);
                 }
@@ -225,7 +227,7 @@ export default class Socket extends EventEmitter {
     }
 
     subscribeBlock() {
-        const index = this.subscriptions.findIndex(s => s.type === 'LATEST_BLOCK');
+        const index = this.subscriptions.findIndex(s => s.type === 'block');
         if (index >= 0) {
             // remove previous subscriptions
             this.subscriptions.splice(index, 1);
@@ -234,16 +236,35 @@ export default class Socket extends EventEmitter {
         const id = this.messageID.toString();
         this.subscriptions.push({
             id,
-            type: 'LATEST_BLOCK',
+            type: 'block',
             callback: (result: Responses['block_content']) => {
-                this.emit('GET_LATEST_BLOCK', result);
+                this.emit('block', result);
             },
         });
+
         return this.send('SUBSCRIBE_BLOCK');
     }
 
+    subscribeAddresses(addresses: string[]) {
+        const index = this.subscriptions.findIndex(s => s.type === 'notification');
+        if (index >= 0) {
+            // remove previous subscriptions
+            this.subscriptions.splice(index, 1);
+        }
+        // add new subscription
+        const id = this.messageID.toString();
+        this.subscriptions.push({
+            id,
+            type: 'notification',
+            callback: (result: any) => {
+                this.emit('notification', result);
+            },
+        });
+        return this.send('SUBSCRIBE_ADDRESSES', { addresses });
+    }
+
     unsubscribeBlock() {
-        const index = this.subscriptions.findIndex(s => s.type === 'LATEST_BLOCK');
+        const index = this.subscriptions.findIndex(s => s.type === 'block');
         if (index >= 0) {
             // remove previous subscriptions
             this.subscriptions.splice(index, 1);
@@ -252,6 +273,16 @@ export default class Socket extends EventEmitter {
         return {
             subscribed: false,
         };
+    }
+
+    unsubscribeAddresses() {
+        const index = this.subscriptions.findIndex(s => s.type === 'notification');
+        if (index >= 0) {
+            // remove previous subscriptions
+            this.subscriptions.splice(index, 1);
+            return this.send('UNSUBSCRIBE_ADDRESSES');
+        }
+        return { subscribed: false };
     }
 
     dispose() {
