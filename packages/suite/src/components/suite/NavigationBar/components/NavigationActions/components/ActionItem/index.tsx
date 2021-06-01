@@ -10,11 +10,33 @@ const Wrapper = styled.div<Pick<Props, 'isOpen' | 'marginLeft'>>`
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: ${variables.BORDER_RADIUS.HOVER};
     ${props => props.marginLeft && `margin-left: 8px`};
+    transition: background ${variables.HOVER_TRANSITION.DURATION}
+        ${variables.HOVER_TRANSITION.ANIMATION};
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        bottom: 4px;
+        z-index: -1;
+        border-radius: ${variables.BORDER_RADIUS.HOVER};
+        transition: all ${variables.HOVER_TRANSITION.DURATION}
+            ${variables.HOVER_TRANSITION.ANIMATION};
+        background-color: transparent;
+    }
 
     &:hover {
-        background: ${props => props.theme.BG_GREY_OPEN};
+        &:after {
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background-color: ${props => props.theme.BG_HOVER_ITEM};
+        }
     }
 
     ${props =>

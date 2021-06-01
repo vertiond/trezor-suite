@@ -22,6 +22,7 @@ export const THEME = {
         BG_LIGHT_RED: '#F6E2E2',
         BG_TOOLTIP: '#262742',
         BG_ICON: 'transparent',
+        BG_HOVER_ITEM: 'rgba(0,0,0,0.04)', // used for hovered navigation items background
 
         TYPE_GREEN: '#279503',
         TYPE_ORANGE: '#c19009',
@@ -77,6 +78,7 @@ export const THEME = {
         BG_LIGHT_RED: '#5a1616', // used for outer glow for disconnected device status dot
         BG_TOOLTIP: '#3a3b3c', // same as STROKE_GREY in dark theme
         BG_ICON: '#ffffff',
+        BG_HOVER_ITEM: 'rgba(255,255,255,0.08)', // used for hovered navigation items background
 
         TYPE_GREEN: '#66ab4e',
         TYPE_ORANGE: '#9b813b',
@@ -134,6 +136,7 @@ export const THEME = {
         BG_LIGHT_RED: '#5a1616', // used for outer glow for disconnected device status dot
         BG_TOOLTIP: '#151524', // todo
         BG_ICON: '#ffffff', // todo
+        BG_HOVER_ITEM: 'rgba(255,255,255,0.08)', // used for hovered navigation items background
 
         TYPE_GREEN: '#6fa95c',
         TYPE_ORANGE: '#9b813b',

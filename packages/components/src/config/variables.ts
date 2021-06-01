@@ -184,3 +184,12 @@ export const ICONS: IconType[] = [
     'PENCIL_LINE',
     'KEY',
 ];
+
+export const HOVER_TRANSITION = {
+    DURATION: '150ms',
+    ANIMATION: 'ease-out',
+} as const;
+
+export const BORDER_RADIUS = {
+    HOVER: '8px',
+} as const;
