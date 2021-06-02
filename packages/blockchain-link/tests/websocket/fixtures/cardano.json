@@ -18,6 +18,33 @@
     "GET_ACCOUNT_UTXO": {
         "data": []
     },
+    "SUBSCRIBE_BLOCK": {
+        "data": {
+            "subscribed": true
+        }
+    },
+    "UNSUBSCRIBE_BLOCK": {
+        "data": {
+            "subscribed": false
+        }
+    },
+    "SUBSCRIBE_ADDRESSES": {
+        "data": {
+            "subscribed": true
+        }
+    },
+    "UNSUBSCRIBE_ADDRESSES": {
+        "data": {
+            "subscribed": false
+        }
+    },
+    "PUSH_TRANSACTION": {
+        "data": {
+            "error": {
+                "message": "-22: TX decode failed"
+            }
+        }
+    },
     "GET_TRANSACTION": {
         "data": {
             "error": {

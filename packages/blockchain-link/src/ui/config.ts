@@ -433,8 +433,8 @@ export default [
         blockchain: {
             name: 'Cardano Mainnet',
             worker: 'js/cardano-worker.js',
-            // server: ['wss://trezor-cardano-mainnet.blockfrost.io'],
-            server: ['ws://localhost:3005'],
+            server: ['wss://trezor-cardano-mainnet.blockfrost.io'],
+            // server: ['ws://localhost:3005'],
             debug: true,
         },
         data: {
