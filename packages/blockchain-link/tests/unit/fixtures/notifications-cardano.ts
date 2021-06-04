@@ -1,20 +1,8 @@
 // To avoid unnecessary data this fixtures sends notifications with mostly undefined values
 const tx = {
-    // amount: undefined,
-    // blockHash: undefined,
-    // blockHeight: undefined,
-    // blockTime: undefined,
-    // fee: undefined,
-    // txid: undefined,
     tokens: [],
     targets: [],
 };
-// const target = {
-//     addresses: [],
-//     amount: undefined,
-//     coinbase: undefined,
-//     isAddress: undefined,
-// };
 
 const notifyBlocks = [
     {

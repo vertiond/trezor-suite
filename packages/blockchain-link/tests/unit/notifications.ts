@@ -4,10 +4,12 @@ import BlockchainLink from '../../src';
 
 import fixturesBlockbook from './fixtures/notifications-blockbook';
 import fixturesRipple from './fixtures/notifications-ripple';
+import fixturesCardano from './fixtures/notifications-cardano';
 
 const fixtures = {
     blockbook: fixturesBlockbook,
     ripple: fixturesRipple,
+    cardano: fixturesCardano,
 };
 
 // this test covers application live cycle

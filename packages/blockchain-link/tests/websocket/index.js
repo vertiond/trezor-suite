@@ -96,27 +96,16 @@ const create = async type => {
     });
 
     // Blockbook
-
     server.on('blockbook_getInfo', request => sendResponse(request));
-
     server.on('blockbook_getBlockHash', request => sendResponse(request));
-
     server.on('blockbook_getAccountInfo', request => sendResponse(request));
-
     server.on('blockbook_getAccountUtxo', request => sendResponse(request));
-
     server.on('blockbook_getTransaction', request => sendResponse(request));
-
     server.on('blockbook_getTransactionSpecific', request => sendResponse(request));
-
     server.on('blockbook_estimateFee', request => sendResponse(request));
-
     server.on('blockbook_sendTransaction', request => sendResponse(request));
-
     server.on('blockbook_subscribeNewBlock', request => sendResponse(request));
-
     server.on('blockbook_unsubscribeNewBlock', request => sendResponse(request));
-
     server.on('blockbook_subscribeAddresses', request => {
         addresses = request.params.addresses; // eslint-disable-line prefer-destructuring
         sendResponse(request);
@@ -130,6 +119,7 @@ const create = async type => {
     // Cardano
     server.on('cardano_GET_BLOCK', request => sendResponse(request));
     server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
     server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
     server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
     server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
@@ -139,7 +129,6 @@ const create = async type => {
     server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
 
     // Ripple
-
     server.on('ripple_subscribe', request => {
         if (Array.isArray(request.accounts_proposed)) {
             if (!Array.isArray(addresses)) {

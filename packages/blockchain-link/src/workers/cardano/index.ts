@@ -13,7 +13,6 @@ declare function postMessage(data: Response): void;
 const common = new WorkerCommon(postMessage);
 
 let api: Connection | undefined;
-let endpoints: string[] = [];
 
 const cleanup = () => {
     if (api) {
@@ -22,7 +21,6 @@ const cleanup = () => {
         api = undefined;
     }
 
-    endpoints = [];
     common.removeAccounts(common.getAccounts());
     common.removeAddresses(common.getAddresses());
     common.clearSubscriptions();
