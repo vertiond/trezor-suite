@@ -53,11 +53,4 @@ export default {
             response: [{ feePerUnit: '12' }],
         },
     ],
-    cardano: [
-        {
-            description: 'Successfull',
-            params: { blocks: [1] },
-            response: [{ feePerUnit: '12' }],
-        },
-    ],
 };
