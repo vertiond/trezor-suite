@@ -10,7 +10,7 @@ const fixtures = {
     blockbook: fixturesBlockbook,
     ripple: fixturesRipple,
     cardano: fixturesCardano,
-};
+} as const;
 
 // this test covers application live cycle
 // where "subscribe" and "unsubscribe" is called multiple times on single blockchain-link instance
@@ -40,15 +40,15 @@ workers.forEach(instance => {
             beforeAll(setup);
             afterAll(teardown);
 
-            // @ts-ignore No index signature
             fixtures[instance.name].notifyAddresses.forEach((f, id) => {
                 it(f.description, async () => {
                     const callback = jest.fn();
                     blockchain.on('notification', callback);
-                    // @ts-ignore No index signature
                     const s = await blockchain[f.method](f.params);
 
-                    expect(s).toEqual({ subscribed: f.method === 'subscribe' });
+                    expect(s).toEqual({
+                        subscribed: f.method === 'subscribe',
+                    });
 
                     const data = (!Array.isArray(f.notifications)
                         ? [f.notifications]
@@ -57,6 +57,7 @@ workers.forEach(instance => {
                         ...n,
                         id: id.toString(),
                     }));
+
                     await server.sendNotification(data);
 
                     if (f.result) {
@@ -72,13 +73,12 @@ workers.forEach(instance => {
             beforeAll(setup);
             afterAll(teardown);
 
-            // @ts-ignore No index signature
             fixtures[instance.name].notifyBlocks.forEach(f => {
                 it(f.description, async () => {
                     const callback = jest.fn();
                     blockchain.on('block', callback);
-                    // @ts-ignore No index signature
                     const s = await blockchain[f.method]({ type: 'block' });
+
                     expect(s).toEqual({ subscribed: f.method === 'subscribe' });
 
                     await server.sendNotification(f.notifications);

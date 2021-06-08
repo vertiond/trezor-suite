@@ -139,9 +139,9 @@ declare function FSend(
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(method: 'UNSUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(
-    method: 'SUBSCRIBE_ADDRESSES',
+    method: 'SUBSCRIBE_ADDRESS',
     params: { addresses: string[] }
 ): Promise<Subscribe>;
-declare function FSend(method: 'UNSUBSCRIBE_ADDRESSES'): Promise<Subscribe>;
+declare function FSend(method: 'UNSUBSCRIBE_ADDRESS'): Promise<Subscribe>;
 
 export type Send = typeof FSend;

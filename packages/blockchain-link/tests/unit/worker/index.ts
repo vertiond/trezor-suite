@@ -58,16 +58,7 @@ const cardanoWorkerFactory = () => {
 };
 
 export default [
-    {
-        name: 'ripple',
-        worker: rippleWorkerFactory,
-    },
-    {
-        name: 'blockbook',
-        worker: blockbookWorkerFactory,
-    },
-    {
-        name: 'cardano',
-        worker: cardanoWorkerFactory,
-    },
-];
+    { name: 'ripple', worker: rippleWorkerFactory },
+    { name: 'blockbook', worker: blockbookWorkerFactory },
+    { name: 'cardano', worker: cardanoWorkerFactory },
+] as const;

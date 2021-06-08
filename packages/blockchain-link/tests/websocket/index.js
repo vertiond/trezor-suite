@@ -5,7 +5,7 @@ import defaultBlockbookResponses from './fixtures/blockbook';
 import defaultRippleResponses from './fixtures/ripple';
 import defaultCardanoResponses from './fixtures/cardano';
 
-const RESPONSES = {
+const DEFAULT_RESPONSES = {
     blockbook: defaultBlockbookResponses,
     ripple: defaultRippleResponses,
     cardano: defaultCardanoResponses,
@@ -16,7 +16,7 @@ const create = async type => {
     const server = new Server({ port, noServer: true });
     const { close } = server;
 
-    const defaultResponses = RESPONSES[type];
+    const defaultResponses = DEFAULT_RESPONSES[type];
     const connections = [];
     let addresses;
 
@@ -116,18 +116,6 @@ const create = async type => {
         sendResponse(request);
     });
 
-    // Cardano
-    server.on('cardano_GET_BLOCK', request => sendResponse(request));
-    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
-    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_SUBSCRIBE_ADDRESSES', request => sendResponse(request));
-    server.on('cardano_UNSUBSCRIBE_ADDRESSES', request => sendResponse(request));
-    server.on('cardano_SUBSCRIBE_BLOCK', request => sendResponse(request));
-    server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
-
     // Ripple
     server.on('ripple_subscribe', request => {
         if (Array.isArray(request.accounts_proposed)) {
@@ -149,11 +137,31 @@ const create = async type => {
         }
         sendResponse(request);
     });
+
     server.on('ripple_server_info', request => sendResponse(request));
     server.on('ripple_account_info', request => sendResponse(request));
     server.on('ripple_account_tx', request => sendResponse(request));
     server.on('ripple_submit', request => sendResponse(request));
     server.on('ripple_tx', request => sendResponse(request));
+
+    // Cardano
+    server.on('cardano_GET_BLOCK', request => sendResponse(request));
+    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
+    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
+    server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
+    server.on('cardano_SUBSCRIBE_ADDRESS', request => {
+        addresses = request.params.addresses; // eslint-disable-line prefer-destructuring
+        sendResponse(request);
+    });
+
+    server.on('cardano_UNSUBSCRIBE_ADDRESS', request => {
+        addresses = undefined;
+        sendResponse(request);
+    });
+    server.on('cardano_SUBSCRIBE_BLOCK', request => sendResponse(request));
+    server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
 
     // Public methods
 

@@ -122,10 +122,13 @@ export default class Socket extends EventEmitter {
     };
 
     onmessage(message: string) {
+        console.log('subscriptions', this.subscriptions);
         try {
             const resp = JSON.parse(message);
             const { id, data } = resp;
             const dfd = this.messages.find(m => m.id === id);
+
+            console.log('dfd', dfd);
 
             if (dfd) {
                 if (data.error) {
@@ -136,6 +139,8 @@ export default class Socket extends EventEmitter {
                 this.messages.splice(this.messages.indexOf(dfd), 1);
             } else {
                 const subs = this.subscriptions.find(s => s && s.id === id);
+
+                console.log('subs', subs);
 
                 if (subs) {
                     subs.callback(data);
@@ -238,6 +243,7 @@ export default class Socket extends EventEmitter {
             id,
             type: 'block',
             callback: (result: Responses['block_content']) => {
+                console.log('EMIT EMIT EMIT');
                 this.emit('block', result);
             },
         });
@@ -260,7 +266,7 @@ export default class Socket extends EventEmitter {
                 this.emit('notification', result);
             },
         });
-        return this.send('SUBSCRIBE_ADDRESSES', { addresses });
+        return this.send('SUBSCRIBE_ADDRESS', { addresses });
     }
 
     unsubscribeBlock() {
@@ -280,7 +286,7 @@ export default class Socket extends EventEmitter {
         if (index >= 0) {
             // remove previous subscriptions
             this.subscriptions.splice(index, 1);
-            return this.send('UNSUBSCRIBE_ADDRESSES');
+            return this.send('UNSUBSCRIBE_ADDRESS');
         }
         return { subscribed: false };
     }
