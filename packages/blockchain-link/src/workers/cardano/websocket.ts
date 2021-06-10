@@ -58,6 +58,7 @@ export default class Socket extends EventEmitter {
         if (this.pingTimeout) {
             clearTimeout(this.pingTimeout);
         }
+
         this.pingTimeout = setTimeout(
             this.onPing.bind(this),
             this.options.pingTimeout || DEFAULT_PING_TIMEOUT
@@ -116,19 +117,16 @@ export default class Socket extends EventEmitter {
 
         this.setConnectionTimeout();
         this.setPingTimeout();
-        console.log('req', req);
+
         ws.send(JSON.stringify(req));
         return dfd.promise as Promise<any>;
     };
 
     onmessage(message: string) {
-        console.log('subscriptions', this.subscriptions);
         try {
             const resp = JSON.parse(message);
             const { id, data } = resp;
             const dfd = this.messages.find(m => m.id === id);
-
-            console.log('dfd', dfd);
 
             if (dfd) {
                 if (data.error) {
@@ -139,8 +137,6 @@ export default class Socket extends EventEmitter {
                 this.messages.splice(this.messages.indexOf(dfd), 1);
             } else {
                 const subs = this.subscriptions.find(s => s && s.id === id);
-
-                console.log('subs', subs);
 
                 if (subs) {
                     subs.callback(data);
@@ -233,17 +229,18 @@ export default class Socket extends EventEmitter {
 
     subscribeBlock() {
         const index = this.subscriptions.findIndex(s => s.type === 'block');
+
         if (index >= 0) {
             // remove previous subscriptions
             this.subscriptions.splice(index, 1);
         }
+
         // add new subscription
         const id = this.messageID.toString();
         this.subscriptions.push({
             id,
             type: 'block',
             callback: (result: Responses['block_content']) => {
-                console.log('EMIT EMIT EMIT');
                 this.emit('block', result);
             },
         });
@@ -266,6 +263,7 @@ export default class Socket extends EventEmitter {
                 this.emit('notification', result);
             },
         });
+
         return this.send('SUBSCRIBE_ADDRESS', { addresses });
     }
 
@@ -288,7 +286,9 @@ export default class Socket extends EventEmitter {
             this.subscriptions.splice(index, 1);
             return this.send('UNSUBSCRIBE_ADDRESS');
         }
-        return { subscribed: false };
+        return {
+            subscribed: false,
+        };
     }
 
     dispose() {

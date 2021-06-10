@@ -116,6 +116,25 @@ const create = async type => {
         sendResponse(request);
     });
 
+    // Cardano
+    server.on('cardano_GET_BLOCK', request => sendResponse(request));
+    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
+    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
+    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
+    server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
+    server.on('cardano_SUBSCRIBE_ADDRESS', request => {
+        addresses = request.params.addresses; // eslint-disable-line prefer-destructuring
+        sendResponse(request);
+    });
+
+    server.on('cardano_UNSUBSCRIBE_ADDRESS', request => {
+        addresses = undefined;
+        sendResponse(request);
+    });
+    server.on('cardano_SUBSCRIBE_BLOCK', request => sendResponse(request));
+    server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
+
     // Ripple
     server.on('ripple_subscribe', request => {
         if (Array.isArray(request.accounts_proposed)) {
@@ -143,25 +162,6 @@ const create = async type => {
     server.on('ripple_account_tx', request => sendResponse(request));
     server.on('ripple_submit', request => sendResponse(request));
     server.on('ripple_tx', request => sendResponse(request));
-
-    // Cardano
-    server.on('cardano_GET_BLOCK', request => sendResponse(request));
-    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
-    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_SUBSCRIBE_ADDRESS', request => {
-        addresses = request.params.addresses; // eslint-disable-line prefer-destructuring
-        sendResponse(request);
-    });
-
-    server.on('cardano_UNSUBSCRIBE_ADDRESS', request => {
-        addresses = undefined;
-        sendResponse(request);
-    });
-    server.on('cardano_SUBSCRIBE_BLOCK', request => sendResponse(request));
-    server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
 
     // Public methods
 

@@ -239,6 +239,7 @@ const subscribeAddresses = async (addresses: string[]) => {
 
 const subscribe = async (data: { id: number } & MessageTypes.Subscribe): Promise<void> => {
     const { payload } = data;
+
     try {
         let response;
         if (payload.type === 'accounts') {
@@ -327,6 +328,19 @@ const unsubscribe = async (data: { id: number } & MessageTypes.Unsubscribe): Pro
     }
 };
 
+const disconnect = async (data: { id: number }) => {
+    if (!api) {
+        common.response({ id: data.id, type: RESPONSES.DISCONNECTED, payload: true });
+        return;
+    }
+    try {
+        await api.disconnect();
+        common.response({ id: data.id, type: RESPONSES.DISCONNECTED, payload: true });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
 onmessage = (event: { data: Message }) => {
     if (!event.data) return;
     const { data } = event;
@@ -368,6 +382,9 @@ onmessage = (event: { data: Message }) => {
             break;
         case MESSAGES.UNSUBSCRIBE:
             unsubscribe(data);
+            break;
+        case MESSAGES.DISCONNECT:
+            disconnect(data);
             break;
         // @ts-ignore this message is used in tests
         case 'terminate':

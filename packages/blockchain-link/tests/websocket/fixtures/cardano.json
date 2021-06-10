@@ -28,12 +28,12 @@
             "subscribed": false
         }
     },
-    "SUBSCRIBE_ADDRESSES": {
+    "SUBSCRIBE_ADDRESS": {
         "data": {
             "subscribed": true
         }
     },
-    "UNSUBSCRIBE_ADDRESSES": {
+    "UNSUBSCRIBE_ADDRESS": {
         "data": {
             "subscribed": false
         }
