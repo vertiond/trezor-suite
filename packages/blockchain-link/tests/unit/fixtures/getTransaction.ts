@@ -144,12 +144,6 @@ export default {
         {
             description: 'Successful',
             params: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
-            serverFixtures: [
-                {
-                    method: 'GET_TRANSACTION',
-                    response: cardanoTx,
-                },
-            ],
             response: {
                 type: 'cardano',
                 tx: cardanoTx,
@@ -157,8 +151,22 @@ export default {
         },
         {
             description: 'Not found',
+            serverFixtures: [
+                {
+                    method: 'GET_TRANSACTION',
+                    response: {
+                        data: {
+                            error: {
+                                status_code: 404,
+                                error: 'Not Found',
+                                message: 'The requested component has not been found.',
+                            },
+                        },
+                    },
+                },
+            ],
             params: 'non_existing_tx',
-            error: 'Transaction not found',
+            error: 'The requested component has not been found.',
         },
     ],
 };

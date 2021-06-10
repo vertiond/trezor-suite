@@ -53,4 +53,11 @@ export default {
             response: [{ feePerUnit: '12' }],
         },
     ],
+    cardano: [
+        {
+            description: 'estimateFee - not implemented',
+            params: 0,
+            error: 'Unknown message type: m_estimate_fee',
+        },
+    ],
 };

@@ -38,7 +38,7 @@ export default {
         {
             description: 'Unsuccessful',
             params: new Uint8Array(1),
-            error: '-22: TX decode failed',
+            error: 'Message not set',
         },
     ],
     ripple: [
