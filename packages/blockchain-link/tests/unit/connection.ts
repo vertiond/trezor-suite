@@ -143,6 +143,9 @@ workers.forEach(instance => {
         });
 
         it('Connect (only one endpoint is valid)', async () => {
+            // cardano has only one valid endpoint
+            if (instance.name === 'cardano') return;
+
             blockchain.settings.server = [
                 'gibberish1',
                 'gibberish2',

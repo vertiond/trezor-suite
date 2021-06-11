@@ -21,8 +21,8 @@ interface Options {
     keepAlive?: boolean;
 }
 
-const DEFAULT_TIMEOUT = 90 * 1000;
-const DEFAULT_PING_TIMEOUT = 30 * 1000;
+const DEFAULT_TIMEOUT = 20 * 1000;
+const DEFAULT_PING_TIMEOUT = 50 * 1000;
 
 export default class Socket extends EventEmitter {
     options: Options;
@@ -85,7 +85,7 @@ export default class Socket extends EventEmitter {
         // make sure that connection is alive if there are subscriptions
         if (this.ws && this.isConnected()) {
             if (this.subscriptions.length > 0 || this.options.keepAlive) {
-                await this.getServerInfo();
+                await this.getBlockHash(0);
             } else {
                 try {
                     this.ws.close();
