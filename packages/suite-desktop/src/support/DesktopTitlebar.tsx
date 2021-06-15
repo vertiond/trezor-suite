@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import NoSSR from '@suite-support/NoSSR';
 import { DESKTOP_TITLEBAR_HEIGHT, DESKTOP_WRAPPER_BORDER_WIDTH } from '@suite-constants/layout';
 import { colors, TrezorLogo, Icon } from '@trezor/components';
-import { isMac as isMacOS } from '@suite-utils/env';
+import { isMacOs } from '@suite-utils/env';
 
 const RESIZE_HANDLER_PADDING = 4;
-const WRAPPER_BORDER_WIDTH = isMacOS() ? '0px' : DESKTOP_WRAPPER_BORDER_WIDTH;
+const WRAPPER_BORDER_WIDTH = isMacOs() ? '0px' : DESKTOP_WRAPPER_BORDER_WIDTH;
 
 const ContentWrapper = styled.div`
     height: calc(100% - ${DESKTOP_TITLEBAR_HEIGHT});
@@ -147,7 +147,7 @@ const DesktopTitlebar = () => {
         });
     }, []);
 
-    const isMac = isMacOS();
+    const isMac = isMacOs();
     const iconSize = isMac ? 10 : 16;
     const iconColor = isMac ? colors.TYPE_DARK_GREY : colors.TYPE_LIGHT_GREY;
     const isMinimizedDisabled = isMac && maximized;
@@ -205,7 +205,7 @@ const DesktopTitlebar = () => {
             <LogoWrapper>
                 <TrezorLogo
                     type="suite_compact"
-                    variant="white"
+                    fillColor="white"
                     width="48px"
                     data-test="trezor-suite-compact-logo-black"
                 />
@@ -218,15 +218,13 @@ interface Props {
     children: React.ReactNode;
 }
 
-const DesktopTitlebarWrapper = (props: Props) => {
-    return (
-        <>
-            <NoSSR>
-                <DesktopTitlebar />
-            </NoSSR>
-            <ContentWrapper>{props.children}</ContentWrapper>
-        </>
-    );
-};
+const DesktopTitlebarWrapper = (props: Props) => (
+    <>
+        <NoSSR>
+            <DesktopTitlebar />
+        </NoSSR>
+        <ContentWrapper>{props.children}</ContentWrapper>
+    </>
+);
 
 export default DesktopTitlebarWrapper;

@@ -5,19 +5,20 @@
  */
 
 import { ANALYTICS } from '@suite-actions/constants';
-import { Dispatch, GetState, AppState, TrezorDevice } from '@suite-types';
+import { Dispatch, GetState, AppState } from '@suite-types';
 import { getAnalyticsRandomId } from '@suite-utils/random';
 import { encodeDataToQueryString } from '@suite-utils/analytics';
 import { Account } from '@wallet-types';
 import {
     isDesktop,
-    isWeb,
     setOnBeforeUnloadListener,
     getLocationHostname,
-    getOSVersion,
+    getOsType,
+    getEnvironment,
 } from '@suite-utils/env';
 import { setSentryUser } from '@suite-utils/sentry';
 import { State } from '@suite-reducers/analyticsReducer';
+import { DeviceMode } from 'trezor-connect';
 
 export type AnalyticsAction =
     | { type: typeof ANALYTICS.ENABLE }
@@ -32,23 +33,18 @@ export type AnalyticsAction =
           };
       };
 
-/**
-simple semver for data-analytics part.
-<breaking-change>.<analytics-extended>
-
-Don't forget to update docs with changelog!
-*/
-
-const version = '1.6';
+// Don't forget to update docs with changelog!
+// <breaking-change>.<analytics-extended>
+export const version = '1.10';
 
 export type AnalyticsEvent =
     | {
           /**
-        suite-ready
-        Triggers on application start. Logs part of suite setup that might have been loaded from storage
-        but it might also be suite default setup that is loaded when suite starts for the first time.
-        IMPORTANT: skipped if user opens suite for the first time. In such case, the first log will be 'initial-run-completed'
-        */
+         suite-ready
+         Triggers on application start. Logs part of suite setup that might have been loaded from storage
+         but it might also be suite default setup that is loaded when suite starts for the first time.
+         IMPORTANT: skipped if user opens suite for the first time. In such case, the first log will be 'initial-run-completed'
+         */
           type: 'suite-ready';
           payload: {
               language: AppState['suite']['settings']['language'];
@@ -69,27 +65,39 @@ export type AnalyticsEvent =
               theme: string;
               // added in 1.6
               suiteVersion: string;
+              // added in 1.8
+              browserName: string;
+              browserVersion: string;
+              osName: string;
+              osVersion: string;
+              windowWidth: number;
+              windowHeight: number;
+              // added in 1.9
+              platformLanguages: string;
           };
       }
     | { type: 'transport-type'; payload: { type: string; version: string } }
     | {
           /**
-        device-connect
-        is logged when user connects device
-        - if device is not in bootloader, some of its features are logged 
-        */
+         device-connect
+         is logged when user connects device
+         - if device is not in bootloader, some of its features are logged
+         */
           type: 'device-connect';
           payload: {
-              mode: TrezorDevice['mode'];
+              mode?: DeviceMode;
               firmware: string;
-              pin_protection: boolean;
-              passphrase_protection: boolean;
-              totalInstances: number;
+              pin_protection: boolean | null;
+              passphrase_protection: boolean | null;
+              totalInstances: number | null;
               backup_type: string;
               // added in 1.6
               isBitcoinOnly: boolean;
               // added in 1.7
               totalDevices: number;
+              // added in 1.9
+              language: string | null;
+              model: string;
           };
       }
     | {
@@ -102,9 +110,9 @@ export type AnalyticsEvent =
       }
     | {
           /**
-        device-update-firmware
-        is log after firmware update call to device is finished. 
-        */
+         device-update-firmware
+         is log after firmware update call to device is finished.
+         */
           type: 'device-update-firmware';
           payload: {
               /** version of bootloader before update started. */
@@ -121,10 +129,10 @@ export type AnalyticsEvent =
       }
     | {
           /**
-        initial-run-completed
-        when new installation of trezor suite starts it is in initial-run mode which means that some additional screens appear (welcome, analytics, onboarding)
-        it is completed either by going trough onboarding or skipping it. once completed event is registered, we log some data connected up to this point     
-         */
+         initial-run-completed
+         when new installation of trezor suite starts it is in initial-run mode which means that some additional screens appear (welcome, analytics, onboarding)
+         it is completed either by going trough onboarding or skipping it. once completed event is registered, we log some data connected up to this point
+          */
           type: 'initial-run-completed';
           payload: {
               analytics: false;
@@ -138,17 +146,14 @@ export type AnalyticsEvent =
               createSeed: boolean;
               /** how many users chose to do recovery */
               recoverSeed: boolean;
-              /**  how many users clicked that they have a new/used device */
-              newDevice: boolean;
-              usedDevice: boolean;
           };
       }
     | {
           /**
-        account-create
-        logged either automatically upon each suite start as default switched on accounts are loaded
-        or when user adds account manually 
-        */
+         account-create
+         logged either automatically upon each suite start as default switched on accounts are loaded
+         or when user adds account manually
+         */
           type: 'account-create';
           payload: {
               /** normal, segwit, legacy */
@@ -163,6 +168,12 @@ export type AnalyticsEvent =
       }
     | {
           type: 'accounts/empty-account/buy';
+          payload: {
+              symbol: string;
+          };
+      }
+    | {
+          type: 'accounts/empty-account/receive';
           payload: {
               symbol: string;
           };
@@ -182,15 +193,33 @@ export type AnalyticsEvent =
       }
     | { type: 'menu/goto/switch-device' }
     | { type: 'menu/goto/suite-index' }
-    | { type: 'menu/goto/exchange-index' }
     | { type: 'menu/goto/wallet-index' }
     | { type: 'menu/goto/notifications-index' }
+    | {
+          type: 'menu/notifications/toggle';
+          payload: {
+              value: boolean;
+          };
+      }
     | { type: 'menu/goto/settings-index' }
+    | {
+          type: 'menu/settings/toggle';
+          payload: {
+              value: boolean;
+          };
+      }
+    | {
+          type: 'menu/settings/dropdown';
+          payload: { option: 'all' | 'general' | 'device' | 'coins' };
+      }
     | {
           type: 'menu/toggle-discreet';
           payload: {
               value: boolean;
           };
+      }
+    | {
+          type: 'menu/goto/tor';
       }
     | {
           type: 'menu/toggle-tor';
@@ -226,7 +255,7 @@ export type AnalyticsEvent =
     | {
           type: 'settings/device/change-pin-protection';
           payload: {
-              remove: boolean;
+              remove: boolean | null;
           };
       }
     | {
@@ -239,7 +268,24 @@ export type AnalyticsEvent =
               value: number;
           };
       }
-    | { type: 'settings/device/goto/background' }
+    | {
+          type: 'settings/device/goto/background';
+          payload: {
+              // added in 1.9
+              custom: boolean;
+          };
+      }
+    | {
+          type: 'settings/device/background';
+          payload: {
+              // added in 1.9
+              image?: string;
+              format?: string;
+              size?: number;
+              resolutionWidth?: number;
+              resolutionHeight?: number;
+          };
+      }
     | {
           type: 'settings/device/change-orientation';
           payload: {
@@ -314,14 +360,18 @@ export type AnalyticsEvent =
     | {
           type: 'transaction-created';
           payload: {
-              action: 'sent' | 'copied' | 'downloaded';
+              // added in 1.9
+              action: 'sent' | 'copied' | 'downloaded' | 'replaced';
               symbol: Account['symbol'];
-              broadcast: boolean;
+              tokens: string;
               outputsCount: number;
+              broadcast: boolean;
               bitcoinRbf: boolean;
               bitcoinLockTime: boolean;
               ethereumData: boolean;
-              tokenSent: boolean;
+              ethereumNonce: boolean;
+              rippleDestinationTag: boolean;
+              selectedFee: string;
           };
       }
     | {
@@ -329,6 +379,8 @@ export type AnalyticsEvent =
           payload: {
               networkSymbol: Account['symbol'];
               addedNth: number; // if the user added 1st, 2nd,... token in his account
+              // added in 1.9
+              token: string;
           };
       }
     | {
@@ -339,35 +391,21 @@ export type AnalyticsEvent =
       };
 
 const getUrl = () => {
-    const base = 'https://data.trezor.io/suite/log';
-
     const hostname = getLocationHostname();
+    const environment = getEnvironment();
 
-    // this is true for both web and desktop dev server
+    const base = `https://data.trezor.io/suite/log/${environment}`;
+
+    if (process.env.CODESIGN_BUILD) {
+        return `${base}/stable.log`;
+    }
+
+    // no reporting on localhost
     if (hostname === 'localhost') {
-        return; // no reporting on dev
+        return;
     }
 
-    if (isDesktop()) {
-        // currently released desktop version is in beta.
-        return `${base}/desktop/beta.log`;
-        // there is no staging for desktop version
-    }
-
-    if (isWeb()) {
-        /* istanbul ignore next */
-        switch (hostname) {
-            case 'staging-suite.trezor.io':
-                return `${base}/web/staging.log`;
-            case 'beta-wallet.trezor.io':
-                return `${base}/web/beta.log`;
-            case 'suite.trezor.io':
-                return `${base}/web/stable.log`;
-            default:
-                // on dev server
-                return `${base}/web/develop.log`;
-        }
-    }
+    return `${base}/develop.log`;
 };
 
 export const report = (data: AnalyticsEvent, force = false) => (
@@ -375,8 +413,9 @@ export const report = (data: AnalyticsEvent, force = false) => (
     getState: GetState,
 ) => {
     const url = getUrl();
+
+    // no reporting on localhost
     if (!url) {
-        // this is for local dev
         return;
     }
 
@@ -387,11 +426,13 @@ export const report = (data: AnalyticsEvent, force = false) => (
     if (initialRun) {
         return;
     }
-    // the only case we want to override users 'do not log' choice is when we
-    // want to log that user did not give consent to logging.
+
+    // The only case we want to override users 'do not log' choice is
+    // when we want to log that user did not give consent to logging.
     if (!enabled && !force) {
         return;
     }
+
     const qs = encodeDataToQueryString(data, { sessionId, instanceId, version });
 
     try {
@@ -399,7 +440,7 @@ export const report = (data: AnalyticsEvent, force = false) => (
             method: 'GET',
         });
     } catch (err) {
-        // do nothing, just log error for sentry
+        // do nothing, just log error to sentry
         console.error('failed to log analytics', err);
     }
 };
@@ -449,10 +490,10 @@ export const init = (loadedState: State, optout: boolean) => async (
         );
     });
 
-    // send OS version if isDesktop
+    // send OS type if isDesktop
     if (isDesktop()) {
         let desktopOSVersion = '';
-        const resp = await getOSVersion();
+        const resp = await getOsType();
         if (resp?.success) {
             desktopOSVersion = `${resp.payload.platform}_${resp.payload.release}`;
         }

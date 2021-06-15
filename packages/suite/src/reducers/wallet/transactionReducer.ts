@@ -12,13 +12,20 @@ import { TimestampedRates } from '@wallet-types/fiatRates';
 export interface RbfTransactionParams {
     txid: string;
     utxo: AccountUtxo[]; // original utxo used by this transaction
-    outputs: {
-        type: 'payment' | 'change';
-        address: string;
-        amount: string;
-        formattedAmount: string;
-        token?: string;
-    }[];
+    outputs: Array<
+        | {
+              type: 'payment' | 'change';
+              address: string;
+              amount: string;
+              formattedAmount: string;
+              token?: string;
+          }
+        | {
+              type: 'opreturn';
+              dataHex: string;
+              dataAscii: string;
+          }
+    >;
     changeAddress?: AccountAddress; // original change address
     feeRate: string; // original fee rate
     baseFee: number; // original fee
@@ -129,8 +136,8 @@ const remove = (draft: State, account: Account, txs: WalletAccountTransaction[])
     });
 };
 
-const transactionReducer = (state: State = initialState, action: Action | WalletAction): State => {
-    return produce(state, draft => {
+const transactionReducer = (state: State = initialState, action: Action | WalletAction): State =>
+    produce(state, draft => {
         switch (action.type) {
             case STORAGE.LOADED:
                 return action.payload.wallet.transactions;
@@ -175,6 +182,5 @@ const transactionReducer = (state: State = initialState, action: Action | Wallet
             // no default
         }
     });
-};
 
 export default transactionReducer;

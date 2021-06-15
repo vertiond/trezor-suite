@@ -1,8 +1,10 @@
-import TrezorConnect from 'trezor-connect';
+import TrezorConnect, { Device } from 'trezor-connect';
+
 import { FIRMWARE } from '@firmware-actions/constants';
-import { Dispatch, GetState, AppState, AcquiredDevice } from '@suite-types';
 import * as analyticsActions from '@suite-actions/analyticsActions';
-import { isBitcoinOnly } from '@suite-utils/device';
+import { getFwVersion, isBitcoinOnly } from '@suite-utils/device';
+
+import type { Dispatch, GetState, AppState, AcquiredDevice } from '@suite-types';
 
 export type FirmwareAction =
     | {
@@ -12,8 +14,10 @@ export type FirmwareAction =
     | { type: typeof FIRMWARE.SET_TARGET_RELEASE; payload: AcquiredDevice['firmwareRelease'] }
     | { type: typeof FIRMWARE.RESET_REDUCER }
     | { type: typeof FIRMWARE.ENABLE_REDUCER; payload: boolean }
+    | { type: typeof FIRMWARE.SET_INTERMEDIARY_INSTALLED; payload: boolean }
     | { type: typeof FIRMWARE.SET_ERROR; payload?: string }
-    | { type: typeof FIRMWARE.TOGGLE_HAS_SEED };
+    | { type: typeof FIRMWARE.TOGGLE_HAS_SEED }
+    | { type: typeof FIRMWARE.REMEMBER_PREVIOUS_DEVICE; payload: Device };
 
 export const resetReducer = (): FirmwareAction => ({
     type: FIRMWARE.RESET_REDUCER,
@@ -50,26 +54,28 @@ export const firmwareUpdate = () => async (dispatch: Dispatch, getState: GetStat
 
     const model = device.features.major_version;
 
-    // for update (in firmware modal) target release is set. otherwise use device.firmwareRelease
-    const toFwVersion = targetRelease?.release?.version || device.firmwareRelease!.release.version;
-    const fromBlVersion = [
-        device.features.major_version,
-        device.features.minor_version,
-        device.features.patch_version,
-    ].join();
-
     let fromFwVersion = 'none';
-
-    if (prevDevice?.features && prevDevice?.firmware !== 'none') {
-        fromFwVersion = [
-            prevDevice.features.major_version,
-            prevDevice.features.minor_version,
-            prevDevice.features.patch_version,
-        ].join();
+    if (prevDevice && prevDevice.features && prevDevice.firmware !== 'none') {
+        fromFwVersion = getFwVersion(prevDevice);
     }
 
-    // update to same variant as is currently installed
-    const toBtcOnly = isBitcoinOnly(device);
+    // for update (in firmware modal) target release is set. otherwise use device.firmwareRelease
+    const toRelease = targetRelease || device.firmwareRelease;
+
+    if (!toRelease) return;
+
+    // device in bootloader mode have bootloader version in attributes used for fw version in non-bootloader mode
+    const fromBlVersion = getFwVersion(device);
+
+    // update to same variant as is currently installed or to the regular one if device does not have any fw (new/wiped device)
+    const isBtcOnlyFirmware = !prevDevice ? false : isBitcoinOnly(prevDevice);
+
+    const intermediary = !toRelease.isLatest;
+    if (intermediary) {
+        console.warn('Cannot install latest firmware. Will install intermediary fw instead.');
+    } else {
+        console.warn(`Installing firmware ${toRelease.release.version}`);
+    }
 
     const payload = {
         keepSession: false,
@@ -77,8 +83,10 @@ export const firmwareUpdate = () => async (dispatch: Dispatch, getState: GetStat
         device: {
             path: device.path,
         },
-        btcOnly: toBtcOnly,
-        version: toFwVersion,
+        btcOnly: isBtcOnlyFirmware,
+        version: toRelease.release.version,
+        // if we detect latest firmware may not be used right away, we should use intermediary instead
+        intermediary,
     };
 
     const updateResponse = await TrezorConnect.firmwareUpdate(payload);
@@ -89,8 +97,8 @@ export const firmwareUpdate = () => async (dispatch: Dispatch, getState: GetStat
             payload: {
                 fromFwVersion,
                 fromBlVersion,
-                toFwVersion: toFwVersion.join('.'),
-                toBtcOnly,
+                toFwVersion: toRelease.release.version.join('.'),
+                toBtcOnly: isBtcOnlyFirmware,
                 error: !updateResponse.success ? updateResponse.payload.error : '',
             },
         }),
@@ -98,6 +106,10 @@ export const firmwareUpdate = () => async (dispatch: Dispatch, getState: GetStat
 
     if (!updateResponse.success) {
         return dispatch({ type: FIRMWARE.SET_ERROR, payload: updateResponse.payload.error });
+    }
+
+    if (intermediary) {
+        dispatch({ type: FIRMWARE.SET_INTERMEDIARY_INSTALLED, payload: true });
     }
 
     // handling case described here: https://github.com/trezor/trezor-suite/issues/2650
@@ -108,12 +120,19 @@ export const firmwareUpdate = () => async (dispatch: Dispatch, getState: GetStat
     }
 
     // model 1
-    // ask user to unplug device (see firmwareMiddleware)
+    // ask user to unplug device if BL < 1.10.0 (see firmwareMiddleware), BL starting with 1.10.0 will automatically restart itself just like on model T
     // model 2 without pin
     // ask user to wait until device reboots
-    dispatch(setStatus(model === 1 ? 'unplug' : 'wait-for-reboot'));
+    dispatch(
+        setStatus(model === 1 && device.features.minor_version < 10 ? 'unplug' : 'wait-for-reboot'),
+    );
 };
 
 export const toggleHasSeed = (): FirmwareAction => ({
     type: FIRMWARE.TOGGLE_HAS_SEED,
+});
+
+export const rememberPreviousDevice = (device: Device) => ({
+    type: FIRMWARE.REMEMBER_PREVIOUS_DEVICE,
+    payload: device,
 });

@@ -8,12 +8,14 @@ export const WIKI_URL = 'https://wiki.trezor.io/';
 export const BLOG_URL = 'https://blog.trezor.io/';
 export const SHOP_URL = 'https://shop.trezor.io/';
 export const SUITE_URL = 'https://suite.trezor.io';
+export const SUITE_BRIDGE_URL = 'https://suite.trezor.io/web/bridge/';
 export const TREZOR_DATA_URL = 'https://wallet.trezor.io/data/';
 export const PIN_MANUAL_URL = 'https://wiki.trezor.io/User_manual:Entering_PIN';
 export const DRY_RUN_URL = 'https://wiki.trezor.io/User_manual:Dry-run_recovery';
 export const PASSPHRASE_URL = 'https://wiki.trezor.io/Passphrase';
 export const USER_MANUAL_URL = 'https://wiki.trezor.io/User_manual';
 export const TOS_URL = 'https://data.trezor.io/legal/wallet-terms.pdf';
+export const TOS_INVITY_URL = 'https://data.trezor.io/legal/invity-terms-of-use.pdf';
 export const SEED_MANUAL_URL = 'https://wiki.trezor.io/Recovery_seed';
 export const PHISHING_URL =
     'https://blog.trezor.io/phishing-attacks-used-to-steal-your-coins-recommended-reading-a39c0679c55d';
@@ -51,6 +53,7 @@ export const WIKI_UDEV_RULES = 'https://wiki.trezor.io/Udev_rules';
 export const WIKI_TOR = 'https://wiki.trezor.io/Glossary:Tor';
 export const WIKI_HOW_TO_RUN = 'https://wiki.trezor.io/Apps:Trezor_Suite#How_to_run';
 export const FEEDBACK_FORM = 'https://satoshilabs.typeform.com/to/Dqb71wm1';
+export const FIRMWARE_COMMIT_URL = 'https://github.com/trezor/trezor-firmware/commit/';
 
 // Tor domain
 export const TOR_DOMAIN = 'trezoriovpjcahpzkrewelclulmszwbqpzmzgub37gbcjlvluxtruqad.onion';

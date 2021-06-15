@@ -1,5 +1,5 @@
 # ! DO NOT set latest here USE custom hash !
-image: registry.gitlab.com/satoshilabs/trezor/trezor-suite/base@sha256:a11083e6fddc1b10f878b7c23bc282b9545d6d0951e8ecad6ffeecc902aa2766
+image: registry.gitlab.com/satoshilabs/trezor/trezor-suite/base@sha256:cfc62bc28946f0789a10dde4ecd3990ee7502e92de3dc2fa4d4ca84a329f7d21
 
 variables:
   DEV_SERVER_URL: "https://suite.corp.sldev.cz"
@@ -10,6 +10,7 @@ variables:
 
 stages:
   - setup environment
+  - validation
   - prebuild
   - build
   - deploy to dev
@@ -21,14 +22,12 @@ stages:
 
 include:
   - ci/environment.yml
+  - ci/validation.yml
   - ci/prebuild.yml
-  - ci/packages/components.yml
-  - ci/packages/suite-web.yml
-  - ci/packages/suite-desktop.yml
-  - ci/packages/suite-native.yml
-  - ci/packages/rollout.yml
-  - ci/packages/landing-page.yml
-  - ci/packages/suite-web-landing.yml
-  # to be run only on scheduled pipelines
+  - ci/components.yml
+  - ci/build.yml
+  - ci/deploy.yml
+  - ci/test.yml
   - ci/releases.yml
+  # to be run only on scheduled pipelines
   - ci/schedules.yml

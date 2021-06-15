@@ -10,6 +10,7 @@ import {
     eachQuarterOfInterval,
     eachMonthOfInterval,
     eachDayOfInterval,
+    differenceInMinutes,
 } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 
@@ -18,9 +19,7 @@ export const formatDuration = (seconds: number) =>
 
 export const formatDurationStrict = (seconds: number) => formatDistanceStrict(0, seconds * 1000);
 
-export const getLocalTimeZone = () => {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-};
+export const getLocalTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export const getDateWithTimeZone = (date: number, timeZone?: string) => {
     try {
@@ -46,12 +45,14 @@ export const calcTicks = (startDate: Date, endDate: Date) => {
 
 export const calcTicksFromData = (data: { time: number }[]) => {
     if (!data || data.length < 1) return [];
-    const startDate = data.reduce((min, current) => {
-        return current.time < min ? current.time : min;
-    }, data[0].time);
-    const endDate = data.reduce((max, current) => {
-        return current.time > max ? current.time : max;
-    }, data[0].time);
+    const startDate = data.reduce(
+        (min, current) => (current.time < min ? current.time : min),
+        data[0].time,
+    );
+    const endDate = data.reduce(
+        (max, current) => (current.time > max ? current.time : max),
+        data[0].time,
+    );
 
     const startUnix = fromUnixTime(startDate);
     const endUnix = fromUnixTime(endDate);
@@ -84,14 +85,20 @@ export const calcTicksFromData = (data: { time: number }[]) => {
 };
 
 /**
- * Returns Blockbook-safe current unix timestamp (current time - 3 mins).
- * Little workaround for Blockbook as it doesn't return rates data for too recent timestamps.
+ * Little workaround for Blockbook API for fetching fiat rates for given timestamps (getFiatRatesForTimestamps)
+ * which doesn't return proper response if the timestamp is too recent.
+ * If passed timestamp is older than 3 minutes it is returned without any adjustments.
+ * Otherwise timestamp of 3 minutes ago is returned.
  *
  * @returns
  */
-export const getBlockbookSafeTime = () => {
-    const timestamp = getUnixTime(new Date());
-    return timestamp - 180; // current time - 3 mins
+export const getBlockbookSafeTime = (timestamp?: number) => {
+    const currentTimestamp = getUnixTime(new Date());
+    if (timestamp && differenceInMinutes(currentTimestamp * 1000, timestamp * 1000) > 3) {
+        // timestamp is older than 3 mins, no adjustment needed
+        return timestamp;
+    }
+    return currentTimestamp - 180;
 };
 
 /**

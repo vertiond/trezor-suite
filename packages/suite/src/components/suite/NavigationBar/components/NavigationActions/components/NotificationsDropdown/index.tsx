@@ -3,7 +3,7 @@ import { Dropdown, DropdownRef, variables } from '@trezor/components';
 import React, { useRef, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import ActionItem from '../ActionItem';
-import { useActions } from '@suite-hooks';
+import { useActions, useAnalytics } from '@suite-hooks';
 import * as notificationActions from '@suite-actions/notificationActions';
 
 const Wrapper = styled.div<Pick<Props, 'marginLeft' | 'marginRight'>>`
@@ -21,18 +21,22 @@ const NotificationsWrapper = styled.div`
 `;
 
 interface Props {
-    withAlertDot: boolean;
+    indicator?: boolean;
+    isActive?: boolean;
     marginLeft?: string;
     marginRight?: string;
 }
 
 const NotificationsDropdown = ({
-    withAlertDot,
+    indicator = false,
+    isActive = false,
     marginLeft = '0px',
     marginRight = '0px',
 }: Props) => {
+    const analytics = useAnalytics();
+
     // use "opened" state to decide if "active" styles on ActionItem should be applied
-    const [opened, setOpened] = useState(false);
+    const [open, setOpen] = useState(false);
     const dropdownRef = useRef<DropdownRef>();
 
     const { resetUnseen } = useActions({
@@ -42,14 +46,21 @@ const NotificationsDropdown = ({
     const handleToggleChange = useCallback(
         (isToggled: boolean) => {
             if (isToggled) {
-                setOpened(true);
+                setOpen(true);
             } else {
                 // if the dropdown is going to be closed, mark all notifications as seen and "deactivate" ActionItem
                 resetUnseen();
-                setOpened(false);
+                setOpen(false);
             }
+
+            analytics.report({
+                type: 'menu/notifications/toggle',
+                payload: {
+                    value: isToggled,
+                },
+            });
         },
-        [resetUnseen],
+        [resetUnseen, analytics],
     );
 
     return (
@@ -84,8 +95,9 @@ const NotificationsDropdown = ({
                 <ActionItem
                     label={<Translation id="TR_NOTIFICATIONS" />}
                     icon="NOTIFICATION"
-                    isActive={opened}
-                    withAlertDot={withAlertDot}
+                    isOpen={open}
+                    isActive={isActive}
+                    indicator={indicator ? 'alert' : undefined}
                 />
             </Dropdown>
         </Wrapper>

@@ -1,26 +1,33 @@
-import * as React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+
 import { isDesktop } from '@suite-utils/env';
 import { useSelector } from '@suite-hooks';
-
 import OnlineStatus from './OnlineStatus';
 import UpdateBridge from './UpdateBridge';
 import UpdateFirmware from './UpdateFirmware';
 import NoBackup from './NoBackup';
 import FailedBackup from './FailedBackup';
+import MessageSystemBanner from './MessageSystemBanner';
+import SafetyChecksBanner from './SafetyChecks';
 
-const Wrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    z-index: 3;
+import type { Message } from '@suite-types/messageSystem';
+
+const Wrapper = styled.div<{ onTop?: boolean }>`
+    z-index: ${props => (props.onTop ? '10001' : '3')};
+    background: ${props => props.theme.BG_WHITE};
 `;
 
 const Banners = () => {
     const transport = useSelector(state => state.suite.transport);
     const online = useSelector(state => state.suite.online);
     const device = useSelector(state => state.suite.device);
-
-    let Banner;
+    const { validMessages, dismissedMessages, config } = useSelector(state => state.messageSystem);
+    // The dismissal doesn't need to outlive the session. Use local state.
+    const [safetyChecksDismissed, setSafetyChecksDismissed] = useState(false);
+    useEffect(() => {
+        setSafetyChecksDismissed(false);
+    }, [device?.features?.safety_checks]);
 
     const showUpdateBridge = () => {
         if (
@@ -33,27 +40,73 @@ const Banners = () => {
         return transport?.outdated;
     };
 
+    const messageSystemBanner = useMemo((): Message | null => {
+        const nonDismissedValidMessages = validMessages.banner.filter(
+            id => !dismissedMessages[id]?.banner,
+        );
+
+        const messages = config?.actions
+            .filter(({ message }) => nonDismissedValidMessages.includes(message.id))
+            .map(action => action.message);
+
+        if (!messages?.length) return null;
+
+        return messages.reduce((prev, current) =>
+            prev.priority > current.priority ? prev : current,
+        );
+    }, [validMessages, dismissedMessages, config]);
+
+    let banner;
+    let priority = 0;
     if (device?.features?.unfinished_backup) {
-        Banner = <FailedBackup />;
+        banner = <FailedBackup />;
+        priority = 90;
     } else if (device?.features?.needs_backup) {
-        Banner = <NoBackup />;
+        banner = <NoBackup />;
+        priority = 70;
+    } else if (device?.connected && device?.features?.safety_checks === 'PromptAlways') {
+        // PromptAlways could only be set via trezorctl. Warn user unconditionally.
+        banner = <SafetyChecksBanner />;
+        priority = 50;
+    } else if (
+        !safetyChecksDismissed &&
+        device?.connected &&
+        device?.features?.safety_checks === 'PromptTemporarily'
+    ) {
+        // PromptTemporarily was probably set intentionally via Suite and will change back to Strict when Trezor reboots.
+        // Let the user dismiss the warning.
+        banner = <SafetyChecksBanner onDismiss={() => setSafetyChecksDismissed(true)} />;
+        priority = 50;
     } else if (showUpdateBridge()) {
-        Banner = <UpdateBridge />;
+        banner = <UpdateBridge />;
+        priority = 30;
     } else if (
         device?.connected &&
         device?.features &&
         device?.mode !== 'bootloader' &&
         ['outdated'].includes(device.firmware)
     ) {
-        Banner = <UpdateFirmware />;
+        banner = <UpdateFirmware />;
+        priority = 10;
     }
 
+    // message system banners should always be visible in the app even if app body is blurred
+    const useMessageSystemBanner = messageSystemBanner && messageSystemBanner.priority >= priority;
+
     return (
-        <Wrapper>
-            <OnlineStatus isOnline={online} />
-            {Banner}
-            {/* TODO: add Pin not set */}
-        </Wrapper>
+        <>
+            {useMessageSystemBanner && (
+                <Wrapper onTop>
+                    {/* @ts-ignore - fix ts which thinks that "messageSystemBanner" can be null */}
+                    <MessageSystemBanner message={messageSystemBanner} />
+                </Wrapper>
+            )}
+            <Wrapper>
+                <OnlineStatus isOnline={online} />
+                {!useMessageSystemBanner && banner}
+                {/* TODO: add Pin not set */}
+            </Wrapper>
+        </>
     );
 };
 

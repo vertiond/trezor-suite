@@ -12,21 +12,9 @@ const modalAppParams = ['cancelable'] as const;
 
 const routes = [
     {
-        name: 'suite-welcome',
-        pattern: '/welcome',
-        app: 'welcome',
-        isModal: true,
-    },
-    {
         name: 'suite-start',
         pattern: '/start',
         app: 'start',
-    },
-    {
-        name: 'suite-analytics',
-        pattern: '/analytics',
-        app: 'analytics',
-        isModal: true,
     },
     {
         name: 'suite-index',
@@ -72,13 +60,13 @@ const routes = [
         name: 'onboarding-index',
         pattern: '/onboarding',
         app: 'onboarding',
-        isModal: true,
-        params: modalAppParams,
+        isModal: true, // used to prevent url change
     },
     {
         name: 'settings-index',
         pattern: '/settings',
         app: 'settings',
+        params: undefined,
     },
     {
         name: 'settings-debug',
@@ -125,7 +113,7 @@ const routes = [
     {
         name: 'coinmarket-buy-detail',
         pattern: 'accounts/coinmarket/buy/detail',
-        app: 'walletParams',
+        app: 'wallet',
         params: walletParams,
     },
     {
@@ -177,6 +165,12 @@ const routes = [
         params: walletParams,
     },
     {
+        name: 'wallet-coinmarket-sell-offers',
+        pattern: '/accounts/coinmarket/sell/offers',
+        app: 'wallet',
+        params: walletParams,
+    },
+    {
         name: 'wallet-coinmarket-exchange-offers',
         pattern: '/accounts/coinmarket/exchange/offers',
         app: 'wallet',
@@ -189,6 +183,12 @@ const routes = [
         params: walletParams,
     },
     {
+        name: 'wallet-coinmarket-sell-detail',
+        pattern: '/accounts/coinmarket/sell/detail',
+        app: 'wallet',
+        params: walletParams,
+    },
+    {
         name: 'wallet-coinmarket-exchange-detail',
         pattern: '/accounts/coinmarket/exchange/detail',
         app: 'wallet',
@@ -197,6 +197,12 @@ const routes = [
     {
         name: 'wallet-details',
         pattern: '/accounts/details',
+        app: 'wallet',
+        params: walletParams,
+    },
+    {
+        name: 'wallet-tokens',
+        pattern: '/accounts/tokens',
         app: 'wallet',
         params: walletParams,
     },

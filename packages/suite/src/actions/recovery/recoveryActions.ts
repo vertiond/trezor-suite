@@ -7,11 +7,13 @@ import * as analyticsActions from '@suite-actions/analyticsActions';
 import { Dispatch, GetState } from '@suite-types';
 import { WordCount } from '@recovery-types';
 import { DEVICE } from '@suite-constants';
+import { SUITE } from '@suite-actions/constants';
 
 export type SeedInputStatus =
     | 'initial'
     | 'select-word-count'
     | 'select-recovery-type'
+    | 'waiting-for-confirmation'
     | 'in-progress'
     | 'finished';
 
@@ -55,7 +57,12 @@ const checkSeed = () => async (dispatch: Dispatch, getState: GetState) => {
     const { device } = getState().suite;
     if (!device || !device.features) return;
     dispatch(setError(''));
-    dispatch(setStatus('in-progress'));
+
+    if (device.features.major_version === 1) {
+        dispatch(setStatus('waiting-for-confirmation'));
+    } else {
+        dispatch(setStatus('in-progress'));
+    }
 
     const response = await TrezorConnect.recoveryDevice({
         dry_run: true,
@@ -84,7 +91,12 @@ const recoverDevice = () => async (dispatch: Dispatch, getState: GetState) => {
     const { device } = getState().suite;
     if (!device || !device.features) return;
     dispatch(setError(''));
-    dispatch(setStatus('in-progress'));
+
+    if (device.features.major_version === 1) {
+        dispatch(setStatus('waiting-for-confirmation'));
+    } else {
+        dispatch(setStatus('in-progress'));
+    }
 
     const params: RecoveryDevice = {
         type: advancedRecovery ? 1 : 0,
@@ -103,6 +115,15 @@ const recoverDevice = () => async (dispatch: Dispatch, getState: GetState) => {
             path: device.path,
         },
     });
+
+    if (response.success && DEVICE.DEFAULT_PASSPHRASE_PROTECTION) {
+        // We call recoverDevice from onboarding
+        // Uninitialized device has disabled passphrase protection thus useEmptyPassphrase is set to true.
+        // It means that when user finished the onboarding process a standard wallet is automatically
+        // discovered instead of asking for selecting between standard wallet and a passphrase.
+        // This action takes cares of setting useEmptyPassphrase to false (handled by deviceReducer).
+        dispatch({ type: SUITE.UPDATE_PASSPHRASE_MODE, payload: device, hidden: true });
+    }
 
     if (!response.success) {
         dispatch(setError(response.payload.error));

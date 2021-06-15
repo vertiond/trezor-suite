@@ -42,24 +42,24 @@ On disable, it throws away all metadata related records from memory.`, () => {
                 aesKey: 'c785ef250807166bffc141960c525df97647fcc1bca57f6892ca3742ba86ed8d',
             });
 
-            cy.prefixedVisit('/accounts', {
+            cy.prefixedVisit('/', {
                 onBeforeLoad: (win: Window) => {
                     cy.stub(win, 'open', stubOpen(win));
                     cy.stub(win, 'fetch', rerouteMetadataToMockProvider);
                 },
             });
-
-            cy.passThroughInitialRun();
-
             cy.log(
                 'Wait for discovery to finish. There is "add label" button, but no actual metadata appeared',
             );
-
+            cy.passThroughInitialRun();
             cy.discoveryShouldFinish();
+
+            cy.getTestElement('@suite/menu/wallet-index').click();
 
             cy.getTestElement('@account-menu/btc/normal/0/label').should('contain', 'Bitcoin');
 
             cy.log('Go to settings and enable metadata');
+            cy.getTestElement('@suite/menu/settings').click();
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata-switch').click({ force: true });
             cy.passThroughInitMetadata(f.provider);
@@ -77,6 +77,7 @@ On disable, it throws away all metadata related records from memory.`, () => {
             cy.log(
                 "Now go back to settings, disconnect provider and check that we don't see metadata in app",
             );
+            cy.getTestElement('@suite/menu/settings').click();
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata/disconnect-provider-button').click();
             cy.getTestElement('@settings/metadata/connect-provider-button');
@@ -100,6 +101,7 @@ On disable, it throws away all metadata related records from memory.`, () => {
             );
 
             // device not saved, disable metadata
+            cy.getTestElement('@suite/menu/settings').click();
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata-switch').click({ force: true });
             cy.getTestElement('@suite/menu/wallet-index').click();
@@ -127,6 +129,7 @@ On disable, it throws away all metadata related records from memory.`, () => {
             cy.getTestElement('@metadata/input').type(' edited for remembered{enter}');
 
             cy.log('Now again, lets try disconnecting provider');
+            cy.getTestElement('@suite/menu/settings').click();
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata/disconnect-provider-button').click();
             cy.getTestElement('@suite/menu/wallet-index').click();
@@ -142,6 +145,7 @@ On disable, it throws away all metadata related records from memory.`, () => {
             cy.getTestElement('@metadata/input').type('mnau{enter}');
 
             //  device saved, disable metadata
+            cy.getTestElement('@suite/menu/settings').click();
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata-switch').click({ force: true });
             cy.getTestElement('@suite/menu/wallet-index').click();

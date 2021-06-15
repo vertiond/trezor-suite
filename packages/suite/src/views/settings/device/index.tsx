@@ -17,11 +17,13 @@ import {
     FAILED_BACKUP_URL,
     PASSPHRASE_URL,
     SEED_MANUAL_URL,
+    FIRMWARE_COMMIT_URL,
 } from '@suite-constants/urls';
+import { MAX_LABEL_LENGTH } from '@suite-constants/device';
 import { getFwVersion, isBitcoinOnly } from '@suite-utils/device';
 import * as homescreen from '@suite-utils/homescreen';
 import { useDevice, useAnalytics, useActions, useSelector } from '@suite-hooks';
-import { variables, Switch } from '@trezor/components';
+import { variables, Switch, Button, Tooltip } from '@trezor/components';
 import * as routerActions from '@suite-actions/routerActions';
 import * as modalActions from '@suite-actions/modalActions';
 import * as deviceSettingsActions from '@settings-actions/deviceSettingsActions';
@@ -44,6 +46,24 @@ const HiddenInput = styled.input`
 const Col = styled.div`
     flex-direction: column;
 `;
+
+const Version = styled.div`
+    span {
+        display: flex;
+        align-items: center;
+    }
+`;
+
+const VersionButton = styled(Button)`
+    padding-left: 1ch;
+`;
+
+const VersionTooltip = styled(Tooltip)`
+    display: inline-flex;
+    margin: 0 2px;
+`;
+
+const VersionLink = styled.a``;
 
 const buildAutoLockOption = (seconds: number) => ({
     label: formatDurationStrict(seconds),
@@ -86,7 +106,6 @@ const Settings = () => {
     const { isLocked } = useDevice();
     const isDeviceLocked = isLocked();
     const analytics = useAnalytics();
-    const MAX_LABEL_LENGTH = 16;
 
     useEffect(() => {
         if (!device) {
@@ -100,11 +119,25 @@ const Settings = () => {
     }
 
     const { features } = device;
+    const { revision } = features;
 
     const onUploadHomescreen = async (files: FileList | null) => {
         if (!files || !files.length) return;
-        const dataUrl = await homescreen.fileToDataUrl(files[0]);
+        const image = files[0];
+        const dataUrl = await homescreen.fileToDataUrl(image);
+
         setCustomHomescreen(dataUrl);
+
+        const imageResolution = await homescreen.getImageResolution(dataUrl);
+        analytics.report({
+            type: 'settings/device/background',
+            payload: {
+                format: image.type,
+                size: image.size,
+                resolutionWidth: imageResolution.width,
+                resolutionHeight: imageResolution.height,
+            },
+        });
     };
 
     const onSelectCustomHomescreen = async () => {
@@ -138,7 +171,7 @@ const Settings = () => {
                                 isDisabled={
                                     isDeviceLocked ||
                                     !features.needs_backup ||
-                                    features.unfinished_backup
+                                    !!features.unfinished_backup
                                 }
                             >
                                 {features.needs_backup && <Translation id="TR_CREATE_BACKUP" />}
@@ -183,8 +216,8 @@ const Settings = () => {
                                 }}
                                 isDisabled={
                                     isDeviceLocked ||
-                                    features.needs_backup ||
-                                    features.unfinished_backup
+                                    !!features.needs_backup ||
+                                    !!features.unfinished_backup
                                 }
                                 variant="secondary"
                             >
@@ -199,13 +232,33 @@ const Settings = () => {
                     <TextColumn
                         title={<Translation id="TR_FIRMWARE_VERSION" />}
                         description={
-                            <>
+                            <Version>
                                 <Translation
                                     id="TR_YOUR_CURRENT_FIRMWARE"
-                                    values={{ version: getFwVersion(device) }}
+                                    values={{
+                                        version: (
+                                            <VersionTooltip content={revision} disabled={!revision}>
+                                                <VersionLink
+                                                    target="_blank"
+                                                    href={FIRMWARE_COMMIT_URL + revision}
+                                                >
+                                                    <VersionButton
+                                                        variant="tertiary"
+                                                        icon={
+                                                            revision ? 'EXTERNAL_LINK' : undefined
+                                                        }
+                                                        alignIcon="right"
+                                                        disabled={!revision}
+                                                    >
+                                                        {getFwVersion(device)}
+                                                        {isBitcoinOnly(device) && ' (bitcoin-only)'}
+                                                    </VersionButton>
+                                                </VersionLink>
+                                            </VersionTooltip>
+                                        ),
+                                    }}
                                 />
-                                {isBitcoinOnly(device) && ' (bitcoin-only)'}
-                            </>
+                            </Version>
                         }
                     />
                     <ActionColumn>
@@ -238,7 +291,7 @@ const Settings = () => {
                         <Switch
                             checked={!!features.pin_protection}
                             onChange={() => {
-                                changePin({ remove: features.pin_protection });
+                                changePin({ remove: !!features.pin_protection });
                                 analytics.report({
                                     type: 'settings/device/change-pin-protection',
                                     payload: {
@@ -304,6 +357,26 @@ const Settings = () => {
                         />
                     </ActionColumn>
                 </SectionItem>
+                {device.features.safety_checks && (
+                    <SectionItem>
+                        <TextColumn
+                            title={<Translation id="TR_DEVICE_SETTINGS_SAFETY_CHECKS_TITLE" />}
+                            description={<Translation id="TR_DEVICE_SETTINGS_SAFETY_CHECKS_DESC" />}
+                        />
+                        <ActionColumn>
+                            <ActionButton
+                                variant="secondary"
+                                onClick={() => {
+                                    openModal({ type: 'safety-checks' });
+                                }}
+                                data-test="@settings/device/safety-checks-button"
+                                isDisabled={isDeviceLocked}
+                            >
+                                <Translation id="TR_DEVICE_SETTINGS_SAFETY_CHECKS_BUTTON" />
+                            </ActionButton>
+                        </ActionColumn>
+                    </SectionItem>
+                )}
             </Section>
             <Section title={<Translation id="TR_PERSONALIZATION" />}>
                 <SectionItem>
@@ -374,6 +447,10 @@ const Settings = () => {
                                 onClick={() => {
                                     if (fileInputElement.current) {
                                         fileInputElement.current.click();
+                                        analytics.report({
+                                            type: 'settings/device/goto/background',
+                                            payload: { custom: true },
+                                        });
                                     }
                                 }}
                                 isDisabled={isDeviceLocked}
@@ -391,6 +468,7 @@ const Settings = () => {
                                 });
                                 analytics.report({
                                     type: 'settings/device/goto/background',
+                                    payload: { custom: false },
                                 });
                             }}
                             isDisabled={isDeviceLocked}

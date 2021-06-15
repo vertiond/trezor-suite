@@ -1,7 +1,7 @@
 import { AppState } from '@suite-types';
 
-export const getFormattedFingerprint = (fingerprint: string) => {
-    return [
+export const getFormattedFingerprint = (fingerprint: string) =>
+    [
         fingerprint.substr(0, 16),
         fingerprint.substr(16, 16),
         fingerprint.substr(32, 16),
@@ -9,19 +9,19 @@ export const getFormattedFingerprint = (fingerprint: string) => {
     ]
         .join('\n')
         .toUpperCase();
-};
 
 export const getTextForStatus = (status: AppState['firmware']['status']) => {
     switch (status) {
-        case 'waiting-for-confirmation':
-            return 'TR_WAITING_FOR_CONFIRMATION';
         case 'started':
         case 'installing':
             return 'TR_INSTALLING';
+        case 'unplug':
+        case 'reconnect-in-normal':
+        case 'done':
+        case 'partially-done':
+            return 'TR_FIRMWARE_STATUS_INSTALLATION_COMPLETED';
         case 'wait-for-reboot':
             return 'TR_WAIT_FOR_REBOOT';
-        case 'unplug':
-            return 'TR_DISCONNECT_YOUR_DEVICE';
         default:
             return null;
     }

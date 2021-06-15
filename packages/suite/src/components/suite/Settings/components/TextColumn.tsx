@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { variables } from '@trezor/components';
-import { Translation, ExternalLink } from '@suite-components';
+import { variables, Button } from '@trezor/components';
+import { Translation, TrezorLink } from '@suite-components';
 
 interface TextColumnProps {
     title?: React.ReactNode;
@@ -15,6 +15,11 @@ const Wrapper = styled.div`
     flex-direction: column;
     text-align: left;
     margin-right: 16px;
+    max-width: 500px;
+`;
+
+const LearnMoreButton = styled(Button)`
+    max-width: fit-content;
 `;
 
 const Description = styled.div`
@@ -32,18 +37,18 @@ const Title = styled.div`
     font-weight: ${variables.FONT_WEIGHT.REGULAR};
 `;
 
-const TextColumn = ({ title, description, learnMore }: TextColumnProps) => {
-    return (
-        <Wrapper>
-            {title && <Title>{title}</Title>}
-            {description && <Description>{description}</Description>}
-            {learnMore && (
-                <ExternalLink href={learnMore} size="tiny">
+const TextColumn = ({ title, description, learnMore }: TextColumnProps) => (
+    <Wrapper>
+        {title && <Title>{title}</Title>}
+        {description && <Description>{description}</Description>}
+        {learnMore && (
+            <TrezorLink href={learnMore}>
+                <LearnMoreButton variant="tertiary">
                     <Translation id="TR_LEARN_MORE" />
-                </ExternalLink>
-            )}
-        </Wrapper>
-    );
-};
+                </LearnMoreButton>
+            </TrezorLink>
+        )}
+    </Wrapper>
+);
 
 export default TextColumn;

@@ -12,7 +12,7 @@ export type ButtonSize = 'small' | 'large';
 
 export type InputState = 'success' | 'warning' | 'error';
 
-export type InputVariant = 'small' | 'large';
+export type InputVariant = 'small' | 'medium' | 'large';
 
 export interface InputButton {
     icon?: IconType;
@@ -32,7 +32,13 @@ export type FlagType = keyof typeof FLAGS;
 
 export type ParagraphSize = 'normal' | 'small' | 'tiny';
 
-export type TrezorLogoType = 'horizontal' | 'vertical' | 'symbol' | 'suite' | 'suite_compact';
+export type TrezorLogoType =
+    | 'horizontal'
+    | 'vertical'
+    | 'symbol'
+    | 'suite'
+    | 'suite_square'
+    | 'suite_compact';
 
 export type TrezorLogoVariant = 'white' | 'black';
 

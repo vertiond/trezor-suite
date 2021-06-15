@@ -1,11 +1,7 @@
 import React from 'react';
 import randomColor from 'randomcolor';
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { THEME, tooltipGlobalStyles, P } from '../index';
-
-const GlobalStyle = createGlobalStyle`
-    ${tooltipGlobalStyles}
-`;
+import styled, { ThemeProvider } from 'styled-components';
+import { THEME, P } from '../index';
 
 const color = randomColor({ luminosity: 'light' });
 
@@ -18,27 +14,19 @@ const Wrapper = styled.div`
     color: ${props => props.theme.TYPE_DARK_GREY};
 `;
 
-const StoryWrapper = (story: any) => {
-    return (
-        <>
-            <P size="normal">Light theme</P>
-            <ThemeProvider theme={THEME.light}>
-                <Wrapper>
-                    <GlobalStyle />
-                    {story.children}
-                </Wrapper>
-            </ThemeProvider>
+const StoryWrapper = (story: any) => (
+    <>
+        <P size="normal">Light theme</P>
+        <ThemeProvider theme={THEME.light}>
+            <Wrapper>{story.children}</Wrapper>
+        </ThemeProvider>
 
-            <P size="normal">Dark theme</P>
-            <ThemeProvider theme={THEME.dark}>
-                <Wrapper>
-                    <GlobalStyle />
-                    {story.children}
-                </Wrapper>
-            </ThemeProvider>
-        </>
-    );
-};
+        <P size="normal">Dark theme</P>
+        <ThemeProvider theme={THEME.dark}>
+            <Wrapper>{story.children}</Wrapper>
+        </ThemeProvider>
+    </>
+);
 
 interface StoryColumnProps {
     children: any;

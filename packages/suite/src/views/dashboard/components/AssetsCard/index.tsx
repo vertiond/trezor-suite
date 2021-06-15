@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import BigNumber from 'bignumber.js';
 import { NETWORKS } from '@wallet-config';
@@ -8,8 +8,9 @@ import AssetGrid, { AssetGridSkeleton } from './components/AssetGrid';
 import { Account, Network } from '@wallet-types';
 import { variables, Icon, Button, colors } from '@trezor/components';
 import { Card, Translation } from '@suite-components';
-import { useDiscovery, useActions } from '@suite-hooks';
+import { useDiscovery, useActions, useSelector } from '@suite-hooks';
 import { useAccounts } from '@wallet-hooks';
+import * as suiteActions from '@suite-actions/suiteActions';
 import * as routerActions from '@suite-actions/routerActions';
 import { AnimatePresence } from 'framer-motion';
 
@@ -76,10 +77,10 @@ const AssetsCard = () => {
     const theme = useTheme();
     const { discovery, getDiscoveryStatus } = useDiscovery();
     const { accounts } = useAccounts(discovery);
-    const [isTableMode, setIsTableMode] = useState(true);
-
-    const { goto } = useActions({
+    const { dashboardAssetsGridMode } = useSelector(s => s.suite.flags);
+    const { goto, setFlag } = useActions({
         goto: routerActions.goto,
+        setFlag: suiteActions.setFlag,
     });
 
     const assets: { [key: string]: Account[] } = {};
@@ -132,33 +133,31 @@ const AssetsCard = () => {
                 <ActionsWrapper>
                     <Icon
                         icon="TABLE"
-                        onClick={() => setIsTableMode(true)}
-                        color={isTableMode ? colors.BG_GREEN : colors.TYPE_LIGHT_GREY}
+                        onClick={() => setFlag('dashboardAssetsGridMode', false)}
+                        color={!dashboardAssetsGridMode ? colors.BG_GREEN : colors.TYPE_LIGHT_GREY}
                     />
                     <Icon
                         icon="GRID"
-                        onClick={() => setIsTableMode(false)}
-                        color={!isTableMode ? colors.BG_GREEN : colors.TYPE_LIGHT_GREY}
+                        onClick={() => setFlag('dashboardAssetsGridMode', true)}
+                        color={dashboardAssetsGridMode ? colors.BG_GREEN : colors.TYPE_LIGHT_GREY}
                     />
                 </ActionsWrapper>
             }
         >
-            {!isTableMode && (
+            {dashboardAssetsGridMode && (
                 <GridWrapper>
-                    {assetsData.map(asset => {
-                        return (
-                            <AssetGrid
-                                key={asset.symbol}
-                                network={asset.network}
-                                failed={asset.assetFailed}
-                                cryptoValue={asset.assetBalance.toFixed()}
-                            />
-                        );
-                    })}
+                    {assetsData.map(asset => (
+                        <AssetGrid
+                            key={asset.symbol}
+                            network={asset.network}
+                            failed={asset.assetFailed}
+                            cryptoValue={asset.assetBalance.toFixed()}
+                        />
+                    ))}
                     {discoveryInProgress && <AssetGridSkeleton />}
                 </GridWrapper>
             )}
-            {isTableMode && (
+            {!dashboardAssetsGridMode && (
                 <StyledCard>
                     <AnimatePresence initial={false}>
                         <Grid>
@@ -171,17 +170,15 @@ const AssetsCard = () => {
                             <Header>
                                 <Translation id="TR_EXCHANGE_RATE" />
                             </Header>
-                            {assetsData.map((asset, i) => {
-                                return (
-                                    <AssetTable
-                                        key={asset.symbol}
-                                        network={asset.network}
-                                        failed={asset.assetFailed}
-                                        cryptoValue={asset.assetBalance.toFixed()}
-                                        isLastRow={i === assetsData.length - 1}
-                                    />
-                                );
-                            })}
+                            {assetsData.map((asset, i) => (
+                                <AssetTable
+                                    key={asset.symbol}
+                                    network={asset.network}
+                                    failed={asset.assetFailed}
+                                    cryptoValue={asset.assetBalance.toFixed()}
+                                    isLastRow={i === assetsData.length - 1}
+                                />
+                            ))}
                             {discoveryInProgress && <AssetTableSkeleton />}
                         </Grid>
                     </AnimatePresence>

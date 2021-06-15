@@ -5,15 +5,41 @@ const glob = require('glob');
 const { build } = require('esbuild');
 const pkg = require('../package.json');
 
+const { NODE_ENV, USE_MOCKS } = process.env;
+
 const electronSource = path.join(__dirname, '..', 'src-electron');
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = NODE_ENV !== 'production';
+const useMocks = USE_MOCKS === 'true' || (isDev && USE_MOCKS !== 'false');
 
+// Get git revision
 const gitRevision = child_process.execSync('git rev-parse HEAD').toString().trim();
-const modulePath = path.join(electronSource, 'modules');
-const modules = glob.sync(`${modulePath}/**/*.ts`).map(m => `modules/${m.replace(modulePath, '')}`);
 
-console.log('[Electron Build] Starting...');
+// Get all modules (used as entry points)
+const modulePath = path.join(electronSource, 'modules');
+const modules = glob.sync(`${modulePath}/**/*.ts`).map(m => `modules${m.replace(modulePath, '')}`);
+
+// Prepare mock plugin with files from the mocks folder
+const mockPath = path.join(electronSource, 'mocks');
+const mocks = glob
+    .sync(`${mockPath}/**/*.ts`)
+    .map(m => m.replace(`${mockPath}/`, '').replace('.ts', ''));
+const mockFilter = new RegExp(`^${mocks.join('|')}$`);
+const mockPlugin = {
+    name: 'mock-plugin',
+    setup: build => {
+        build.onResolve({ filter: mockFilter }, args => ({
+            path: path.join(mockPath, `${args.path}.ts`),
+        }));
+    },
+};
+
+// Read signature public key
+const keyPath = path.join(__dirname, 'app-key.asc');
+const appKey = fs.readFileSync(keyPath, 'utf-8');
+
+// Start build
 const hrstart = process.hrtime();
+console.log('[Electron Build] Starting...');
 build({
     entryPoints: ['app.ts', 'preload.ts', ...modules].map(f => path.join(electronSource, f)),
     platform: 'node',
@@ -29,7 +55,10 @@ build({
     outdir: path.join(__dirname, '..', 'dist'),
     define: {
         'process.env.COMMITHASH': JSON.stringify(gitRevision),
+        'process.env.APP_PUBKEY': JSON.stringify(appKey),
     },
+    inject: [path.join(__dirname, 'build-inject.js')],
+    plugins: useMocks ? [mockPlugin] : [],
 })
     .then(() => {
         const hrend = process.hrtime(hrstart);

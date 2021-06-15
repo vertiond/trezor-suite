@@ -27,16 +27,14 @@ SendContext.displayName = 'SendContext';
 const getDefaultValues = (
     currency: Output['currency'],
     network: UseSendFormState['network'],
-): FormState => {
-    return {
-        ...DEFAULT_VALUES,
-        options:
-            isFeatureEnabled('RBF') && network.features?.includes('rbf')
-                ? ['bitcoinRBF', 'broadcast']
-                : ['broadcast'],
-        outputs: [{ ...DEFAULT_PAYMENT, currency }],
-    };
-};
+): FormState => ({
+    ...DEFAULT_VALUES,
+    options:
+        isFeatureEnabled('RBF') && network.features?.includes('rbf')
+            ? ['bitcoinRBF', 'broadcast']
+            : ['broadcast'],
+    outputs: [{ ...DEFAULT_PAYMENT, currency }],
+});
 
 // convert UseSendFormProps to UseSendFormState
 const getStateFromProps = (props: UseSendFormProps) => {
@@ -224,7 +222,7 @@ export const useSendForm = (props: UseSendFormProps): SendContextValues => {
             updateContext({ isLoading: true });
             const result = await signTransaction(values, composedTx);
             updateContext({ isLoading: false });
-            if (result) {
+            if (result?.success) {
                 resetContext();
                 goto('wallet-index', undefined, true);
             }

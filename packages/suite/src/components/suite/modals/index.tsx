@@ -19,6 +19,7 @@ import PassphraseDuplicate from './PassphraseDuplicate';
 import ConfirmAction from './confirm/Action';
 import ConfirmFingerPrint from './confirm/Fingerprint';
 import CoinmarketBuyTerms from './confirm/CoinmarketBuyTerms';
+import CoinmarketSellTerms from './confirm/CoinmarketSellTerms';
 import CoinmarketExchangeTerms from './confirm/CoinmarketExchangeTerms';
 import CoinmarketLeaveSpend from './confirm/CoinmarketLeaveSpend';
 import Word from './Word';
@@ -39,6 +40,7 @@ import DisconnectDevice from './DisconnectDevice';
 import MetadataProvider from './metadata/MetadataProvider';
 import AdvancedCoinSettings from './AdvancedCoinSettings';
 import AddToken from './AddToken';
+import SafetyChecks from './SafetyChecks';
 
 const mapStateToProps = (state: AppState) => ({
     modal: state.modal,
@@ -187,6 +189,14 @@ const getUserContextModal = (props: Props) => {
                     decision={payload.decision}
                 />
             );
+        case 'coinmarket-sell-terms':
+            return (
+                <CoinmarketSellTerms
+                    provider={payload.provider}
+                    onCancel={modalActions.onCancel}
+                    decision={payload.decision}
+                />
+            );
         case 'coinmarket-exchange-terms':
             return (
                 <CoinmarketExchangeTerms
@@ -211,6 +221,8 @@ const getUserContextModal = (props: Props) => {
             return <AdvancedCoinSettings {...payload} onCancel={modalActions.onCancel} />;
         case 'add-token':
             return <AddToken {...payload} onCancel={modalActions.onCancel} />;
+        case 'safety-checks':
+            return <SafetyChecks onCancel={modalActions.onCancel} />;
         default:
             return null;
     }

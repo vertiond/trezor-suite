@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import { isDesktop, isMac } from '@suite-utils/env';
+import { isDesktop, isMacOs } from '@suite-utils/env';
 import { DESKTOP_WRAPPER_BORDER_WIDTH } from '@suite-constants/layout';
 
 export const FADE_IN = keyframes`
@@ -17,11 +17,11 @@ interface Props {
     className?: string;
     zIndex?: number;
     animated: boolean;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 const StyledBackdrop = styled.div<Props>`
-    ${isDesktop() && !isMac()
+    ${isDesktop() && !isMacOs()
         ? `
         width: calc(100% - (${DESKTOP_WRAPPER_BORDER_WIDTH} * 2));
         height: calc(100% - ${DESKTOP_WRAPPER_BORDER_WIDTH});

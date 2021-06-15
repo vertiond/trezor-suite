@@ -14,9 +14,6 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
         'plugin:import/typescript',
         'prettier',
-        'prettier/babel',
-        'prettier/@typescript-eslint',
-        'prettier/react',
     ],
     settings: {
         react: {
@@ -88,6 +85,8 @@ module.exports = {
         'prettier/prettier': 'error',
         'react/require-default-props': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
+        // We use this syntax
+        '@typescript-eslint/triple-slash-reference': 'off',
         // new rules (eslint 6) temporary disabled until components-v2 and ts-ignore resolve
         'react/jsx-props-no-spreading': 'off',
         '@typescript-eslint/ban-ts-ignore': 'off',

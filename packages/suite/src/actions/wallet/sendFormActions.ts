@@ -100,15 +100,13 @@ export const composeTransaction = (formValues: FormState, formState: UseSendForm
 
 // this is only a wrapper for `openDeferredModal` since it doesn't work with `bindActionCreators`
 // used in send/Address component
-export const scanQrRequest = () => (dispatch: Dispatch) => {
-    return dispatch(modalActions.openDeferredModal({ type: 'qr-reader' }));
-};
+export const scanQrRequest = () => (dispatch: Dispatch) =>
+    dispatch(modalActions.openDeferredModal({ type: 'qr-reader' }));
 
 // this is only a wrapper for `openDeferredModal` since it doesn't work with `bindActionCreators`
 // used in send/Header component
-export const importRequest = () => (dispatch: Dispatch) => {
-    return dispatch(modalActions.openDeferredModal({ type: 'import-transaction' }));
-};
+export const importRequest = () => (dispatch: Dispatch) =>
+    dispatch(modalActions.openDeferredModal({ type: 'import-transaction' }));
 
 // this could be called at any time during signTransaction or pushTransaction process (from ReviewTransaction modal)
 export const cancelSignTx = () => (dispatch: Dispatch, getState: GetState) => {
@@ -129,7 +127,7 @@ const pushTransaction = () => async (dispatch: Dispatch, getState: GetState) => 
     const { signedTx, precomposedTx } = getState().wallet.send;
     const { account } = getState().wallet.selectedAccount;
     const { device } = getState().suite;
-    if (!signedTx || !precomposedTx || !account) return false;
+    if (!signedTx || !precomposedTx || !account) return;
 
     const sentTx = await TrezorConnect.pushTransaction(signedTx);
     // const sentTx = { success: true, payload: { txid: 'ABC ' } };
@@ -190,7 +188,7 @@ const pushTransaction = () => async (dispatch: Dispatch, getState: GetState) => 
     }
 
     // resolve sign process
-    return sentTx.success;
+    return sentTx;
 };
 
 export const signTransaction = (
@@ -202,16 +200,38 @@ export const signTransaction = (
 
     if (!device || !account) return;
 
+    // native RBF is available since FW 1.9.4/2.3.5
+    const nativeRbfAvailable =
+        account.networkType === 'bitcoin' &&
+        formValues.rbfParams &&
+        !device.unavailableCapabilities?.replaceTransaction;
+    // decrease output is available since FW 1.10.0/2.4.0
+    const decreaseOutputAvailable =
+        account.networkType === 'bitcoin' &&
+        formValues.rbfParams &&
+        !device.unavailableCapabilities?.decreaseOutput;
+    const hasDecreasedOutput =
+        formValues.rbfParams && typeof formValues.setMaxOutputId === 'number';
+    // in case where native RBF is NOT available fallback to "legacy" way of signing (regular signing):
+    // - do not enhance inputs/outputs in signFormBitcoinActions
+    // - do not display "rbf mode" in ReviewTransaction modal
+    const useNativeRbf =
+        (!hasDecreasedOutput && nativeRbfAvailable) ||
+        (hasDecreasedOutput && decreaseOutputAvailable);
+
+    const enhancedTxInfo = {
+        ...transactionInfo,
+        rbf: formValues.options.includes('bitcoinRBF'),
+        prevTxid: formValues.rbfParams ? formValues.rbfParams.txid : undefined,
+        useNativeRbf,
+    };
+
     // store formValues and transactionInfo in send reducer to be used by ReviewTransaction modal
     dispatch({
         type: SEND.REQUEST_SIGN_TRANSACTION,
         payload: {
             formValues,
-            transactionInfo: {
-                ...transactionInfo,
-                rbf: formValues.options.includes('bitcoinRBF'),
-                prevTxid: formValues.rbfParams ? formValues.rbfParams.txid : undefined,
-            },
+            transactionInfo: enhancedTxInfo,
         },
     });
 
@@ -224,17 +244,17 @@ export const signTransaction = (
     let serializedTx: string | undefined;
     if (account.networkType === 'bitcoin') {
         serializedTx = await dispatch(
-            sendFormBitcoinActions.signTransaction(formValues, transactionInfo),
+            sendFormBitcoinActions.signTransaction(formValues, enhancedTxInfo),
         );
     }
     if (account.networkType === 'ethereum') {
         serializedTx = await dispatch(
-            sendFormEthereumActions.signTransaction(formValues, transactionInfo),
+            sendFormEthereumActions.signTransaction(formValues, enhancedTxInfo),
         );
     }
     if (account.networkType === 'ripple') {
         serializedTx = await dispatch(
-            sendFormRippleActions.signTransaction(formValues, transactionInfo),
+            sendFormRippleActions.signTransaction(formValues, enhancedTxInfo),
         );
     }
 

@@ -4,7 +4,7 @@ import * as deviceUtils from '@suite-utils/device';
 import { addToast } from '@suite-actions/notificationActions';
 import * as modalActions from '@suite-actions/modalActions';
 import * as storageActions from '@suite-actions/storageActions';
-import { getOSTheme } from '@suite-utils/env';
+import { getOsTheme } from '@suite-utils/env';
 import { SUITE, METADATA } from './constants';
 import { LANGUAGES } from '@suite-config';
 import {
@@ -77,6 +77,17 @@ export type SuiteAction =
           variant: SuiteThemeVariant;
           colors: SuiteThemeColors;
       };
+
+export const removeButtonRequests = (device: TrezorDevice | undefined) => ({
+    type: SUITE.ADD_BUTTON_REQUEST,
+    device,
+});
+
+export const addButtonRequest = (device: TrezorDevice | undefined, payload: string) => ({
+    type: SUITE.ADD_BUTTON_REQUEST,
+    device,
+    payload,
+});
 
 export const setDbError = (payload: AppState['suite']['dbError']) => ({
     type: SUITE.SET_DB_ERROR,
@@ -224,6 +235,13 @@ export const selectDevice = (device?: Device | TrezorDevice) => (
     });
 };
 
+/**
+ * Toggles remembering the given device. I.e. if given device is not remembered it will become remembered
+ * and if it is remembered it will be forgotten.
+ * @param forceRemember can be set to `true` to remember given device regardless if its current state.
+ *
+ * Use `forgetDevice` to forget a device regardless if its current state.
+ */
 export const rememberDevice = (payload: TrezorDevice, forceRemember?: true): SuiteAction => ({
     type: SUITE.REMEMBER_DEVICE,
     payload,
@@ -280,13 +298,12 @@ export const createDeviceInstance = (device: TrezorDevice, useEmptyPassphrase = 
 export const handleDeviceConnect = (device: Device) => (dispatch: Dispatch, getState: GetState) => {
     const selectedDevice = getState().suite.device;
     const { firmware } = getState();
-    // todo:
     // We are waiting for device in bootloader mode (only in firmware update)
     if (
         selectedDevice &&
         device.features &&
         device.mode === 'bootloader' &&
-        firmware.status === 'waiting-for-bootloader'
+        ['reconnect-in-normal', 'waiting-for-bootloader'].includes(firmware.status)
     ) {
         dispatch(selectDevice(device));
     }
@@ -309,8 +326,16 @@ export const handleDeviceDisconnect = (device: Device) => (
     if (!selectedDevice) return;
     if (selectedDevice.path !== device.path) return;
 
+    const { devices, firmware, router } = getState();
+
+    if (['wait-for-reboot', 'unplug'].includes(firmware.status) || router.app === 'onboarding') {
+        // Suite tried to switch selected device to a remembered (and disconnected) device or another connected device while being in Onboarding process.
+        // We never want to switch to some different remembered device when currently used device disconnects because of loose cable or in order to complete firmware installation
+        dispatch({ type: SUITE.SELECT_DEVICE, payload: undefined });
+        return;
+    }
+
     // selected device is disconnected, decide what to do next
-    const { devices } = getState();
     // device is still present in reducer (remembered or candidate to remember)
     const devicePresent = deviceUtils.getSelectedDevice(selectedDevice, devices);
     const deviceInstances = deviceUtils.getDeviceInstances(selectedDevice, devices);
@@ -559,7 +584,7 @@ export const setInitialTheme = () => async (dispatch: Dispatch, getState: GetSta
         if (isInitialRun || !storedSettings) {
             // Initial run
             // set initial theme (light/dark) based on OS settings
-            const osThemeVariant = getOSTheme();
+            const osThemeVariant = getOsTheme();
             if (osThemeVariant !== currentThemeVariant) {
                 dispatch(setTheme(osThemeVariant, undefined));
             }

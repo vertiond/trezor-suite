@@ -10,12 +10,10 @@ interface InitialState {
     analytics?: Partial<AnalyticsState>;
 }
 
-jest.mock('@suite-utils/random', () => {
-    return {
-        __esModule: true, // this property makes it work
-        getAnalyticsRandomId: () => 'very-random',
-    };
-});
+jest.mock('@suite-utils/random', () => ({
+    __esModule: true, // this property makes it work
+    getAnalyticsRandomId: () => 'very-random',
+}));
 
 export const getInitialState = (state: InitialState | undefined) => {
     const analytics = state ? state.analytics : undefined;
@@ -62,12 +60,9 @@ describe('Analytics Actions', () => {
         };
     });
     beforeEach(() => {
-        const mockSuccessResponse = {};
-        const mockJsonPromise = Promise.resolve(mockSuccessResponse);
         const mockFetchPromise = Promise.resolve({
-            json: () => mockJsonPromise,
+            json: () => Promise.resolve({}),
         });
-        // @ts-ignore
         global.fetch = jest.fn().mockImplementation(() => mockFetchPromise);
         // @ts-ignore
         jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise);
@@ -86,10 +81,9 @@ describe('Analytics Actions', () => {
         });
         const store = initStore(state);
         store.dispatch(analyticsActions.report({ type: 'switch-device/eject' }));
-        // @ts-ignore
         expect(global.fetch).toHaveBeenNthCalledWith(
             1,
-            'https://data.trezor.io/suite/log/desktop/beta.log?c_v=1.6&c_type=switch-device%2Feject&c_instance_id=1&c_session_id=very-random',
+            `https://data.trezor.io/suite/log/desktop/develop.log?c_v=${analyticsActions.version}&c_type=switch-device%2Feject&c_instance_id=1&c_session_id=very-random`,
             { method: 'GET' },
         );
         process.env.SUITE_TYPE = env;
@@ -103,10 +97,9 @@ describe('Analytics Actions', () => {
         });
         const store = initStore(state);
         store.dispatch(analyticsActions.report({ type: 'switch-device/eject' }));
-        // @ts-ignore
         expect(global.fetch).toHaveBeenNthCalledWith(
             1,
-            'https://data.trezor.io/suite/log/web/develop.log?c_v=1.6&c_type=switch-device%2Feject&c_instance_id=1&c_session_id=very-random',
+            `https://data.trezor.io/suite/log/web/develop.log?c_v=${analyticsActions.version}&c_type=switch-device%2Feject&c_instance_id=1&c_session_id=very-random`,
             { method: 'GET' },
         );
         process.env.SUITE_TYPE = env;
@@ -118,7 +111,6 @@ describe('Analytics Actions', () => {
         });
         const store = initStore(state);
         store.dispatch(analyticsActions.report({ type: 'switch-device/eject' }));
-        // @ts-ignore
         expect(global.fetch).toHaveBeenCalledTimes(0);
     });
 
@@ -130,7 +122,6 @@ describe('Analytics Actions', () => {
         });
         const store = initStore(state);
         store.dispatch(analyticsActions.report({ type: 'switch-device/eject' }));
-        // @ts-ignore
         expect(global.fetch).toHaveBeenCalledTimes(0);
         process.env.SUITE_TYPE = env;
     });

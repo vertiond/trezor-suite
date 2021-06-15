@@ -32,10 +32,13 @@ const FIXED_WIDTH_SMALL: [string, string, string, string] = ['100vw', '90vw', '6
 const FIXED_WIDTH_TINY: [string, string, string, string] = ['360px', '360px', '360px', '360px'];
 const FIXED_HEIGHT: [string, string, string, string] = ['90vh', '90vh', '620px', '620px'];
 
-const ModalOverlay = styled.div<{ desktopBorder?: string }>`
+const ModalOverlay = styled.div<{ desktopBorder?: string; guidePanelSize: string }>`
     position: fixed;
     z-index: 10000;
-    width: ${props => (props.desktopBorder ? `calc(100% - (${props.desktopBorder} * 2))` : '100%')};
+    width: ${props =>
+        props.desktopBorder
+            ? `calc(100% - (${props.desktopBorder} * 2) - ${props.guidePanelSize})`
+            : `calc(100% - ${props.guidePanelSize})`};
     height: ${props => (props.desktopBorder ? `calc(100% - ${props.desktopBorder})` : '100%')};
     top: 0px;
     left: ${props => props.desktopBorder || 0};
@@ -164,16 +167,19 @@ const ModalWindow = styled.div<ModalWindowProps>`
         `}
 `;
 
-const Heading = styled(H1)<{
+interface HeadingProps {
     cancelable: boolean;
     showHeaderBorder: boolean;
     showProgressBar: boolean;
     hiddenProgressBar: boolean;
-}>`
+    noHeadingPadding: boolean;
+}
+
+const Heading = styled(H1)<HeadingProps>`
     display: flex;
     align-items: flex-start;
     word-break: break-word;
-    padding: 28px 32px 22px 32px;
+    padding: ${props => (props.noHeadingPadding ? '0px' : '28px 32px 22px 32px')};
     margin-bottom: ${props => (props.showProgressBar ? 0 : '20px')};
 
     border-bottom: ${props =>
@@ -354,6 +360,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
     modalPaddingSide?: [string, string, string, string]; // [SM, MD, LG, XL]
     contentPaddingSide?: [string, string, string, string]; // [SM, MD, LG, XL]
     noPadding?: boolean;
+    noHeadingPadding?: boolean;
     noBackground?: boolean;
     onCancel?: () => void;
     showHeaderBorder?: boolean;
@@ -362,6 +369,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
     currentProgressBarStep?: number;
     centerContent?: boolean;
     desktopBorder?: string;
+    guideOpen?: boolean;
 }
 
 const Modal = ({
@@ -380,6 +388,8 @@ const Modal = ({
     useFixedHeight = false,
     fixedHeight = FIXED_HEIGHT,
     noPadding = false,
+    noHeadingPadding = false,
+    // TODO: get rid of all these padding props bellow. Usage should be simple: Either use default paddings provided by modal, or use noPadding and then do all necessary work in components which will be passed as heading, description, children/content. We cannot keep handling whole universe here for few stupid custom components
     modalPaddingTop = getModalPaddingTop(size, heading, noPadding),
     modalPaddingBottom = getModalPaddingBottom(size, noPadding),
     modalPaddingSide = ZERO_PADDING, // default value is zero padding on sides for Modal container
@@ -390,6 +400,7 @@ const Modal = ({
     currentProgressBarStep,
     centerContent = false,
     desktopBorder,
+    guideOpen = false,
     ...rest
 }: Props) => {
     const escPressed = useKeyPress('Escape');
@@ -434,6 +445,7 @@ const Modal = ({
                     showHeaderBorder={showHeaderBorder}
                     hiddenProgressBar={hiddenProgressBar}
                     showProgressBar={showProgressBarPlaceholder}
+                    noHeadingPadding={noHeadingPadding}
                 >
                     {heading}
                     {cancelable && (
@@ -471,6 +483,7 @@ const Modal = ({
     return (
         <ModalOverlay
             desktopBorder={desktopBorder}
+            guidePanelSize={guideOpen ? variables.LAYOUT_SIZE.GUIDE_PANEL_WIDTH : '0px'}
             data-test="@modal"
             onClick={() => {
                 if (cancelable && onCancel) {

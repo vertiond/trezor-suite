@@ -1,62 +1,100 @@
-import { SuiteThemeVariant } from '@suite-types';
+import UAParser from 'ua-parser-js';
 
-/**
- * method does not do much, but still it is useful as we do not
- * have navigator.userAgent in native. This way we may define
- * overrides only for simple utils and do not need to rewrite entire files
- * for example actions or middlewares
- */
-export const getUserAgent = () => {
-    return navigator.userAgent;
+import type { SuiteThemeVariant, EnvironmentType } from '@suite-types';
+
+/* This way, we can override simple utils, which helps to polyfill methods which are not available in react-native. */
+export const getUserAgent = () => window.navigator.userAgent;
+
+export const getPlatform = () => window.navigator.platform;
+
+export const getPlatformLanguage = () => window.navigator.language;
+
+export const getPlatformLanguages = () => window.navigator.languages;
+
+export const getAppVersion = () => window.navigator.appVersion;
+
+export const getScreenWidth = () => window.screen.width;
+
+export const getScreenHeight = () => window.screen.height;
+
+export const getWindowWidth = () => window.innerWidth;
+
+export const getWindowHeight = () => window.innerHeight;
+
+export const getLocationOrigin = () => window.location.origin;
+
+export const getLocationHostname = () => window.location.hostname;
+
+/* For usage in Electron (SSR) */
+export const getProcessPlatform = () => process.platform;
+
+let userAgentParser: UAParser;
+const getUserAgentParser = () => {
+    if (!userAgentParser) {
+        const ua = getUserAgent();
+        userAgentParser = new UAParser(ua);
+    }
+    return userAgentParser;
 };
 
-export const isAndroid = () => {
-    if (typeof navigator === 'undefined') return;
-    return navigator.appVersion.includes('Android');
-};
+export const isMacOs = () => {
+    if (getProcessPlatform() === 'darwin') return true;
+    if (typeof window === 'undefined') return;
 
-export const isMac = () => {
-    if (process.platform === 'darwin') return true; // For usage in Electron (SSR)
-    if (typeof navigator === 'undefined') return false;
-    return ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'].includes(navigator.platform);
+    return ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'].includes(getPlatform());
 };
 
 export const isWindows = () => {
-    if (typeof navigator === 'undefined') return;
-    return ['Win32', 'Win64', 'Windows', 'WinCE'].includes(navigator.platform);
+    if (getProcessPlatform() === 'win32') return true;
+    if (typeof window === 'undefined') return;
+
+    return ['Win32', 'Win64', 'Windows', 'WinCE'].includes(getPlatform());
 };
 
 export const isLinux = () => {
-    if (typeof navigator === 'undefined') return;
-    return /Linux/.test(navigator.platform);
+    if (getProcessPlatform() === 'linux') return true;
+    if (typeof window === 'undefined') return;
+
+    return /Linux/.test(getPlatform());
 };
 
-export const getScreenWidth = () => {
-    return window.screen.width;
+export const isAndroid = () => getAppVersion().includes('Android');
+
+export const isIOs = () => ['iPhone', 'iPad', 'iPod'].includes(getPlatform());
+
+export const getOsName = () => {
+    if (isMacOs()) return 'macos';
+    if (isLinux()) return 'linux';
+    if (isWindows()) return 'windows';
+    if (isAndroid()) return 'android';
+    if (isIOs()) return 'ios';
+
+    return '';
 };
 
-export const getScreenHeight = () => {
-    return window.screen.height;
+/* Not correct for Linux as there is many different distributions in different versions */
+export const getOsVersion = () => getUserAgentParser().getOS().version || '';
+
+export const getBrowserName = (): string => {
+    const browserName = getUserAgentParser().getBrowser().name;
+
+    return browserName?.toLowerCase() || '';
 };
 
-export const getPlatform = () => {
-    return window.navigator.platform;
-};
-
-export const getPlatformLanguage = () => {
-    return window.navigator.language;
-};
+export const getBrowserVersion = (): string => getUserAgentParser().getBrowser().version || '';
 
 export const isWeb = () => process.env.SUITE_TYPE === 'web';
 
 export const isDesktop = () => process.env.SUITE_TYPE === 'desktop';
 
-export const getLocationOrigin = () => {
-    return window.location.origin;
-};
+export const isMobile = () => process.env.SUITE_TYPE === 'mobile';
 
-export const getLocationHostname = () => {
-    return window.location.hostname;
+export const getEnvironment = (): EnvironmentType => {
+    if (isWeb()) return 'web';
+    if (isDesktop()) return 'desktop';
+    if (isMobile()) return 'mobile';
+
+    return '';
 };
 
 export const submitRequestForm = async (
@@ -107,7 +145,7 @@ export const setOnBeforeUnloadListener = (callback: () => void) => {
     window.addEventListener('beforeunload', callback);
 };
 
-export const getOSTheme = (): SuiteThemeVariant => {
+export const getOsTheme = (): SuiteThemeVariant => {
     if (typeof window === 'undefined') return 'light'; // in SSR, where window object is not defined, just return light theme
     // retrieving os color scheme is supported in Chrome 76+, Firefox 67+
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -116,6 +154,5 @@ export const getOSTheme = (): SuiteThemeVariant => {
     return 'light';
 };
 
-export const getOSVersion = () => {
-    return window.desktopApi?.getOSVersion();
-};
+/* Working only in desktop app */
+export const getOsType = () => window.desktopApi?.getOsType();

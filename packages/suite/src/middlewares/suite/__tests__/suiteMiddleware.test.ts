@@ -13,36 +13,32 @@ import suiteMiddleware from '@suite-middlewares/suiteMiddleware';
 import routes from '@suite-constants/routes';
 import { Action } from '@suite-types';
 
-jest.mock('next/router', () => {
-    return {
-        __esModule: true, // this property makes it work
-        default: {
-            push: () => {},
-            pathname: '/',
-        },
-    };
-});
+jest.mock('next/router', () => ({
+    __esModule: true, // this property makes it work
+    default: {
+        push: () => {},
+        pathname: '/',
+    },
+}));
 
 type SuiteState = ReturnType<typeof suiteReducer>;
 type RouterState = ReturnType<typeof routerReducer>;
 
-export const getInitialState = (router?: RouterState, suite?: Partial<SuiteState>) => {
-    return {
-        router: {
-            ...routerReducer(undefined, { type: 'foo' } as any),
-            ...router,
-        },
-        suite: {
-            ...suiteReducer(undefined, { type: 'foo' } as any),
-            ...suite,
-        },
-        modal: modalReducer(undefined, { type: 'foo' } as any),
-        analytics: analyticsReducer(undefined, {
-            type: ANALYTICS.INIT,
-            payload: { instanceId: '1', sessionId: '2', enabled: false, sessionStart: 1 },
-        }),
-    };
-};
+export const getInitialState = (router?: RouterState, suite?: Partial<SuiteState>) => ({
+    router: {
+        ...routerReducer(undefined, { type: 'foo' } as any),
+        ...router,
+    },
+    suite: {
+        ...suiteReducer(undefined, { type: 'foo' } as any),
+        ...suite,
+    },
+    modal: modalReducer(undefined, { type: 'foo' } as any),
+    analytics: analyticsReducer(undefined, {
+        type: ANALYTICS.INIT,
+        payload: { instanceId: '1', sessionId: '2', enabled: false, sessionStart: 1 },
+    }),
+});
 
 type State = ReturnType<typeof getInitialState>;
 
@@ -90,7 +86,7 @@ describe('suite middleware', () => {
                 getInitialState({
                     loaded: true,
                     url: '/onboarding',
-                    pathname: '/',
+                    pathname: '/onboarding',
                     hash: undefined,
                     app: 'onboarding',
                     params: undefined,
@@ -99,7 +95,7 @@ describe('suite middleware', () => {
                         pattern: '/onboarding',
                         app: 'onboarding',
                         isModal: true,
-                        params: ['cancelable'],
+                        params: undefined,
                     },
                 }),
             );
@@ -114,7 +110,7 @@ describe('suite middleware', () => {
     });
 
     describe('redirection on initial run', () => {
-        it('if initialRun is true, should redirect to welcome screen after STORAGE.LOADED action', () => {
+        it('if initialRun is true, should redirect to onboarding screen after STORAGE.LOADED action', () => {
             // eslint-disable-next-line global-require
             require('next/router').default.pathname = '/accounts';
 
@@ -141,7 +137,7 @@ describe('suite middleware', () => {
                 .filter(a => a.type === ROUTER.LOCATION_CHANGE);
             expect(locationChangedAction.length).toBe(1);
             expect(locationChangedAction[0].url).toBe(
-                routes.find(r => r.name === 'suite-welcome')?.pattern,
+                routes.find(r => r.name === 'onboarding-index')?.pattern,
             );
         });
 

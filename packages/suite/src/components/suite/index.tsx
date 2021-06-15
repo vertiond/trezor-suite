@@ -33,12 +33,15 @@ import AddAccountButton from './AddAccountButton';
 import ToastContainer from './ToastContainer';
 import TrezorLink from './TrezorLink';
 import { ReadMoreLink } from './ReadMoreLink';
-import BetaBadge from './BetaBadge';
 import { Modal, ModalProps } from './Modal';
 import { SkeletonRectangle, SkeletonCircle } from './Skeleton';
 import Notifications from './Notifications';
 import FormattedDate, { FormattedDateWithBullet } from './FormattedDate';
 import Metadata from './Metadata';
+import HomescreenGallery from './HomescreenGallery';
+import PinMatrix from './PinMatrix';
+import CollapsibleBox from './CollapsibleBox';
+import DeviceMatrixExplanation from './DeviceMatrixExplanation';
 
 export {
     Backdrop,
@@ -78,7 +81,6 @@ export {
     Sign,
     AddAccountButton,
     ReadMoreLink,
-    BetaBadge,
     ToastContainer,
     TrezorLink,
     Modal,
@@ -88,5 +90,9 @@ export {
     FormattedDate,
     FormattedDateWithBullet,
     Metadata,
+    HomescreenGallery,
+    PinMatrix,
+    CollapsibleBox,
+    DeviceMatrixExplanation,
 };
 export type { ImageProps, ModalProps };

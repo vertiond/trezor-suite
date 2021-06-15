@@ -18,16 +18,15 @@ describe(`Metadata - switching between cloud providers`, () => {
         cy.task(`metadataStartProvider`, 'dropbox');
         cy.task(`metadataStartProvider`, 'google');
 
-        cy.prefixedVisit('/accounts', {
+        cy.prefixedVisit('/', {
             onBeforeLoad: (win: Window) => {
                 cy.stub(win, 'open', stubOpen(win));
                 cy.stub(win, 'fetch', rerouteMetadataToMockProvider);
             },
         });
-
         cy.passThroughInitialRun();
-
         cy.discoveryShouldFinish();
+        cy.getTestElement('@suite/menu/wallet-index').click();
 
         cy.log('');
         cy.getTestElement('@account-menu/btc/normal/0/label').should('contain', 'Bitcoin');
@@ -40,6 +39,7 @@ describe(`Metadata - switching between cloud providers`, () => {
         cy.getTestElement('@metadata/input').type('dropbox label {enter}');
         cy.getTestElement('@account-menu/btc/normal/0/label').should('contain', 'dropbox label');
 
+        cy.getTestElement('@suite/menu/settings').click();
         cy.getTestElement('@suite/menu/settings-index').click();
         cy.getTestElement('@settings/metadata/disconnect-provider-button').click();
         cy.getTestElement('@settings/metadata/connect-provider-button').should('be.visible');

@@ -18,11 +18,13 @@ import { Input, InputProps } from './components/form/Input';
 import { Textarea, TextareaProps } from './components/form/Textarea';
 import { Select, SelectProps } from './components/form/Select';
 import { Checkbox, CheckboxProps } from './components/form/Checkbox';
+import { RadioButton, RadioButtonProps } from './components/form/RadioButton';
 import { Switch, SwitchProps } from './components/form/Switch';
 import { Icon, IconProps } from './components/Icon';
 import { H1, H2 } from './components/typography/Heading';
 import { P, PProps } from './components/typography/Paragraph';
 import { Link, LinkProps } from './components/typography/Link';
+import { Warning } from './components/Warning';
 import { Box, BoxProps } from './components/others/Box';
 import { Card, CardProps } from './components/others/Card';
 import { SecurityCard, SecurityCardProps } from './components/others/SecurityCard';
@@ -31,7 +33,7 @@ import { Modal, ModalProps } from './components/Modal';
 import { CoinLogo, CoinLogoProps } from './components/logos/CoinLogo';
 import { TrezorLogo, TrezorLogoProps } from './components/logos/TrezorLogo';
 import { Loader, LoaderProps } from './components/loaders/Loader';
-import { Tooltip, TooltipProps, tooltipGlobalStyles } from './components/Tooltip';
+import { Tooltip, TooltipProps } from './components/Tooltip';
 import { scrollbarStyles } from './components/Scrollbar';
 import { Timerange, TimerangeProps } from './components/Timerange';
 import { Truncate } from './components/Truncate';
@@ -60,6 +62,8 @@ export {
     SelectProps,
     Checkbox,
     CheckboxProps,
+    RadioButton,
+    RadioButtonProps,
     Switch,
     SwitchProps,
     Icon,
@@ -70,6 +74,7 @@ export {
     PProps,
     Link,
     LinkProps,
+    Warning,
     Modal,
     ModalProps,
     CoinLogo,
@@ -80,7 +85,6 @@ export {
     LoaderProps,
     Tooltip,
     TooltipProps,
-    tooltipGlobalStyles,
     Timerange,
     TimerangeProps,
     Truncate,

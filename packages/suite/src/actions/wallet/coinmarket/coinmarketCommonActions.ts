@@ -6,11 +6,22 @@ import { COINMARKET_BUY, COINMARKET_EXCHANGE, COINMARKET_COMMON } from '../const
 import { getUnusedAddressFromAccount } from '@wallet-utils/coinmarket/coinmarketUtils';
 import { Account } from '@wallet-types';
 import { ComposedTransactionInfo } from '@wallet-reducers/coinmarketReducer';
+import * as suiteActions from '@suite-actions/suiteActions';
+import { submitRequestForm as envSubmitRequestForm, isDesktop } from '@suite-utils/env';
 
-export type CoinmarketCommonAction = {
-    type: typeof COINMARKET_COMMON.SAVE_COMPOSED_TRANSACTION_INFO;
-    info: ComposedTransactionInfo;
-};
+export type CoinmarketCommonAction =
+    | {
+          type: typeof COINMARKET_COMMON.SAVE_COMPOSED_TRANSACTION_INFO;
+          info: ComposedTransactionInfo;
+      }
+    | {
+          type: typeof COINMARKET_COMMON.SET_LOADING;
+          isLoading: boolean;
+          lastLoadedTimestamp: number;
+      }
+    | {
+          type: typeof COINMARKET_COMMON.LOAD_DATA;
+      };
 
 export const verifyAddress = (account: Account, inExchange = false) => async (
     dispatch: Dispatch,
@@ -107,4 +118,30 @@ export const saveComposedTransactionInfo = (
 ): CoinmarketCommonAction => ({
     type: COINMARKET_COMMON.SAVE_COMPOSED_TRANSACTION_INFO,
     info,
+});
+
+export const submitRequestForm = (form?: {
+    formMethod: 'GET' | 'POST' | 'IFRAME';
+    formAction: string;
+    fields: {
+        [key: string]: string;
+    };
+}) => (dispatch: Dispatch, getState: GetState) => {
+    const { device } = getState().suite;
+    if (device && !device.remember && !isDesktop()) {
+        dispatch(suiteActions.rememberDevice(device, true));
+    }
+    if (form) {
+        envSubmitRequestForm(form.formMethod, form.formAction, form.fields);
+    }
+};
+
+export const setLoading = (isLoading: boolean, lastLoadedTimestamp?: number) => ({
+    type: COINMARKET_COMMON.SET_LOADING,
+    isLoading,
+    ...(lastLoadedTimestamp && { lastLoadedTimestamp }),
+});
+
+export const loadInvityData = () => ({
+    type: COINMARKET_COMMON.LOAD_DATA,
 });

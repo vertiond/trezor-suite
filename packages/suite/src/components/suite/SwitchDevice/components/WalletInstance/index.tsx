@@ -56,12 +56,12 @@ const Col = styled.div<{ grow?: number; centerItems?: boolean }>`
 `;
 
 const ColEject = styled(Col)`
-    margin: 0 24px;
+    margin: 0 22px;
 `;
 
 const SwitchCol = styled.div`
     display: flex;
-    margin-right: 60px;
+    margin-right: 46px;
 `;
 
 const LockIcon = styled(Icon)`
@@ -129,9 +129,7 @@ const WalletInstance = ({
                                 payload={{
                                     type: 'walletLabel',
                                     deviceState: instance.state,
-                                    defaultValue: instance.useEmptyPassphrase
-                                        ? 'standard-wallet'
-                                        : `hidden-wallet-${instance.walletNumber}`,
+                                    defaultValue: instance.state,
                                     value:
                                         instance?.metadata.status === 'enabled'
                                             ? instance.metadata.walletLabel

@@ -34,7 +34,7 @@ interface Props {
     device: TrezorDevice;
     instances: AcquiredDevice[];
     addDeviceInstance: (instance: TrezorDevice) => Promise<void>;
-    selectDeviceInstance: (instance: TrezorDevice) => Promise<void>;
+    selectDeviceInstance: (instance: TrezorDevice) => void;
 }
 
 const AddWalletButton = ({ device, instances, addDeviceInstance, selectDeviceInstance }: Props) => {
@@ -68,9 +68,8 @@ const AddWalletButton = ({ device, instances, addDeviceInstance, selectDeviceIns
     return (
         <AddWallet>
             <StyledTooltip
-                enabled={!device.connected}
-                placement="top"
                 content={<Translation id="TR_TO_ACCESS_OTHER_WALLETS" />}
+                cursor="pointer"
             >
                 <StyledButton
                     data-test={

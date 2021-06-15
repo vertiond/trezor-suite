@@ -18,6 +18,8 @@ const selectStyle = (
     hideTextCursor: boolean,
     isClean: boolean,
     minWidth: string,
+    borderRadius: number,
+    borderWidth: number,
     theme: SuiteThemeColors
 ) => ({
     singleValue: (base: Record<string, any>) => ({
@@ -48,16 +50,16 @@ const selectStyle = (
             alignItems: 'center',
             fontSize: variables.FONT_SIZE.SMALL,
             height,
-            borderRadius: '4px',
-            borderWidth: '2px',
+            borderRadius: `${borderRadius}px`,
+            borderWidth: `${borderWidth}px`,
             borderColor: theme.STROKE_GREY,
             borderStyle: isClean ? 'none' : 'solid',
             backgroundColor: 'transparent',
             boxShadow: 'none',
             '&:hover, &:focus': {
                 cursor: 'pointer',
-                borderRadius: '4px',
-                borderWidth: '2px',
+                borderRadius: `${borderRadius}px`,
+                borderWidth: `${borderWidth}px`,
                 borderColor: theme.STROKE_GREY,
             },
         };
@@ -173,9 +175,7 @@ interface Option {
 /** Custom Type Guards to check if options are grouped or not */
 const isOptionGrouped = (
     x: OptionsType<Option> | GroupedOptionsType<Option>
-): x is GroupedOptionsType<Option> => {
-    return (x as GroupedOptionsType<Option>)[0]?.options !== undefined;
-};
+): x is GroupedOptionsType<Option> => (x as GroupedOptionsType<Option>)[0]?.options !== undefined;
 
 interface CommonProps extends Omit<SelectProps, 'components' | 'isSearchable'> {
     withDropdownIndicator?: boolean;
@@ -186,6 +186,8 @@ interface CommonProps extends Omit<SelectProps, 'components' | 'isSearchable'> {
     noTopLabel?: boolean;
     hideTextCursor?: boolean; // this prop hides blinking text cursor
     minWidth?: string;
+    borderWidth?: number;
+    borderRadius?: number;
 }
 
 // Make sure isSearchable can't be defined if useKeyPressScroll===true
@@ -209,6 +211,8 @@ const Select = ({
     useKeyPressScroll,
     isSearchable = false,
     minWidth = 'initial',
+    borderWidth = 2,
+    borderRadius = 4,
     ...props
 }: Props) => {
     const selectRef: React.RefObject<ReactSelect<Option>> | null | undefined = useRef(null);
@@ -220,30 +224,26 @@ const Select = ({
     const searchedTerm = useRef(''); // string which the user wants to find
 
     // customize control to pass data-test attribute
-    const Control = (controlProps: any) => {
-        return (
-            <components.Control
-                {...controlProps}
-                innerProps={{
-                    ...controlProps.innerProps,
-                    'data-test': `${props['data-test']}/input`,
-                }}
-            />
-        );
-    };
+    const Control = (controlProps: any) => (
+        <components.Control
+            {...controlProps}
+            innerProps={{
+                ...controlProps.innerProps,
+                'data-test': `${props['data-test']}/input`,
+            }}
+        />
+    );
 
     // customize options to pass data-test attribute
-    const Option = (optionProps: any) => {
-        return (
-            <components.Option
-                {...optionProps}
-                innerProps={{
-                    ...optionProps.innerProps,
-                    'data-test': `${props['data-test']}/option/${optionProps.value}`,
-                }}
-            />
-        );
-    };
+    const Option = (optionProps: any) => (
+        <components.Option
+            {...optionProps}
+            innerProps={{
+                ...optionProps.innerProps,
+                'data-test': `${props['data-test']}/option/${optionProps.value}`,
+            }}
+        />
+    );
 
     const findOption = (options: OptionsType<Option>, query: string) => {
         // Option that will be returned
@@ -311,9 +311,9 @@ const Select = ({
                 const { options } = selectRef.current.select.props;
 
                 if (options && options.length > 1) {
-                    /* 
-                    First, check if the options are divided into sub-categories. 
-                    For example <NetworkSelect> has options divided into sub-categories "mainnet" and "testnet".  
+                    /*
+                    First, check if the options are divided into sub-categories.
+                    For example <NetworkSelect> has options divided into sub-categories "mainnet" and "testnet".
                     In such scenario I need to loop through all of the sub-categories and try to find appropriate option in them as well.
                     */
 
@@ -344,10 +344,10 @@ const Select = ({
 
                     // Make sure all the necessary options are defined
                     if (optionToFocusOn && lastOption) {
-                        /* 
+                        /*
                         Here we first scroll to the last option in option-list and then we scroll to the focused option.
- 
-                        The reason why I want to scroll to the last option first is, that I want the focused item to 
+
+                        The reason why I want to scroll to the last option first is, that I want the focused item to
                         appear on the top of the list - I achieve that behavior by scrolling "from bottom-to-top".
                         The default scrolling behavior is "from top-to-bottom". In that case the focused option appears at the bottom
                         of options list, which is not a great UX.
@@ -380,6 +380,8 @@ const Select = ({
                     hideTextCursor,
                     isClean,
                     minWidth,
+                    borderRadius,
+                    borderWidth,
                     theme
                 )}
                 isSearchable={isSearchable}

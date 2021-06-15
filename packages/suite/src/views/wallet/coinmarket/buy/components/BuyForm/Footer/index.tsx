@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Select, variables, Flag } from '@trezor/components';
 import regional from '@wallet-constants/coinmarket/regional';
 import { useCoinmarketBuyFormContext } from '@wallet-hooks/useCoinmarketBuyForm';
-import { getCountryLabelParts } from '@wallet-utils/coinmarket/buyUtils';
-import { CountryOption } from '@wallet-types/coinmarketBuyForm';
+import { getCountryLabelParts } from '@wallet-utils/coinmarket/coinmarketUtils';
+import { CountryOption } from '@wallet-types/coinmarketCommonTypes';
 import { Translation } from '@suite-components';
 import { Controller } from 'react-hook-form';
 import styled from 'styled-components';
@@ -108,40 +108,38 @@ const Footer = () => {
                             : defaultCountry
                     }
                     name={countrySelect}
-                    render={({ onChange, value }) => {
-                        return (
-                            <StyledSelect
-                                noTopLabel
-                                isDropdownVisible
-                                isHovered
-                                options={regional.countriesOptions}
-                                isSearchable
-                                value={value}
-                                formatOptionLabel={(option: CountryOption) => {
-                                    const labelParts = getCountryLabelParts(option.label);
-                                    if (!labelParts) return null;
+                    render={({ onChange, value }) => (
+                        <StyledSelect
+                            noTopLabel
+                            isDropdownVisible
+                            isHovered
+                            options={regional.countriesOptions}
+                            isSearchable
+                            value={value}
+                            formatOptionLabel={(option: CountryOption) => {
+                                const labelParts = getCountryLabelParts(option.label);
+                                if (!labelParts) return null;
 
-                                    return (
-                                        <OptionLabel>
-                                            <FlagWrapper>
-                                                <Flag country={option.value} />
-                                            </FlagWrapper>
-                                            <LabelText>{labelParts.text}</LabelText>
-                                        </OptionLabel>
-                                    );
-                                }}
-                                isClearable={false}
-                                minWidth="160px"
-                                isClean
-                                hideTextCursor
-                                onChange={(selected: any) => {
-                                    onChange(selected);
-                                    setAmountLimits(undefined);
-                                }}
-                                maxSearchLength={12}
-                            />
-                        );
-                    }}
+                                return (
+                                    <OptionLabel>
+                                        <FlagWrapper>
+                                            <Flag country={option.value} />
+                                        </FlagWrapper>
+                                        <LabelText>{labelParts.text}</LabelText>
+                                    </OptionLabel>
+                                );
+                            }}
+                            isClearable={false}
+                            minWidth="160px"
+                            isClean
+                            hideTextCursor
+                            onChange={(selected: any) => {
+                                onChange(selected);
+                                setAmountLimits(undefined);
+                            }}
+                            maxSearchLength={12}
+                        />
+                    )}
                 />
             </Left>
             <Right>

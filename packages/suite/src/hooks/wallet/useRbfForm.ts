@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from '@suite-hooks';
 import { getFeeLevels } from '@wallet-utils/sendFormUtils';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
-import { DEFAULT_PAYMENT, DEFAULT_VALUES } from '@wallet-constants/sendForm';
+import { DEFAULT_PAYMENT, DEFAULT_OPRETURN, DEFAULT_VALUES } from '@wallet-constants/sendForm';
 import { Account, WalletAccountTransaction } from '@wallet-types';
 import { FormState, FeeInfo } from '@wallet-types/sendForm';
 import { useFees } from './form/useFees';
@@ -70,8 +70,7 @@ const useRbfState = ({ tx, finalize, chainedTxs }: Props, currentState: boolean)
     // override Account data
     const rbfAccount = {
         ...account,
-        // use only utxo from original tx
-        utxo: tx.rbfParams.utxo,
+        utxo: tx.rbfParams.utxo.concat(account.utxo!),
         // make sure that the exact same change output will be picked by trezor-connect > hd-wallet during the tx compose process
         // fallback to default if change address is not present
         addresses: account.addresses
@@ -87,14 +86,19 @@ const useRbfState = ({ tx, finalize, chainedTxs }: Props, currentState: boolean)
     // transform original outputs
     const outputs = tx.rbfParams.outputs.flatMap(o => {
         if (o.type === 'change') return [];
-        return [
-            {
-                ...DEFAULT_PAYMENT,
-                address: o.address,
-                amount: o.formattedAmount,
-                token: o.token,
-            },
-        ];
+        if (o.type === 'opreturn') {
+            return {
+                ...DEFAULT_OPRETURN,
+                dataHex: o.dataHex,
+                dataAscii: o.dataAscii,
+            };
+        }
+        return {
+            ...DEFAULT_PAYMENT,
+            address: o.address,
+            amount: o.formattedAmount,
+            token: o.token,
+        };
     });
 
     let { baseFee } = tx.rbfParams;
@@ -147,6 +151,7 @@ export const useRbf = (props: Props) => {
     // react-hook-form auto register custom form fields (without HTMLElement)
     useEffect(() => {
         register({ name: 'outputs', type: 'custom' });
+        register({ name: 'setMaxOutputId', type: 'custom' });
         register({ name: 'options', type: 'custom' });
     }, [register]);
 
@@ -194,6 +199,25 @@ export const useRbf = (props: Props) => {
     // ts requires at least account field to be present (validated by context type)
     const ctxState = state ? { ...state } : { account: undefined };
 
+    // If automatically composed transaction throws NOT-ENOUGH-FUNDS error
+    // try again with decreased output (use set-max calculation on the first possible output)
+    useEffect(() => {
+        if (ctxState.account?.networkType !== 'bitcoin' || !composedLevels) return;
+        const { selectedFee, setMaxOutputId, outputs } = getValues();
+        const tx = composedLevels[selectedFee || 'normal'];
+        if (
+            tx.type === 'error' &&
+            tx.error === 'NOT-ENOUGH-FUNDS' &&
+            typeof setMaxOutputId !== 'number'
+        ) {
+            setValue(
+                'setMaxOutputId',
+                outputs.findIndex(o => o.type === 'payment'),
+            );
+            composeRequest();
+        }
+    }, [ctxState.account, composedLevels, composeRequest, getValues, setValue]);
+
     return {
         ...ctxState,
         isLoading,
@@ -203,6 +227,7 @@ export const useRbf = (props: Props) => {
         getValues,
         composedLevels,
         changeFeeLevel,
+        composeRequest,
         signTransaction,
     };
 };

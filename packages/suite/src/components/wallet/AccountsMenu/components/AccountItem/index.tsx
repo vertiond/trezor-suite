@@ -1,6 +1,6 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { CoinLogo, variables } from '@trezor/components';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { getTitleForNetwork } from '@wallet-utils/accountUtils';
 import { Translation, FiatValue } from '@suite-components';
 import { SkeletonCircle, SkeletonRectangle, Stack } from '@suite-components/Skeleton';
@@ -8,29 +8,37 @@ import { useLoadingSkeleton, useActions } from '@suite-hooks';
 import { CoinBalance } from '@wallet-components';
 import { Account } from '@wallet-types';
 import * as routerActions from '@suite-actions/routerActions';
+import { TokensCount } from './TokensCount';
+
+const activeClassName = 'selected';
+interface WrapperProps {
+    selected: boolean;
+    type: string;
+}
 
 // position: inherit - get position from parent (AccountGroup), it will be set after animation ends
 // sticky top: 34, sticky header
-const Wrapper = styled.div<{ selected: boolean; type: string }>`
-    /* padding: 2px 0px 2px 0px; */
+const Wrapper = styled.div.attrs((props: WrapperProps) => ({
+    className: props.selected ? activeClassName : '',
+}))<WrapperProps>`
     display: flex;
     flex-direction: column;
     &:first-of-type {
         padding-top: 0;
     }
-    ${props =>
-        props.selected &&
-        css`
-            border-radius: 4px;
-            background: ${props => props.theme.BG_GREY_ALT};
-            position: inherit;
-            top: ${props.type !== 'normal'
+    &:hover,
+    &.${activeClassName} {
+        border-radius: 4px;
+        background: ${props => props.theme.BG_GREY_ALT};
+        position: inherit;
+        top: ${props =>
+            props.type !== 'normal'
                 ? '50px'
                 : '0px'}; /* when scrolling keep some space above to fit account group (50px is the height of acc group container)  */
-            bottom: 0px;
-            z-index: 1;
-            padding: 0px;
-        `}
+        bottom: 0px;
+        z-index: 1;
+        padding: 0px;
+    }
 `;
 
 const Left = styled.div`
@@ -48,7 +56,7 @@ const Right = styled.div`
 
 const Row = styled.div`
     display: flex;
-    align-items: center;
+    align-items: baseline;
     text-overflow: ellipsis;
     white-space: nowrap;
 `;
@@ -59,7 +67,7 @@ const AccountName = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: ${variables.FONT_SIZE.NORMAL};
-    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+    font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
     color: ${props => props.theme.TYPE_DARK_GREY};
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
@@ -68,7 +76,7 @@ const AccountName = styled.div`
 const Balance = styled.div`
     font-size: ${variables.FONT_SIZE.SMALL};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
-    color: ${props => props.theme.TYPE_DARK_GREY};
+    color: ${props => props.theme.TYPE_LIGHT_GREY};
     line-height: 1.57;
 `;
 
@@ -99,6 +107,24 @@ const AccountItem = forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) =>
     });
     const { account, selected, closeMenu } = props;
 
+    const accountRouteParams = useMemo(
+        () => ({
+            symbol: account.symbol,
+            accountIndex: account.index,
+            accountType: account.accountType,
+        }),
+        [account],
+    );
+
+    const handleClickOnTokens = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+        event => {
+            event.stopPropagation();
+            closeMenu();
+            goto('wallet-tokens', accountRouteParams);
+        },
+        [accountRouteParams, closeMenu, goto],
+    );
+
     const dataTestKey = `@account-menu/${account.symbol}/${account.accountType}/${account.index}`;
 
     const DefaultLabel = () => (
@@ -121,11 +147,7 @@ const AccountItem = forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) =>
             <AccountHeader
                 onClick={() => {
                     closeMenu();
-                    goto('wallet-index', {
-                        symbol: account.symbol,
-                        accountIndex: account.index,
-                        accountType: account.accountType,
-                    });
+                    goto('wallet-index', accountRouteParams);
                 }}
                 data-test={dataTestKey}
             >
@@ -140,6 +162,12 @@ const AccountItem = forwardRef((props: Props, ref: React.Ref<HTMLDivElement>) =>
                         <Balance>
                             <CoinBalance value={account.formattedBalance} symbol={account.symbol} />
                         </Balance>
+                        {account.networkType === 'ethereum' && !!account.tokens?.length && (
+                            <TokensCount
+                                count={account.tokens.length}
+                                onClick={handleClickOnTokens}
+                            />
+                        )}
                     </Row>
                     <Row>
                         <FiatValue

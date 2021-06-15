@@ -22,7 +22,7 @@ export interface State {
     enabled: boolean;
     state: 'checking' | 'available' | 'not-available' | 'downloading' | 'ready';
     skip?: string;
-    progress?: UpdateProgress;
+    progress?: Partial<UpdateProgress>;
     latest?: UpdateInfo;
     window: UpdateWindow;
 }
@@ -33,8 +33,8 @@ const initialState: State = {
     window: 'maximized',
 };
 
-const desktopUpdateReducer = (state: State = initialState, action: Action): State => {
-    return produce(state, draft => {
+const desktopUpdateReducer = (state: State = initialState, action: Action): State =>
+    produce(state, draft => {
         switch (action.type) {
             case DESKTOP_UPDATE.ENABLE:
                 draft.enabled = true;
@@ -71,6 +71,5 @@ const desktopUpdateReducer = (state: State = initialState, action: Action): Stat
             // no default
         }
     });
-};
 
 export default desktopUpdateReducer;

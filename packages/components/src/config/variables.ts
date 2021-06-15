@@ -8,6 +8,18 @@ export const SCREEN_SIZE = {
     XL: '1200px', // extra Large laptops/desktops
 } as const;
 
+export const LAYOUT_SIZE = {
+    GUIDE_PANEL_WIDTH: '350px',
+} as const;
+
+export const Z_INDEX = {
+    MODAL: 10000,
+    NAVIGATION_BAR: 30,
+    GUIDE_PANEL: 15,
+    BETA_BADGE: 13,
+    GUIDE_BUTTON: 10,
+} as const;
+
 export const FONT_SIZE = {
     BIG: '18px',
     NORMAL: '16px',
@@ -59,22 +71,29 @@ export const COINS: CoinType[] = [
 ];
 
 export const ICONS: IconType[] = [
+    'APP',
     'ARROW_DOWN',
     'ARROW_UP',
     'ARROW_LEFT',
+    'ARROW_LEFT_LONG',
     'ARROW_RIGHT',
     'ARROW_RIGHT_LONG',
+    'ARTICLE',
+    'ATTACHMENT',
     'BROADCAST',
     'CHECK',
     'CHECK_ACTIVE',
+    'COIN',
     'COINS',
     'COPY',
     'CROSS',
     'DASHBOARD',
+    'DEVICE',
     'EXCHANGE',
     'INFO',
     'INFO_ACTIVE',
     'LOG',
+    'LIGHTBULB',
     'MENU',
     'MORE',
     'NON_SUITE',
@@ -152,4 +171,14 @@ export const ICONS: IconType[] = [
     'WINDOW_RESTORE',
     'WINDOW_RESTORE_MAC',
     'TOR',
+    'RECOVER',
+    'NEW',
+    'SEED_SINGLE',
+    'SEED_SHAMIR',
+    'HOLOGRAM',
+    'PACKAGE',
+    'VERIFIED',
+    'ANCHOR',
+    'PENCIL_LINE',
+    'KEY',
 ];

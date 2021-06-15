@@ -6,60 +6,72 @@ import { Features } from 'trezor-connect';
 import { Release } from './src/utils/parse';
 
 export const getDeviceFeatures = (feat?: Partial<Features>): Features => ({
-    device_id: 'device-id',
-    flags: 0,
-    initialized: true,
-    label: 'My Trezor',
+    vendor: 'trezor.io',
     major_version: 2,
     minor_version: 1,
-    model: 'T',
-    needs_backup: false,
-    no_backup: false,
-    passphrase_protection: false,
     patch_version: 1,
+    bootloader_mode: null,
+    device_id: 'device-id',
     pin_protection: false,
-    revision: '3761663164353835',
+    passphrase_protection: false,
+    language: 'en-US',
+    label: 'My Trezor',
+    initialized: true,
+    revision: 'df0963ec',
+    bootloader_hash: '7447a41717022e3eb32011b00b2a68ebb9c7f603cdc730e7307850a3f4d62a5c',
+    imported: null,
+    unlocked: true,
+    firmware_present: null,
+    needs_backup: false,
+    flags: 0,
+    model: 'T',
+    fw_major: null,
+    fw_minor: null,
+    fw_patch: null,
+    fw_vendor: null,
+    fw_vendor_keys: null,
     unfinished_backup: false,
-    vendor: 'trezor.io',
+    no_backup: false,
+    recovery_mode: false,
     capabilities: [],
+    backup_type: 'Bip39',
+    sd_card_present: false,
+    sd_protection: false,
+    wipe_code_protection: false,
+    session_id: 'session-id',
+    passphrase_always_on_device: false,
+    safety_checks: 'Strict',
+    auto_lock_delay_ms: 60000,
+    display_rotation: 0,
+    experimental_features: false,
     ...feat,
 });
 
-const getRelease = (model: 1 | 2) => {
-    return {
-        required: false,
-        version: [model, 0, 0],
-        min_bridge_version: [2, 0, 25],
-        min_firmware_version: [model, 0, 0],
-        min_bootloader_version: [model, 0, 0],
-        url: 'data/firmware/1/trezor-1.8.1.bin',
-        fingerprint: '019e849c1eb285a03a92bbad6d18a328af3b4dc6999722ebb47677b403a4cd16',
-        changelog: '* Fix fault when using the device with no PIN* Fix OMNI transactions parsing',
-    };
-};
+const getRelease = (model: 1 | 2) => ({
+    required: false,
+    version: [model, 0, 0],
+    min_bridge_version: [2, 0, 25],
+    min_firmware_version: [model, 0, 0],
+    min_bootloader_version: [model, 0, 0],
+    url: 'data/firmware/1/trezor-1.8.1.bin',
+    fingerprint: '019e849c1eb285a03a92bbad6d18a328af3b4dc6999722ebb47677b403a4cd16',
+    changelog: '* Fix fault when using the device with no PIN* Fix OMNI transactions parsing',
+});
 
-const getReleaseT1 = (release: any): Release => {
-    return {
-        ...getRelease(1),
-        bootloader_version: [1, 0, 0],
-        ...release,
-    };
-};
+const getReleaseT1 = (release: any): Release => ({
+    ...getRelease(1),
+    bootloader_version: [1, 0, 0],
+    ...release,
+});
 
-const getReleaseT2 = (release: any): Release => {
-    return {
-        ...getRelease(2),
-        ...release,
-    };
-};
+const getReleaseT2 = (release: any): Release => ({
+    ...getRelease(2),
+    ...release,
+});
 
-const getReleasesT1 = (releases: Partial<Release>[]) => {
-    return releases.map(r => getReleaseT1(r));
-};
+const getReleasesT1 = (releases: Partial<Release>[]) => releases.map(r => getReleaseT1(r));
 
-const getReleasesT2 = (releases: Partial<Release>[]) => {
-    return releases.map(r => getReleaseT2(r));
-};
+const getReleasesT2 = (releases: Partial<Release>[]) => releases.map(r => getReleaseT2(r));
 
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace

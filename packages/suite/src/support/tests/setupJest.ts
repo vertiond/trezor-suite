@@ -7,6 +7,7 @@ import { TrezorDevice } from '@suite-types';
 import { Account, WalletAccountTransaction } from '@wallet-types';
 // in-memory implementation of indexedDB
 import 'fake-indexeddb/auto';
+import { MessageSystem, Action } from '@suite/types/suite/messageSystem';
 /**
  * Generate wallet account
  * @param {Partial<Account>} [account]
@@ -39,8 +40,8 @@ const getWalletAccount = (account?: Partial<Account>): Account => ({
  * device.firmwareRelease property
  * note that values don't make much sense.
  */
-const getFirmwareRelease = (): NonNullable<Device['firmwareRelease']> => ({
-    isLatest: false,
+export const getFirmwareRelease = (): NonNullable<Device['firmwareRelease']> => ({
+    isLatest: true,
     isRequired: false,
     isNewer: false,
     changelog: [
@@ -74,22 +75,44 @@ const getFirmwareRelease = (): NonNullable<Device['firmwareRelease']> => ({
  * @returns {Features}
  */
 export const getDeviceFeatures = (feat?: Partial<Features>): Features => ({
-    device_id: 'device-id',
-    flags: 0,
-    initialized: true,
-    label: 'My Trezor',
+    vendor: 'trezor.io',
     major_version: 2,
     minor_version: 1,
-    model: 'T',
-    needs_backup: false,
-    no_backup: false,
-    passphrase_protection: false,
     patch_version: 1,
+    bootloader_mode: null,
+    device_id: 'device-id',
     pin_protection: false,
-    revision: '3761663164353835',
+    passphrase_protection: false,
+    language: 'en-US',
+    label: 'My Trezor',
+    initialized: true,
+    revision: 'df0963ec',
+    bootloader_hash: '7447a41717022e3eb32011b00b2a68ebb9c7f603cdc730e7307850a3f4d62a5c',
+    imported: null,
+    unlocked: true,
+    firmware_present: null,
+    needs_backup: false,
+    flags: 0,
+    model: 'T',
+    fw_major: null,
+    fw_minor: null,
+    fw_patch: null,
+    fw_vendor: null,
+    fw_vendor_keys: null,
     unfinished_backup: false,
-    vendor: 'trezor.io',
+    no_backup: false,
+    recovery_mode: false,
     capabilities: [],
+    backup_type: 'Bip39',
+    sd_card_present: false,
+    sd_protection: false,
+    wipe_code_protection: false,
+    session_id: 'session-id',
+    passphrase_always_on_device: false,
+    safety_checks: 'Strict',
+    auto_lock_delay_ms: 60000,
+    display_rotation: 0,
+    experimental_features: false,
     ...feat,
 });
 
@@ -152,64 +175,62 @@ const getSuiteDevice = (dev?: Partial<TrezorDevice>, feat?: Partial<Features>): 
     return device as TrezorDevice;
 };
 
-const getWalletTransaction = (t?: Partial<WalletAccountTransaction>): WalletAccountTransaction => {
-    return {
-        descriptor:
-            'zpub6rszzdAK6RuafeRwyN8z1cgWcXCuKbLmjjfnrW4fWKtcoXQ8787214pNJjnBG5UATyghuNzjn6Lfp5k5xymrLFJnCy46bMYJPyZsbpFGagT',
-        deviceState: '7dcccffe70d8bb8bb28a2185daac8e05639490eee913b326097ae1d73abc8b4f',
-        symbol: 'btc',
-        type: 'sent',
-        txid: '7e58757f43015242c0efa29447bea4583336f2358fdff587b52bbe040ad8982a',
-        blockTime: 1565797979,
-        blockHeight: 590093,
-        blockHash: '00000000000000000017277948d61a631dae6cce1d7fb501301b825599189f51',
-        amount: '0.00001',
-        totalSpent: '0.00001144',
-        fee: '0.00000144',
-        targets: [
+const getWalletTransaction = (t?: Partial<WalletAccountTransaction>): WalletAccountTransaction => ({
+    descriptor:
+        'zpub6rszzdAK6RuafeRwyN8z1cgWcXCuKbLmjjfnrW4fWKtcoXQ8787214pNJjnBG5UATyghuNzjn6Lfp5k5xymrLFJnCy46bMYJPyZsbpFGagT',
+    deviceState: '7dcccffe70d8bb8bb28a2185daac8e05639490eee913b326097ae1d73abc8b4f',
+    symbol: 'btc',
+    type: 'sent',
+    txid: '7e58757f43015242c0efa29447bea4583336f2358fdff587b52bbe040ad8982a',
+    blockTime: 1565797979,
+    blockHeight: 590093,
+    blockHash: '00000000000000000017277948d61a631dae6cce1d7fb501301b825599189f51',
+    amount: '0.00001',
+    totalSpent: '0.00001144',
+    fee: '0.00000144',
+    targets: [
+        {
+            addresses: ['mvbu1Gdy8SUjTenqerxUaZyYjmveZvt33q'],
+            amount: '0.00001',
+            isAccountTarget: true,
+            isAddress: true,
+            n: 1,
+        },
+    ],
+    tokens: [],
+    details: {
+        vin: [
             {
-                addresses: ['mvbu1Gdy8SUjTenqerxUaZyYjmveZvt33q'],
-                amount: '0.00001',
-                isAccountTarget: true,
+                addresses: ['tb1q4nytpy37cuz8yndtfqpau4nzsva0jh787ny3yg'],
                 isAddress: true,
-                n: 1,
+                n: 0,
+                sequence: 4294967294,
+                txid: 'c894b064beb2f9be4b0d64cffcd89da2e8dc6decac399f5617323a303e07e4e1',
+                value: '0.80720012',
             },
         ],
-        tokens: [],
-        details: {
-            vin: [
-                {
-                    addresses: ['tb1q4nytpy37cuz8yndtfqpau4nzsva0jh787ny3yg'],
-                    isAddress: true,
-                    n: 0,
-                    sequence: 4294967294,
-                    txid: 'c894b064beb2f9be4b0d64cffcd89da2e8dc6decac399f5617323a303e07e4e1',
-                    value: '0.80720012',
-                },
-            ],
-            vout: [
-                {
-                    addresses: ['tb1q4s560ew83wcd6lcjg7uku9qlx4p6gwh74q4jap'],
-                    hex: '0014ac29a7e5c78bb0dd7f1247b96e141f3543a43afe',
-                    isAddress: true,
-                    n: 0,
-                    value: '0.80718868',
-                },
-                {
-                    addresses: ['mvbu1Gdy8SUjTenqerxUaZyYjmveZvt33q'],
-                    hex: '76a914a579388225827d9f2fe9014add644487808c695d88ac',
-                    isAddress: true,
-                    n: 1,
-                    value: '0.00001',
-                },
-            ],
-            size: 225,
-            totalInput: '0.80720012',
-            totalOutput: '0.80719868',
-        },
-        ...t,
-    };
-};
+        vout: [
+            {
+                addresses: ['tb1q4s560ew83wcd6lcjg7uku9qlx4p6gwh74q4jap'],
+                hex: '0014ac29a7e5c78bb0dd7f1247b96e141f3543a43afe',
+                isAddress: true,
+                n: 0,
+                value: '0.80718868',
+            },
+            {
+                addresses: ['mvbu1Gdy8SUjTenqerxUaZyYjmveZvt33q'],
+                hex: '76a914a579388225827d9f2fe9014add644487808c695d88ac',
+                isAddress: true,
+                n: 1,
+                value: '0.00001',
+            },
+        ],
+        size: 225,
+        totalInput: '0.80720012',
+        totalOutput: '0.80719868',
+    },
+    ...t,
+});
 
 // Mocked TrezorConnect used in various tests
 const getTrezorConnect = <M>(methods?: M) => {
@@ -233,30 +254,48 @@ const getTrezorConnect = <M>(methods?: M) => {
                 listeners[event] = cb;
             },
             off: () => {},
-            blockchainSetCustomBackend: jest.fn(async _params => {
-                return { success: true, ...getFixture(), _params };
-            }),
-            blockchainSubscribe: jest.fn(async _params => {
-                return { success: true, ...getFixture(), _params };
-            }),
-            blockchainSubscribeFiatRates: jest.fn(async _params => {
-                return { success: true, ...getFixture(), _params };
-            }),
-            blockchainUnsubscribeFiatRates: jest.fn(async _params => {
-                return { success: true, ...getFixture(), _params };
-            }),
-            blockchainEstimateFee: jest.fn(async _params => {
-                return { success: true, payload: { levels: [{}] }, ...getFixture(), _params };
-            }),
-            blockchainGetTransactions: jest.fn(async _params => {
-                return { success: true, payload: { txid: 'foo' }, ...getFixture(), _params };
-            }),
-            blockchainDisconnect: jest.fn(async _params => {
-                return { success: true, ...getFixture(), _params };
-            }),
-            getAccountInfo: jest.fn(async _params => {
-                return { success: false, ...getFixture(), _params };
-            }),
+            blockchainSetCustomBackend: jest.fn(async _params => ({
+                success: true,
+                ...getFixture(),
+                _params,
+            })),
+            blockchainSubscribe: jest.fn(async _params => ({
+                success: true,
+                ...getFixture(),
+                _params,
+            })),
+            blockchainSubscribeFiatRates: jest.fn(async _params => ({
+                success: true,
+                ...getFixture(),
+                _params,
+            })),
+            blockchainUnsubscribeFiatRates: jest.fn(async _params => ({
+                success: true,
+                ...getFixture(),
+                _params,
+            })),
+            blockchainEstimateFee: jest.fn(async _params => ({
+                success: true,
+                payload: { levels: [{}] },
+                ...getFixture(),
+                _params,
+            })),
+            blockchainGetTransactions: jest.fn(async _params => ({
+                success: true,
+                payload: { txid: 'foo' },
+                ...getFixture(),
+                _params,
+            })),
+            blockchainDisconnect: jest.fn(async _params => ({
+                success: true,
+                ...getFixture(),
+                _params,
+            })),
+            getAccountInfo: jest.fn(async _params => ({
+                success: false,
+                ...getFixture(),
+                _params,
+            })),
             composeTransaction: jest.fn(async _params => {
                 const fixture = getFixture();
                 if (fixture && typeof fixture.delay === 'number') {
@@ -264,26 +303,36 @@ const getTrezorConnect = <M>(methods?: M) => {
                 }
                 return { success: false, payload: { error: 'error' }, ...fixture, _params };
             }),
-            signTransaction: jest.fn(async _params => {
-                return { success: false, payload: { error: 'error' }, ...getFixture(), _params };
+            signTransaction: jest.fn(async _params => ({
+                success: false,
+                payload: { error: 'error' },
+                ...getFixture(),
+                _params,
+            })),
+            ethereumSignTransaction: jest.fn(async _params => ({
+                success: false,
+                payload: { error: 'error' },
+                ...getFixture(),
+                _params,
+            })),
+            rippleSignTransaction: jest.fn(async _params => ({
+                success: false,
+                payload: { error: 'error' },
+                ...getFixture(),
+                _params,
+            })),
+            pushTransaction: jest.fn(async _params => ({
+                success: true,
+                payload: { txid: 'txid' },
+                ...getFixture(),
+                _params,
+            })),
+            changePin: () => ({
+                success: true,
+                payload: {
+                    message: 'great success',
+                },
             }),
-            ethereumSignTransaction: jest.fn(async _params => {
-                return { success: false, payload: { error: 'error' }, ...getFixture(), _params };
-            }),
-            rippleSignTransaction: jest.fn(async _params => {
-                return { success: false, payload: { error: 'error' }, ...getFixture(), _params };
-            }),
-            pushTransaction: jest.fn(async _params => {
-                return { success: true, payload: { txid: 'txid' }, ...getFixture(), _params };
-            }),
-            changePin: () => {
-                return {
-                    success: true,
-                    payload: {
-                        message: 'great success',
-                    },
-                };
-            },
             // additional methods used by s
 
             setTestFixtures: (f?: typeof fixtures) => {
@@ -317,6 +366,115 @@ const getTrezorConnect = <M>(methods?: M) => {
     };
 };
 
+const getMessageSystemConfig = (
+    root?: Partial<MessageSystem>,
+    action1?: Partial<Action>,
+    action2?: Partial<Action>,
+): MessageSystem => ({
+    version: 1,
+    timestamp: '2021-03-03T03:48:16+00:00',
+    sequence: 1,
+    actions: [
+        {
+            conditions: [
+                {
+                    duration: {
+                        from: '2021-03-01T12:10:00.000Z',
+                        to: '2022-01-31T12:10:00.000Z',
+                    },
+                    os: {
+                        macos: ['10.14', '10.18', '11'],
+                        linux: '<20.04',
+                        windows: '!',
+                        android: '*',
+                        ios: '13',
+                    },
+                    environment: {
+                        desktop: '<21.5',
+                        mobile: '!',
+                        web: '<22',
+                    },
+                    browser: {
+                        firefox: ['82', '83'],
+                        chrome: '*',
+                        chromium: '!',
+                    },
+                    settings: [
+                        {
+                            tor: true,
+                            btc: true,
+                        },
+                        {
+                            tor: false,
+                            ltc: true,
+                        },
+                    ],
+                    transport: {
+                        bridge: ['2.0.30', '2.0.27'],
+                        webusbplugin: '*',
+                    },
+                    devices: [
+                        {
+                            model: 'T',
+                            firmware: '2.1.1',
+                            vendor: 'trezor.io',
+                        },
+                    ],
+                },
+            ],
+            message: {
+                id: '0f3ec64d-c3e4-4787-8106-162f3ac14c34',
+                priority: 10,
+                dismissible: true,
+                variant: 'warning',
+                category: 'banner',
+                content: {
+                    'en-GB': 'New Trezor firmware is available!',
+                },
+                cta: {
+                    action: 'internal-link',
+                    link: 'firmware-index',
+                    label: {
+                        'en-GB': 'Update now',
+                    },
+                },
+            },
+            ...action1,
+        },
+        {
+            conditions: [],
+            message: {
+                id: '5213c64d-c3e4-4787-8106-162f3ac14c34',
+                priority: 8,
+                dismissible: false,
+                variant: 'info',
+                category: ['banner', 'context', 'modal'],
+                content: {
+                    'en-GB': 'New Trezor app is available!',
+                },
+                cta: {
+                    action: 'external-link',
+                    link: 'https://example.com/',
+                    label: {
+                        'en-GB': 'Download now',
+                    },
+                },
+                modal: {
+                    title: {
+                        'en-GB': 'Update now',
+                    },
+                    image: 'https://example.com/example.png',
+                },
+                context: {
+                    domain: ['coins.*.receive', 'coins.btc'],
+                },
+            },
+            ...action2,
+        },
+    ],
+    ...root,
+});
+
 class BroadcastChannel {
     name: string;
     constructor(name: string) {
@@ -340,12 +498,14 @@ declare global {
     namespace NodeJS {
         interface Global {
             JestMocks: {
+                getFirmwareRelease: typeof getFirmwareRelease;
                 getDeviceFeatures: typeof getDeviceFeatures;
                 getConnectDevice: typeof getConnectDevice;
                 getSuiteDevice: typeof getSuiteDevice;
                 getWalletAccount: typeof getWalletAccount;
                 getWalletTransaction: typeof getWalletTransaction;
                 getTrezorConnect: typeof getTrezorConnect;
+                getMessageSystemConfig: typeof getMessageSystemConfig;
                 intlMock: typeof intlMock;
             };
             BroadcastChannel: typeof BroadcastChannel;
@@ -359,12 +519,14 @@ const intlMock = {
 };
 
 global.JestMocks = {
+    getFirmwareRelease,
     getDeviceFeatures,
     getConnectDevice,
     getSuiteDevice,
     getWalletAccount,
     getWalletTransaction,
     getTrezorConnect,
+    getMessageSystemConfig,
     intlMock,
 };
 

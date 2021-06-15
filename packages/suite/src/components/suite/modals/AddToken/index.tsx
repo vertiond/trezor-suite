@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TrezorConnect, { TokenInfo } from 'trezor-connect';
-import { Input, Button } from '@trezor/components';
+import { Input, Button, Tooltip } from '@trezor/components';
 import * as tokenActions from '@wallet-actions/tokenActions';
-import { Modal, QuestionTooltip } from '@suite-components';
+import { Modal } from '@suite-components';
 import { Translation } from '@suite-components/Translation';
 import { useActions, useSelector, useTranslation, useAnalytics } from '@suite-hooks';
 import { isAddressValid } from '@wallet-utils/validation';
@@ -113,10 +113,9 @@ const AddToken = (props: Props) => {
             <Wrapper>
                 <Input
                     label={
-                        <QuestionTooltip
-                            label={<Translation id="TR_ADD_TOKEN_LABEL" />}
-                            tooltip="TR_ADD_TOKEN_TOOLTIP"
-                        />
+                        <Tooltip content={<Translation id="TR_ADD_TOKEN_TOOLTIP" />} dashed>
+                            <Translation id="TR_ADD_TOKEN_LABEL" />
+                        </Tooltip>
                     }
                     placeholder={translationString('TR_ADD_TOKEN_PLACEHOLDER')}
                     value={contractAddress}
@@ -132,11 +131,13 @@ const AddToken = (props: Props) => {
                         if (tokenInfo) {
                             addToken(account, tokenInfo);
                             props.onCancel();
+
                             analytics.report({
                                 type: 'add-token',
                                 payload: {
                                     networkSymbol: account.symbol,
                                     addedNth: account.tokens ? account.tokens.length + 1 : 0,
+                                    token: tokenInfo[0]?.symbol?.toLowerCase() || '',
                                 },
                             });
                         }

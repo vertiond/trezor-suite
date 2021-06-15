@@ -6,6 +6,19 @@ import { Icon } from '../../Icon';
 import { getStateColor, useTheme } from '../../../utils';
 import { useEffect, createRef } from 'react';
 
+const getInputHeight = (variant?: InputVariant) => {
+    switch (variant) {
+        case 'small':
+            return 32;
+        case 'medium':
+            return 42;
+        case 'large':
+            return 48;
+        default:
+            return 48;
+    }
+};
+
 const Wrapper = styled.div<Pick<Props, 'width'>>`
     display: inline-flex;
     flex-direction: column;
@@ -14,6 +27,8 @@ const Wrapper = styled.div<Pick<Props, 'width'>>`
 
 interface InputProps extends Props {
     inputAddonWidth?: number;
+    borderWidth: number;
+    borderRadius: number;
 }
 
 const StyledInput = styled.input<InputProps>`
@@ -23,15 +38,15 @@ const StyledInput = styled.input<InputProps>`
     padding: 1px ${props => (props.textIndent ? `${props.textIndent[1] + 16}px` : '16px')} 0
         ${props => (props.textIndent ? `${props.textIndent[0] + 16}px` : '16px')};
     font-size: ${variables.FONT_SIZE.SMALL};
-    border-radius: 4px;
-    border: solid 2px
+    border-radius: ${props => props.borderRadius}px;
+    border: solid ${props => props.borderWidth}px
         ${props =>
             props.state ? getStateColor(props.state, props.theme) : props.theme.STROKE_GREY};
     background-color: ${props => props.theme.BG_WHITE};
     outline: none;
     box-sizing: border-box;
     width: 100%;
-    height: ${props => (props.variant === 'small' ? '32px' : '48px')};
+    height: ${props => `${getInputHeight(props.variant)}px`};
     color: ${props => getStateColor(props.state, props.theme)};
 
     &:read-only {
@@ -187,6 +202,8 @@ interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'width
     textIndent?: [number, number]; // [left, right]
     clearButton?: boolean;
     width?: number;
+    borderWidth?: number;
+    borderRadius?: number;
     onClear?: () => void;
 }
 
@@ -220,6 +237,8 @@ const Input = ({
     noError = false,
     noTopLabel = false,
     textIndent,
+    borderWidth = 2,
+    borderRadius = 4,
     ...rest
 }: Props) => {
     const [isHovered, setIsHovered] = React.useState(false);
@@ -293,6 +312,8 @@ const Input = ({
                         ref={innerRef}
                         data-lpignore="true"
                         inputAddonWidth={inputAddonWidth}
+                        borderWidth={borderWidth}
+                        borderRadius={borderRadius}
                         {...rest}
                     />
                 </InputWrapper>

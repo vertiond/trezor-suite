@@ -10,11 +10,13 @@ import { Input } from './components/form/Input';
 import { Textarea } from './components/form/Textarea';
 import { Select } from './components/form/Select';
 import { Checkbox } from './components/form/Checkbox';
+import { RadioButton } from './components/form/RadioButton';
 import { Switch } from './components/form/Switch';
 import { Icon } from './components/Icon';
 import { H1, H2 } from './components/typography/Heading';
 import { P } from './components/typography/Paragraph';
 import { Link } from './components/typography/Link';
+import { Warning } from './components/Warning';
 import { Box } from './components/others/Box';
 import { Card } from './components/others/Card';
 import { SecurityCard } from './components/others/SecurityCard';
@@ -41,12 +43,14 @@ export {
     Textarea,
     Select,
     Checkbox,
+    RadioButton,
     Switch,
     Icon,
     H1,
     H2,
     P,
     Link,
+    Warning,
     Modal,
     CoinLogo,
     TrezorLogo,

@@ -5,42 +5,40 @@ import recoveryReducer from '@recovery-reducers/recoveryReducer';
 import { Action } from '@suite-types';
 import * as recoveryActions from '@recovery-actions/recoveryActions';
 
-jest.mock('trezor-connect', () => {
-    return {
-        __esModule: true, // this property makes it work
-        default: {
-            recoveryDevice: () => {
-                return { success: true };
-            },
-        },
-        DEVICE: {
-            DISCONNECT: 'device-disconnect',
-        },
-        TRANSPORT: {},
-        BLOCKCHAIN: {},
-        UI: {
-            REQUEST_BUTTON: 'ui-button',
-        },
-    };
-});
+jest.mock('trezor-connect', () => ({
+    __esModule: true, // this property makes it work
+    default: {
+        recoveryDevice: () => ({ success: true }),
+    },
+    DEVICE: {
+        DISCONNECT: 'device-disconnect',
+    },
+    TRANSPORT: {},
+    BLOCKCHAIN: {},
+    UI: {
+        REQUEST_BUTTON: 'ui-button',
+    },
+}));
 
-export const getInitialState = (custom?: any): any => {
-    return {
-        suite: {
-            device: {
-                features: {
-                    // eslint-disable-next-line
-                    major_version: 2,
-                },
+export const getInitialState = (custom?: any): any => ({
+    suite: {
+        device: {
+            features: {
+                // eslint-disable-next-line
+                major_version: 2,
             },
-            locks: [],
         },
-        recovery: {
-            ...recoveryReducer(undefined, {} as Action),
-            ...custom,
-        },
-    };
-};
+        flags: {},
+        locks: [],
+    },
+    recovery: {
+        ...recoveryReducer(undefined, {} as Action),
+        ...custom,
+    },
+    analytics: {
+        enabled: false,
+    },
+});
 
 const createStore = (initialState: ReturnType<typeof getInitialState>) => {
     const store = configureStore<ReturnType<typeof getInitialState>, any>([thunk])(initialState);

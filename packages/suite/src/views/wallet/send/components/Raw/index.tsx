@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import { Card, Translation } from '@suite-components';
 import { InputError } from '@wallet-components';
-import { Textarea, Button, Icon } from '@trezor/components';
+import { Textarea, Button, Icon, Tooltip } from '@trezor/components';
 import { useActions, useAnalytics } from '@suite-hooks';
 import * as sendFormActions from '@wallet-actions/sendFormActions';
 import { getInputState } from '@wallet-utils/sendFormUtils';
@@ -21,17 +21,6 @@ const StyledCard = styled(Card)`
     justify-items: space-between;
     align-items: center;
     padding: 32px 42px;
-`;
-
-const Label = styled.div`
-    display: flex;
-    align-items: center;
-`;
-
-const IconWrapper = styled.div`
-    display: flex;
-    padding: 8px 12px 8px 12px; /* custom padding to solve jumping content */
-    justify-content: flex-end;
 `;
 
 const ButtonWrapper = styled.div`
@@ -66,9 +55,6 @@ const Raw = ({ network }: { network: Network }) => {
 
     return (
         <Wrapper>
-            <IconWrapper>
-                <Icon size={20} icon="CROSS" onClick={() => sendRaw(false)} />
-            </IconWrapper>
             <StyledCard>
                 <Textarea
                     state={inputState}
@@ -90,10 +76,11 @@ const Raw = ({ network }: { network: Network }) => {
                     })}
                     bottomText={<InputError error={error} />}
                     label={
-                        <Label>
+                        <Tooltip content={<Translation id="SEND_RAW_TRANSACTION_TOOLTIP" />} dashed>
                             <Translation id="SEND_RAW_TRANSACTION" />
-                        </Label>
+                        </Tooltip>
                     }
+                    labelRight={<Icon size={20} icon="CROSS" onClick={() => sendRaw(false)} />}
                 />
             </StyledCard>
             <ButtonWrapper>

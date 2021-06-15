@@ -2,7 +2,7 @@
 suite codesign deploy staging-suite:
   stage: deploy to staging
   needs:
-    - suite-web build stable
+    - suite-web build stable codesign
     - suite-desktop build mac codesign
     - suite-desktop build linux codesign
     - suite-desktop build windows codesign
@@ -32,7 +32,7 @@ suite codesign deploy staging-suite:
   tags:
     - deploy
 
-# Create a GitHub release and append signed binaries
+# Suite Desktop create a GitHub release and append signed binaries
 suite-desktop github release:
   stage: deploy to production
   needs:
@@ -48,7 +48,9 @@ suite-desktop github release:
       - codesign
   when: manual
   script:
-    - release-it --ci --config=ci/release-it.yml --disable-metrics
+    - gh config set prompt disabled
+    - VERSION=$(jq -r .version packages/suite-desktop/package.json)
+    - gh release create --repo trezor/trezor-suite --draft v${VERSION}  --title "v${VERSION}" ./Trezor-Suite* latest*
   tags:
     - deploy
 

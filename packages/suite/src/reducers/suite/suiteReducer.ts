@@ -14,16 +14,16 @@ export interface DebugModeOptions {
 }
 
 interface Flags {
-    initialRun: boolean;
+    initialRun: boolean; // true on very first launch of Suite, will switch to false after completing onboarding process
     // is not saved to storage at the moment, so for simplicity of types set to be optional now
-    initialWebRun?: boolean;
     // recoveryCompleted: boolean;
     // pinCompleted: boolean;
     // passphraseCompleted: boolean;
-    discreetModeCompleted: boolean;
-    bech32BannerClosed: boolean;
-    securityStepsHidden: boolean;
-    dashboardGraphHidden: boolean;
+    bech32BannerClosed: boolean; // banner in account view informing about advantages of using Bech32
+    discreetModeCompleted: boolean; // dashboard UI, user tried discreet mode
+    securityStepsHidden: boolean; // dashboard UI
+    dashboardGraphHidden: boolean; // dashboard UI
+    dashboardAssetsGridMode: boolean; // dashboard UI
 }
 
 interface SuiteSettings {
@@ -60,8 +60,6 @@ const initialState: SuiteState = {
     locks: [],
     flags: {
         initialRun: true,
-        // on web, there is another preceding initialWebRun, that shows 'download' desktop
-        initialWebRun: isWeb(),
         // recoveryCompleted: false;
         // pinCompleted: false;
         // passphraseCompleted: false;
@@ -69,6 +67,7 @@ const initialState: SuiteState = {
         bech32BannerClosed: false,
         securityStepsHidden: false,
         dashboardGraphHidden: false,
+        dashboardAssetsGridMode: false,
     },
     settings: {
         theme: {
@@ -98,8 +97,8 @@ const setFlag = (draft: SuiteState, key: keyof Flags, value: boolean) => {
     draft.flags[key] = value;
 };
 
-const suiteReducer = (state: SuiteState = initialState, action: Action): SuiteState => {
-    return produce(state, draft => {
+const suiteReducer = (state: SuiteState = initialState, action: Action): SuiteState =>
+    produce(state, draft => {
         switch (action.type) {
             case SUITE.INIT:
                 draft.loading = true;
@@ -195,6 +194,5 @@ const suiteReducer = (state: SuiteState = initialState, action: Action): SuiteSt
             // no default
         }
     });
-};
 
 export default suiteReducer;

@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { Device, DEVICE } from 'trezor-connect';
+import { Device, DEVICE, Features } from 'trezor-connect';
 import { SUITE, STORAGE, METADATA } from '@suite-actions/constants';
 import * as deviceUtils from '@suite-utils/device';
 import { TrezorDevice, AcquiredDevice, Action } from '@suite-types';
@@ -7,20 +7,37 @@ import { TrezorDevice, AcquiredDevice, Action } from '@suite-types';
 type State = TrezorDevice[];
 const initialState: State = [];
 
+// Use the negated form as it better fits the call sites.
+// Export to be testeable.
+/** Returns true if device with given Features is not locked. */
+export const isUnlocked = (features: Features): boolean =>
+    typeof features.unlocked === 'boolean'
+        ? features.unlocked
+        : // Older FW (<2.3.2) which doesn't have `unlocked` feature also doesn't have auto-lock and is always unlocked.
+          true;
+
 /**
  * Local utility: set updated fields for device
  * @param {AcquiredDevice} device
  * @param {Partial<AcquiredDevice>} upcoming
  * @returns {TrezorDevice}
  */
-const merge = (device: AcquiredDevice, upcoming: Partial<AcquiredDevice>): TrezorDevice => {
-    return {
-        ...device,
-        ...upcoming,
-        state: device.state,
-        instance: device.instance,
-    };
-};
+const merge = (device: AcquiredDevice, upcoming: Partial<AcquiredDevice>): TrezorDevice => ({
+    ...device,
+    ...upcoming,
+    state: device.state,
+    instance: device.instance,
+    features: {
+        // Don't override features if upcoming device is locked.
+        // In such case the features are redacted i.e. all fields are `null`
+        // but we still want to remember what the features are...
+        ...(upcoming.features && isUnlocked(upcoming.features)
+            ? upcoming.features
+            : device.features),
+        // ...except for `unlocked` which should reflect the actual state of the device.
+        unlocked: upcoming.features ? upcoming.features.unlocked : null,
+    },
+});
 
 /**
  * Action handler: DEVICE.CONNECT + DEVICE.CONNECT_UNACQUIRED
@@ -50,12 +67,6 @@ const connectDevice = (draft: State, device: Device) => {
     }
 
     const { features } = device;
-    // older FW (< 2.3.2) doesn't have `unlocked` field in Features ALSO doesn't have auto-lock, so it's always true
-    const unlocked =
-        // todo: remove features.pin_protection once fixed in connect
-        features.pin_protection && typeof features.unlocked === 'boolean'
-            ? features.unlocked
-            : true;
     // find affected devices with current "device_id" (acquired only)
     const affectedDevices = draft.filter(d => d.features && d.id === device.id) as AcquiredDevice[];
     // find unacquired device with current "path" (unacquired device will become acquired)
@@ -74,7 +85,7 @@ const connectDevice = (draft: State, device: Device) => {
     // prepare new device
     const newDevice: TrezorDevice = {
         ...device,
-        useEmptyPassphrase: unlocked && !features.passphrase_protection,
+        useEmptyPassphrase: isUnlocked(device.features) && !features.passphrase_protection,
         remember: false,
         connected: true,
         available: true,
@@ -91,7 +102,7 @@ const connectDevice = (draft: State, device: Device) => {
     if (affectedDevices.length > 0) {
         const changedDevices = affectedDevices.map(d => {
             // change availability according to "passphrase_protection" field
-            if (d.instance && unlocked && !features.passphrase_protection) {
+            if (d.instance && isUnlocked(device.features) && !features.passphrase_protection) {
                 return merge(d, { ...device, connected: true, available: false });
             }
             return merge(d, { ...device, connected: true, available: true });
@@ -144,13 +155,11 @@ const changeDevice = (
         // merge incoming device with State
         const changedDevices = affectedDevices.map(d => {
             // change availability according to "passphrase_protection" field
-            // older FW (< 2.3.2) doesn't have `unlocked` field in Features ALSO doesn't have auto-lock, so it's always true
-            const unlocked =
-                // todo: remove features.pin_protection once fixed in connect
-                device.features.pin_protection && typeof device.features.unlocked === 'boolean'
-                    ? device.features.unlocked
-                    : true;
-            if (d.instance && unlocked && !device.features.passphrase_protection) {
+            if (
+                d.instance &&
+                isUnlocked(device.features) &&
+                !device.features.passphrase_protection
+            ) {
                 return merge(d, { ...device, ...extended, available: !d.state });
             }
             return merge(d, { ...device, ...extended, available: true });
@@ -179,31 +188,6 @@ const disconnectDevice = (draft: State, device: Device) => {
             draft.splice(draft.indexOf(d), 1);
         }
     });
-
-    // remove.forEach(d => {
-    //     draft.splice(draft.indexOf(d), 1);
-    // });
-
-    // if (remove.length >)
-
-    // if (affectedDevices.length > 0) {
-    //     // remembered devices shouldn't be removed from reducer
-    //     const rememberedDevices = affectedDevices.filter(
-    //         d => d.features && d.remember,
-    //     ) as AcquiredDevice[];
-    //     // clear draft
-    //     draft.splice(0, draft.length);
-    //     // fill draft with not affected devices
-    //     otherDevices.forEach(d => draft.push(d));
-    //     // fill draft with affected but remembered devices
-    //     rememberedDevices.forEach(d => {
-    //         d.connected = false;
-    //         d.available = false;
-    //         d.status = 'available';
-    //         d.path = '';
-    //         draft.push(d);
-    //     });
-    // }
 };
 
 /**
@@ -409,8 +393,8 @@ const updateMetadata = (draft: State, state: string, walletLabel?: string) => {
     metadata.walletLabel = walletLabel;
 };
 
-const deviceReducer = (state: State = initialState, action: Action): State => {
-    return produce(state, draft => {
+const deviceReducer = (state: State = initialState, action: Action): State =>
+    produce(state, draft => {
         switch (action.type) {
             case STORAGE.LOADED:
                 return action.payload.devices;
@@ -464,6 +448,5 @@ const deviceReducer = (state: State = initialState, action: Action): State => {
             // no default
         }
     });
-};
 
 export default deviceReducer;

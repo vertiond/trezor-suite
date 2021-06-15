@@ -36,10 +36,12 @@ export interface DesktopApi {
     getTorAddress: () => Promise<string>;
     setTorAddress: (address: string) => void;
     // Analytics
-    getOSVersion: () => Promise<
+    getOsType: () => Promise<
         | { success: true; payload: { platform: string; release: string } }
         | { success: false; error: string }
     >;
+    // Store
+    clearStore: () => void;
 }
 
 declare global {

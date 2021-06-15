@@ -110,20 +110,19 @@ export const findTransaction = (txid: string, transactions: WalletAccountTransac
 export const findTransactions = (
     txid: string,
     transactions: { [key: string]: WalletAccountTransaction[] },
-) => {
-    return Object.keys(transactions).flatMap(key => {
+) =>
+    Object.keys(transactions).flatMap(key => {
         const tx = findTransaction(txid, transactions[key]);
         if (!tx) return [];
         return [{ key, tx }];
     });
-};
 
 // Find chained pending transactions
 export const findChainedTransactions = (
     txid: string,
     transactions: { [key: string]: WalletAccountTransaction[] },
-) => {
-    return Object.keys(transactions).flatMap(key => {
+) =>
+    Object.keys(transactions).flatMap(key => {
         // check if any pending transaction is using the utxo/vin with requested txid
         const txs = transactions[key]
             .filter(isPending)
@@ -149,14 +148,11 @@ export const findChainedTransactions = (
             return res.concat(item);
         }, [] as typeof result);
     });
-};
 
 export const getConfirmations = (
     tx: WalletAccountTransaction | AccountTransaction,
     height: number,
-) => {
-    return tx.blockHeight && tx.blockHeight > 0 ? height - tx.blockHeight + 1 : 0;
-};
+) => (tx.blockHeight && tx.blockHeight > 0 ? height - tx.blockHeight + 1 : 0);
 
 // inner private type, it's pointless to move it outside of this file
 interface Analyze {
@@ -314,9 +310,8 @@ export const isTxUnknown = (transaction: WalletAccountTransaction) => {
     );
 };
 
-export const isTxFailed = (tx: AccountTransaction | WalletAccountTransaction) => {
-    return !isPending(tx) && tx.ethereumSpecific?.status === 0;
-};
+export const isTxFailed = (tx: AccountTransaction | WalletAccountTransaction) =>
+    !isPending(tx) && tx.ethereumSpecific?.status === 0;
 
 export const getFeeRate = (tx: AccountTransaction, decimals?: number) => {
     // calculate fee rate, TODO: add this to blockchain-link tx details
@@ -385,41 +380,53 @@ const getBitcoinRbfParams = (
         const addr = allAddresses.find(a => input.addresses?.includes(a.address));
         if (!addr) return []; // skip utxo, TODO: set some error? is it even possible?
         // re-create utxo from the input
-        return [
-            {
-                amount: input.value!,
-                txid: input.txid!,
-                vout: input.vout || 0,
-                address: addr!.address,
-                path: addr!.path,
-                blockHeight: 0,
-                confirmations: 0,
-            },
-        ];
+        return {
+            amount: input.value!,
+            txid: input.txid!,
+            vout: input.vout || 0,
+            address: addr!.address,
+            path: addr!.path,
+            blockHeight: 0,
+            confirmations: 0,
+            required: true,
+        };
     });
     // find change address and output
     let changeAddress: AccountAddress | undefined;
     const outputs: RbfTransactionParams['outputs'] = [];
     vout.forEach(output => {
-        const changeOutput = changeAddresses.find(a => output.addresses?.includes(a.address));
-        outputs.push({
-            type: changeOutput ? 'change' : 'payment',
-            address: output.addresses![0],
-            amount: output.value!,
-            formattedAmount: formatNetworkAmount(output.value!, account.symbol),
-        });
-        if (changeOutput) {
-            changeAddress = changeOutput;
+        if (!output.isAddress) {
+            // TODO: this should be done in trezor-connect, blockchain-link or even blockbook
+            // blockbook sends output.hex as scriptPubKey with additional prefix where: 6a - OP_RETURN and XX - data len. this field should be parsed by @trezor/utxo-lib
+            // blockbook sends ascii data in output.address[0] field in format: "OP_RETURN (ASCII-VALUE)". as a workaround we are extracting ascii data from here
+            const dataAscii = output.addresses![0].match(/^OP_RETURN \((.*)\)/)?.pop(); // strip ASCII data from brackets
+            if (dataAscii) {
+                outputs.push({
+                    type: 'opreturn',
+                    dataHex: Buffer.from(dataAscii, 'ascii').toString('hex'),
+                    dataAscii,
+                });
+            }
+        } else {
+            const changeOutput = changeAddresses.find(a => output.addresses?.includes(a.address));
+            outputs.push({
+                type: changeOutput ? 'change' : 'payment',
+                address: output.addresses![0],
+                amount: output.value!,
+                formattedAmount: formatNetworkAmount(output.value!, account.symbol),
+            });
+            if (changeOutput) {
+                changeAddress = changeOutput;
+            }
         }
     });
 
-    // TODO: implement possibility to add another utxo (sign totally different transaction)
-    if (!utxo.length || !outputs.length) return;
+    if (!utxo.length || !outputs.length || outputs.length !== vout.length) return;
 
     // calculate fee rate, TODO: add this to blockchain-link tx details
     const feeRate = getFeeRate(tx);
 
-    // TODO: get other params, like opreturn or locktime? change etc.
+    // TODO: get other params, like locktime etc.
     return {
         txid: tx.txid,
         utxo,
@@ -433,9 +440,8 @@ const getBitcoinRbfParams = (
 export const getRbfParams = (
     tx: AccountTransaction,
     account: Account,
-): WalletAccountTransaction['rbfParams'] => {
-    return getBitcoinRbfParams(tx, account) || getEthereumRbfParams(tx, account);
-};
+): WalletAccountTransaction['rbfParams'] =>
+    getBitcoinRbfParams(tx, account) || getEthereumRbfParams(tx, account);
 
 export const enhanceTransactionDetails = (tx: AccountTransaction, symbol: Account['symbol']) => ({
     ...tx.details,
@@ -487,12 +493,10 @@ export const enhanceTransaction = (
             account.networkType === 'ripple' && tx.blockTime
                 ? tx.blockTime + 946684800
                 : tx.blockTime,
-        tokens: tx.tokens.map(tok => {
-            return {
-                ...tok,
-                amount: formatAmount(tok.amount, tok.decimals),
-            };
-        }),
+        tokens: tx.tokens.map(tok => ({
+            ...tok,
+            amount: formatAmount(tok.amount, tok.decimals),
+        })),
         amount: formatNetworkAmount(tx.amount, account.symbol),
         fee: formatNetworkAmount(tx.fee, account.symbol),
         totalSpent: formatNetworkAmount(tx.totalSpent, account.symbol),
@@ -792,7 +796,6 @@ export const getBlockExplorerUrl = (tx: WalletAccountTransaction) => {
     return `${network!.explorer.tx}${tx.txid}`;
 };
 
-export const isTxFinal = (tx: WalletAccountTransaction, confirmations: number) => {
+export const isTxFinal = (tx: WalletAccountTransaction, confirmations: number) =>
     // checks RBF status
-    return !tx.rbf || confirmations > 0;
-};
+    !tx.rbf || confirmations > 0;

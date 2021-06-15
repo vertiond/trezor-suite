@@ -5,7 +5,7 @@ import Common from 'ethereumjs-common';
 import { Transaction, TxData } from 'ethereumjs-tx';
 import { fromWei, padLeft, toHex, toWei } from 'web3-utils';
 import { ERC20_TRANSFER } from '@wallet-constants/sendForm';
-import { amountToSatoshi, networkAmountToSatoshi, formatAmount } from '@wallet-utils/accountUtils';
+import { amountToSatoshi, networkAmountToSatoshi } from '@wallet-utils/accountUtils';
 import { Network, Account, CoinFiatRates } from '@wallet-types';
 import { FormState, FeeInfo, EthTransactionData, ExternalOutput } from '@wallet-types/sendForm';
 
@@ -90,16 +90,12 @@ export const getEthereumEstimateFeeParams = (
         return {
             to: token.address,
             value: '0x0',
-            data: getSerializedErc20Transfer(
-                token,
-                to,
-                amount || formatAmount('1', token.decimals), // use at least 1 smallest unit of token (satoshi)
-            ),
+            data: getSerializedErc20Transfer(token, to, amount || token.balance!), // if amount is not set (set-max case) use whole token balance
         };
     }
     return {
         to,
-        value: amount ? getSerializedAmount(amount) : toHex('1'), // use at least 1 wei (satoshi)
+        value: amount ? getSerializedAmount(amount) : toHex('1'), // if amount is not set (set-max case) use at least 1 wei
         data: data || '',
     };
 };
@@ -165,13 +161,19 @@ export const getFeeLevels = (networkType: Network['networkType'], feeInfo: FeeIn
 
     if (networkType === 'ethereum') {
         // convert wei to gwei and floor value to avoid decimals
-        return levels.map(level => ({
-            ...level,
-            feePerUnit: new BigNumber(fromWei(level.feePerUnit, 'gwei'))
-                .integerValue(BigNumber.ROUND_FLOOR)
-                .toString(),
-            feeLimit: level.feeLimit,
-        }));
+        return levels.map(level => {
+            const gwei = new BigNumber(fromWei(level.feePerUnit, 'gwei'));
+            // blockbook/geth may return 0 in feePerUnit. if this happens set at least minFee
+            const feePerUnit =
+                level.label !== 'custom' && gwei.lt(feeInfo.minFee)
+                    ? feeInfo.minFee.toString()
+                    : gwei.integerValue(BigNumber.ROUND_FLOOR).toString();
+            return {
+                ...level,
+                feePerUnit,
+                feeLimit: level.feeLimit,
+            };
+        });
     }
 
     return levels;

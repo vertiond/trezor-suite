@@ -37,10 +37,10 @@ const OutputLeft = styled.div`
     flex-direction: column;
 `;
 
-const DualIndicatorWrapper = styled.div`
+const MultiIndicatorWrapper = styled.div<{ linesCount: number }>`
     display: flex;
     align-self: flex-start;
-    height: 80px;
+    height: ${props => props.linesCount * 80}px;
     align-items: center;
     position: relative;
     z-index: 1;
@@ -103,10 +103,11 @@ export type OutputElementLine = {
     id: string;
     label: React.ReactNode;
     value: string;
+    plainValue?: boolean;
 };
 
 export type Props = {
-    indicator?: any;
+    indicator?: JSX.Element;
     lines: OutputElementLine[];
     cryptoSymbol?: string;
     fiatSymbol: Network['symbol'];
@@ -120,9 +121,7 @@ const TruncateWrapper = ({
 }: {
     condition: boolean;
     children?: React.ReactNode;
-}): JSX.Element => {
-    return condition ? <Truncate>{children}</Truncate> : <>{children}</>;
-};
+}) => (condition ? <Truncate>{children}</Truncate> : <>{children}</>);
 
 const OutputLine = ({
     indicator,
@@ -131,52 +130,56 @@ const OutputLine = ({
     fiatSymbol,
     hasExpansion = false,
     fiatVisible = false,
-}: Props) => {
-    return (
-        <OutputWrapper>
-            <OutputLeft>
-                {lines.length > 1 ? (
-                    <DualIndicatorWrapper>{indicator}</DualIndicatorWrapper>
-                ) : (
-                    <>{indicator}</>
-                )}
-            </OutputLeft>
-            <OutputRight>
-                {lines.map(line => (
-                    <OutputRightLine key={line.id}>
-                        <OutputHeadline>
-                            <Truncate>{line.label}</Truncate>
-                        </OutputHeadline>
-                        <OutputValue>
-                            <TruncateWrapper condition={hasExpansion}>
-                                <OutputValueWrapper>
+}: Props) => (
+    <OutputWrapper>
+        <OutputLeft>
+            {lines.length > 1 ? (
+                <MultiIndicatorWrapper linesCount={lines.length - 1}>
+                    {indicator}
+                </MultiIndicatorWrapper>
+            ) : (
+                <>{indicator}</>
+            )}
+        </OutputLeft>
+        <OutputRight>
+            {lines.map(line => (
+                <OutputRightLine key={line.id}>
+                    <OutputHeadline>
+                        <Truncate>{line.label}</Truncate>
+                    </OutputHeadline>
+                    <OutputValue>
+                        <TruncateWrapper condition={hasExpansion}>
+                            <OutputValueWrapper>
+                                {line.plainValue ? (
+                                    line.value
+                                ) : (
                                     <FormattedCryptoAmount
                                         disableHiddenPlaceholder
                                         value={line.value}
                                         symbol={cryptoSymbol}
                                     />
-                                </OutputValueWrapper>
-                                {fiatVisible && (
-                                    <>
-                                        <DotSeparatorWrapper>
-                                            <DotSeparator />
-                                        </DotSeparatorWrapper>
-                                        <OutputValueWrapper>
-                                            <FiatValue
-                                                disableHiddenPlaceholder
-                                                amount={line.value}
-                                                symbol={fiatSymbol}
-                                            />
-                                        </OutputValueWrapper>
-                                    </>
                                 )}
-                            </TruncateWrapper>
-                        </OutputValue>
-                    </OutputRightLine>
-                ))}
-            </OutputRight>
-        </OutputWrapper>
-    );
-};
+                            </OutputValueWrapper>
+                            {fiatVisible && (
+                                <>
+                                    <DotSeparatorWrapper>
+                                        <DotSeparator />
+                                    </DotSeparatorWrapper>
+                                    <OutputValueWrapper>
+                                        <FiatValue
+                                            disableHiddenPlaceholder
+                                            amount={line.value}
+                                            symbol={fiatSymbol}
+                                        />
+                                    </OutputValueWrapper>
+                                </>
+                            )}
+                        </TruncateWrapper>
+                    </OutputValue>
+                </OutputRightLine>
+            ))}
+        </OutputRight>
+    </OutputWrapper>
+);
 
 export default OutputLine;

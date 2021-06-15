@@ -28,38 +28,43 @@ const Icon = styled.img``;
 const Text = styled.div`
     display: flex;
     align-items: center;
+    font-size: ${variables.FONT_SIZE.NORMAL};
     color: ${props => props.theme.TYPE_DARK_GREY};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
 `;
 
 interface Props {
+    children?: React.ReactNode;
     method?: BuyCryptoPaymentMethod;
 }
 
-const CoinmarketPaymentType = ({ method }: Props) => {
-    return (
-        <Wrapper>
-            {!method && (
-                <Text>
-                    <Translation id="TR_PAYMENT_METHOD_UNKOWN" />
-                </Text>
-            )}
-            {method && (
-                <>
-                    <IconWrapper>
-                        <Bg>
-                            <Icon
-                                width="24px"
-                                src={`${invityApi.server}/images/paymentMethods/suite/${method}.svg`}
-                            />
-                        </Bg>
-                    </IconWrapper>
+const CoinmarketPaymentType = ({ children, method }: Props) => (
+    <Wrapper>
+        {!method && (
+            <Text>
+                <Translation id="TR_PAYMENT_METHOD_UNKOWN" />
+            </Text>
+        )}
+        {method && (
+            <>
+                <IconWrapper>
+                    <Bg>
+                        <Icon
+                            width="24px"
+                            src={`${invityApi.server}/images/paymentMethods/suite/${method}.svg`}
+                        />
+                    </Bg>
+                </IconWrapper>
+                <div>
                     {/* temporary solution - payment mehtod name will be returned by API server to be independent on translations */}
-                    <Translation id={`TR_PAYMENT_METHOD_${method.toUpperCase()}` as any} />
-                </>
-            )}
-        </Wrapper>
-    );
-};
+                    <Text>
+                        <Translation id={`TR_PAYMENT_METHOD_${method.toUpperCase()}` as any} />
+                    </Text>
+                    {children}
+                </div>
+            </>
+        )}
+    </Wrapper>
+);
 
 export default CoinmarketPaymentType;
