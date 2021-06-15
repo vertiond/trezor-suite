@@ -20,7 +20,6 @@ module.exports = withOptimizedImages(
                 optimizeImages: false, // TODO: install optimization plugin and enable https://github.com/cyrilwanner/next-optimized-images#optimization-packages
                 typescript: {
                     ignoreDevErrors: true,
-                    ignoreBuildErrors: true,
                 },
                 inlineImageLimit: 0,
                 babelConfigFile: path.resolve('babel.config.js'),
