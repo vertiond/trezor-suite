@@ -99,9 +99,13 @@ const getInfo = async (data: { id: number } & MessageTypes.GetInfo): Promise<voi
 
 const getBlockHash = async (data: { id: number } & MessageTypes.GetBlockHash): Promise<void> => {
     try {
+        const blockNumber = data.payload;
+
+        // common param blockNumber is string in cardano worker
+        if (typeof blockNumber === 'string') return;
+
         const socket = await connect();
-        const blockHashNumber = Number(data.payload);
-        const info = await socket.getBlockHash(blockHashNumber);
+        const info = await socket.getBlockHash(blockNumber);
         common.response({
             id: data.id,
             type: RESPONSES.GET_BLOCK_HASH,
