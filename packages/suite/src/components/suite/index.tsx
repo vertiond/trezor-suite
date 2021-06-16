@@ -42,6 +42,8 @@ import HomescreenGallery from './HomescreenGallery';
 import PinMatrix from './PinMatrix';
 import CollapsibleBox from './CollapsibleBox';
 import DeviceMatrixExplanation from './DeviceMatrixExplanation';
+import AccountStickyContent from './AccountStickyContent';
+
 
 export {
     Backdrop,
@@ -94,5 +96,6 @@ export {
     PinMatrix,
     CollapsibleBox,
     DeviceMatrixExplanation,
+    AccountStickyContent,
 };
 export type { ImageProps, ModalProps };

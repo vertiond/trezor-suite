@@ -11,10 +11,11 @@ interface Props {
     filterPosition?: 'primary' | 'secondary';
     dataTestSuffix?: string;
     primaryContent?: React.ReactNode;
+    inView: boolean;
 }
 
 const AccountNavigation = (props: Props) => {
-    const { account } = props;
+    const { account, inView } = props;
     const { goto, openModal } = useActions({
         goto: routerActions.goto,
         openModal: modalActions.openModal,
@@ -109,7 +110,7 @@ const AccountNavigation = (props: Props) => {
         items = items.filter(item => item.position === props.filterPosition);
     }
 
-    return <AppNavigation items={items} primaryContent={props.primaryContent} />;
+    return <AppNavigation items={items} inView={inView} primaryContent={props.primaryContent} />;
 };
 
 export default AccountNavigation;

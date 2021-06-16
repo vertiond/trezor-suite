@@ -2,9 +2,11 @@ import React, { useRef, useLayoutEffect, useState } from 'react';
 import styled from 'styled-components';
 import { variables, IconProps, useTheme, Button, Icon, Dropdown } from '@trezor/components';
 import { Translation } from '@suite-components';
+import AccountStickyContent from '../AccountStickyContent';
 import { useSelector, useActions } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
 import { Route } from '@suite-types';
+
 
 const { FONT_WEIGHT, FONT_SIZE } = variables;
 
@@ -41,6 +43,18 @@ const SecondaryMenu = styled.div<{ visible: boolean }>`
     & > * + * {
         margin-left: ${SECONDARY_MENU_BUTTON_MARGIN};
     }
+`;
+
+const AccountStickyContentWrap = styled.div<{ visible: boolean }>`
+
+    ${props =>
+          !props.visible && `
+              display: none
+          `}
+      ${props =>
+            props.visible && `
+                display: flex;
+            `}
 `;
 
 const SecondaryMenuCondensed = styled.div`
@@ -135,6 +149,7 @@ export type AppNavigationItem = {
 interface Props {
     items: AppNavigationItem[];
     primaryContent?: React.ReactNode;
+    inView: boolean;
 }
 interface MenuWidths {
     primary: number;
@@ -155,7 +170,8 @@ const isSubsection = (routeName: Route['name']): boolean =>
 const isSecondaryMenuOverflown = ({ primary, secondary, wrapper }: MenuWidths) =>
     primary + secondary >= wrapper;
 
-const AppNavigation = ({ items, primaryContent }: Props) => {
+const AppNavigation = ({ items, primaryContent, inView }: Props) => {
+    const selectedAccount = useSelector(state => state.wallet.selectedAccount.account);
     const theme = useTheme();
     const [condensedSecondaryMenuVisible, setCondensedSecondaryMenuVisible] = useState<boolean>(
         false,
@@ -192,6 +208,9 @@ const AppNavigation = ({ items, primaryContent }: Props) => {
         <Wrapper ref={wrapper}>
             {routeName && isSubsection(routeName) ? (
                 <Primary>
+                    <AccountStickyContentWrap visible={!inView}>
+                        <AccountStickyContent account={selectedAccount} />
+                    </AccountStickyContentWrap>
                     <StyledBackLink onClick={() => goto('wallet-index', undefined, true)}>
                         <StyledIcon icon="ARROW_LEFT" size={16} />
                         <Translation id="TR_BACK" />

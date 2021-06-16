@@ -6,6 +6,16 @@ import FreshAddress from './components/FreshAddress';
 import UsedAddresses from './components/UsedAddresses';
 import { isPending } from '@wallet-utils/transactionUtils';
 import { getAccountTransactions } from '@wallet-utils/accountUtils';
+import { variables } from '@trezor/components';
+import styled from 'styled-components';
+import { Translation } from '@suite-components';
+
+const Header = styled.h2`
+    font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
+    text-transform: capitalize;
+    color: ${props => props.theme.TYPE_DARK_GREY};
+    padding: 10px 0 30px 0;
+`;
 
 const Receive = () => {
     const { selectedAccount, receive, device, transactions } = useSelector(state => ({
@@ -35,7 +45,8 @@ const Receive = () => {
     );
 
     return (
-        <WalletLayout title="TR_NAV_RECEIVE" account={selectedAccount} showEmptyHeaderPlaceholder>
+        <WalletLayout title="TR_NAV_RECEIVE" account={selectedAccount}>
+            <Header><Translation id="TR_NAV_RECEIVE" /></Header>
             <FreshAddress
                 account={account}
                 addresses={receive}

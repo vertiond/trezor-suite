@@ -9,7 +9,7 @@ import Clear from './components/Clear';
 
 const Wrapper = styled.div`
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 `;
 
 const HeaderLeft = styled.div`
@@ -27,6 +27,14 @@ const HeaderRight = styled.div`
     align-items: center;
     justify-content: flex-end;
     flex: 1;
+`;
+
+const StyledTitle = styled.h2`
+    font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
+    text-transform: capitalize;
+    color: ${props => props.theme.TYPE_DARK_GREY};
+    font-size: ${variables.FONT_SIZE.H2};
+    padding-top: 10px;
 `;
 
 const Header = () => {
@@ -72,7 +80,9 @@ const Header = () => {
 
     return (
         <Wrapper>
-            <HeaderLeft />
+            <HeaderLeft>
+                <StyledTitle><Translation id="TR_NAV_SEND" /></StyledTitle>
+            </HeaderLeft>
             <HeaderRight>
                 <Clear />
                 <Dropdown
