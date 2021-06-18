@@ -21,6 +21,18 @@ install:
   script:
     - ci/scripts/check_lockfile.sh
 
+
+build libs:
+  stage: setup environment
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
+    - yarn build:libs
+  artifacts:
+    expire_in: 1 days
+    paths:
+      - packages/suite-data/files/
+
+
 clear_cache:
   stage: setup environment
   when: manual

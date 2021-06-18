@@ -2,10 +2,12 @@
 .config_sign_stable: &config_sign_stable
   needs:
     - msg-system config sign stable
+    - build libs
 
 .config_sign_dev: &config_sign_dev
   needs:
     - msg-system config sign dev
+    - build libs
 
 .run_everything_rules: &run_everything_rules
   refs:
@@ -20,7 +22,6 @@ suite-web build dev:
   <<: *config_sign_dev
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - assetPrefix=/suite-web/${CI_BUILD_REF_NAME}/web yarn workspace @trezor/suite-web build
   artifacts:
     expire_in: 7 days
@@ -38,7 +39,6 @@ suite-web build stable:
       - /^release\//
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - assetPrefix=/web yarn workspace @trezor/suite-web build
   artifacts:
     expire_in: 7 days
@@ -74,7 +74,6 @@ suite-web-landing build dev:
   stage: build
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - assetPrefix=/suite-web-landing/${CI_BUILD_REF_NAME} yarn workspace @trezor/suite-web-landing build
   artifacts:
     expire_in: 7 days
@@ -92,7 +91,6 @@ suite-web-landing build stable:
       - codesign
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - yarn workspace @trezor/suite-web-landing build
   artifacts:
     expire_in: 7 days
@@ -105,7 +103,6 @@ suite-web-landing build stable:
   stage: build
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - yarn workspace @trezor/suite-data copy-static-files
     - yarn workspace @trezor/suite-desktop build:${platform}
     - ls -la packages/suite-desktop/build-electron
@@ -265,7 +262,6 @@ suite-native build android:
     <<: *run_everything_rules
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - yarn workspace @trezor/suite-data copy-static-files
     - yarn workspace @trezor/suite-native build:android
     - mv packages/suite-native/android/app/build/outputs/apk/release/app-release.apk .

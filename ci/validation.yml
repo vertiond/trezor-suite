@@ -2,7 +2,6 @@ lint:
   stage: validation
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - lerna run lint
 
 typescript:
@@ -16,7 +15,6 @@ unit tests:
   stage: validation
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
     - lerna run --stream test:unit -- --passWithNoTests
 
 yaml lint:

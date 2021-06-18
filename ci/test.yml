@@ -3,6 +3,7 @@
   stage: integration testing
   needs:
     - suite-web deploy dev
+    - build libs
   variables:
     COMPOSE_PROJECT_NAME: $CI_JOB_ID
     COMPOSE_FILE: ./docker/docker-compose.suite-ci.yml
