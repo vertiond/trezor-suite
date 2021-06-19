@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { variables, Button } from '@trezor/components';
-import { Translation, TrezorLink } from '@suite-components';
+import { variables } from '@trezor/components';
+import { Translation, ExternalLink } from '@suite-components';
 
 interface TextColumnProps {
     title?: React.ReactNode;
@@ -16,10 +16,6 @@ const Wrapper = styled.div`
     text-align: left;
     margin-right: 16px;
     max-width: 500px;
-`;
-
-const LearnMoreButton = styled(Button)`
-    max-width: fit-content;
 `;
 
 const Description = styled.div`
@@ -39,16 +35,43 @@ const Title = styled.div`
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
 `;
 
+const StyledExternalLink = styled(ExternalLink)`
+    position: relative;
+    padding: 4px 6px;
+    margin-left: -4px;
+    &:after {
+        content: '';
+        position: absolute;
+        border-radius: ${variables.BORDER_RADIUS.HOVER};
+        transition: all ${variables.HOVER_TRANSITION.DURATION}
+            ${variables.HOVER_TRANSITION.ANIMATION};
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        background: transparent;
+    }
+`;
+
+const StyledExternalLinkWrapper = styled.div`
+    &:hover ${StyledExternalLink} {
+        text-decoration: none;
+        &:after {
+            background: ${props => props.theme.BG_HOVER_ITEM};
+        }
+    }
+`;
+
 const TextColumn = ({ title, description, learnMore }: TextColumnProps) => (
     <Wrapper>
         {title && <Title>{title}</Title>}
         {description && <Description>{description}</Description>}
         {learnMore && (
-            <TrezorLink href={learnMore}>
-                <LearnMoreButton variant="tertiary">
+            <StyledExternalLinkWrapper>
+                <StyledExternalLink href={learnMore} size="tiny">
                     <Translation id="TR_LEARN_MORE" />
-                </LearnMoreButton>
-            </TrezorLink>
+                </StyledExternalLink>
+            </StyledExternalLinkWrapper>
         )}
     </Wrapper>
 );
