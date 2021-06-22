@@ -87,10 +87,10 @@ const ItemTitle = styled.span<ComponentProps>`
     &:active {
         &:after {
             background-color: ${props => props.theme.BG_HOVER_ITEM};
-            top: -8px;
-            left: -8px;
-            bottom: -8px;
-            right: -8px;
+            top: -12px;
+            left: -12px;
+            bottom: -12px;
+            right: -12px;
         }
     }
 
