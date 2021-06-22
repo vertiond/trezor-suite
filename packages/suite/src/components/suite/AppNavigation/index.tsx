@@ -7,7 +7,6 @@ import { useSelector, useActions } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
 import { Route } from '@suite-types';
 
-
 const { FONT_WEIGHT, FONT_SIZE } = variables;
 
 const SECONDARY_MENU_BUTTON_MARGIN = '12px';
@@ -46,13 +45,14 @@ const SecondaryMenu = styled.div<{ visible: boolean }>`
 `;
 
 const AccountStickyContentWrap = styled.div<{ visible: boolean }>`
-
     ${props =>
-          !props.visible && `
+        !props.visible &&
+        `
               display: none
           `}
-      ${props =>
-            props.visible && `
+    ${props =>
+        props.visible &&
+        `
                 display: flex;
             `}
 `;

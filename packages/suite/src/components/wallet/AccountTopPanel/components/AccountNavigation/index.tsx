@@ -11,7 +11,7 @@ interface Props {
     filterPosition?: 'primary' | 'secondary';
     dataTestSuffix?: string;
     primaryContent?: React.ReactNode;
-    inView: boolean;
+    inView?: boolean;
 }
 
 const AccountNavigation = (props: Props) => {
