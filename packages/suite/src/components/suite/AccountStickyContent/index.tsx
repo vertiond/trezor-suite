@@ -51,12 +51,11 @@ interface Props {
 }
 
 const AccountStickyContent = (props: Props) => {
+    const { account } = props;
 
-  const { account } = props;
+    if (!account) return null;
 
-  if (!account) return null;
-
-  const { symbol, formattedBalance } = account;
+    const { symbol, formattedBalance } = account;
     return (
         <Main>
             <CoinLogo size={22} symbol={symbol} />
@@ -66,10 +65,7 @@ const AccountStickyContent = (props: Props) => {
                 </LabelWrapper>
                 <BalanceInner>
                     <Balance>
-                        <FormattedCryptoAmount
-                            value={formattedBalance}
-                            symbol={symbol}
-                        />
+                        <FormattedCryptoAmount value={formattedBalance} symbol={symbol} />
                     </Balance>
                     <StyledFiatValue>
                         <FiatValue
@@ -78,17 +74,14 @@ const AccountStickyContent = (props: Props) => {
                             showApproximationIndicator
                         >
                             {({ value }) =>
-                                value ? (
-                                    <FiatBalanceWrapper>{value}</FiatBalanceWrapper>
-                                ) : null
+                                value ? <FiatBalanceWrapper>{value}</FiatBalanceWrapper> : null
                             }
                         </FiatValue>
                     </StyledFiatValue>
                 </BalanceInner>
             </BalanceWrapperContainer>
         </Main>
-    )
+    );
 };
-
 
 export default AccountStickyContent;

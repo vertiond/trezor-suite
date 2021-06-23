@@ -46,7 +46,9 @@ const Receive = () => {
 
     return (
         <WalletLayout title="TR_NAV_RECEIVE" account={selectedAccount}>
-            <Header><Translation id="TR_NAV_RECEIVE" /></Header>
+            <Header>
+                <Translation id="TR_NAV_RECEIVE" />
+            </Header>
             <FreshAddress
                 account={account}
                 addresses={receive}

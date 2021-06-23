@@ -81,7 +81,9 @@ const Header = () => {
     return (
         <Wrapper>
             <HeaderLeft>
-                <StyledTitle><Translation id="TR_NAV_SEND" /></StyledTitle>
+                <StyledTitle>
+                    <Translation id="TR_NAV_SEND" />
+                </StyledTitle>
             </HeaderLeft>
             <HeaderRight>
                 <Clear />

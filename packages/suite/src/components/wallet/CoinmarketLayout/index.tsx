@@ -7,7 +7,6 @@ import Navigation from './components/Navigation';
 import AccountTransactions from './components/AccountTransactions';
 import { Translation } from '@suite-components';
 
-
 const Content = styled.div`
     padding: 29px 41px;
 `;
@@ -28,7 +27,9 @@ const CoinmarketLayout = ({ children }: Props) => {
     const selectedAccount = useSelector(state => state.wallet.selectedAccount);
     return (
         <WalletLayout title="TR_NAV_TRADE" account={selectedAccount}>
-        <StyledTitle><Translation id="TR_NAV_TRADE" /></StyledTitle>
+            <StyledTitle>
+                <Translation id="TR_NAV_TRADE" />
+            </StyledTitle>
             <Card noPadding>
                 <Navigation />
                 <Content>{children}</Content>

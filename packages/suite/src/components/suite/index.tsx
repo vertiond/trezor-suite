@@ -44,7 +44,6 @@ import CollapsibleBox from './CollapsibleBox';
 import DeviceMatrixExplanation from './DeviceMatrixExplanation';
 import AccountStickyContent from './AccountStickyContent';
 
-
 export {
     Backdrop,
     DeviceIcon,
