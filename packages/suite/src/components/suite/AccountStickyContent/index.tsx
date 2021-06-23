@@ -4,9 +4,18 @@ import { FiatValue, FormattedCryptoAmount, AccountLabeling } from '@suite-compon
 import { CoinLogo, variables } from '@trezor/components';
 import { Account } from '@wallet-types';
 
-const Main = styled.div`
-    display: flex;
+const Main = styled.div<{ visible: boolean }>`
     align-items: center;
+    ${props =>
+        !props.visible &&
+        `
+              display: none
+          `}
+    ${props =>
+        props.visible &&
+        `
+                display: flex;
+            `}
 `;
 
 const BalanceWrapperContainer = styled.div`
@@ -48,16 +57,17 @@ const StyledFiatValue = styled.div`
 
 interface Props {
     account?: Account;
+    visible: boolean;
 }
 
 const AccountStickyContent = (props: Props) => {
-    const { account } = props;
+    const { account, visible } = props;
 
     if (!account) return null;
 
     const { symbol, formattedBalance } = account;
     return (
-        <Main>
+        <Main visible={visible}>
             <CoinLogo size={22} symbol={symbol} />
             <BalanceWrapperContainer>
                 <LabelWrapper>

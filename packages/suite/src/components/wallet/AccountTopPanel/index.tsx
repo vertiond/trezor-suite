@@ -15,8 +15,6 @@ import { isTestnet } from '@wallet-utils/accountUtils';
 import AccountNavigation from './components/AccountNavigation';
 import AccountNavigationSticky from './components/AccountNavigationSticky';
 
-import { useInView } from 'react-intersection-observer';
-
 const BalanceWrapper = styled.div`
     display: flex;
     align-items: center;
@@ -57,11 +55,6 @@ const AccountTopPanel = () => {
     const { account } = selectedAccount;
     const { symbol, formattedBalance } = account;
 
-    const { ref, inView } = useInView({
-        delay: 100,
-        initialInView: true,
-    });
-
     return (
         <AppNavigationPanel
             maxWidth="small"
@@ -77,10 +70,10 @@ const AccountTopPanel = () => {
                 />
             }
             navigationSticky={<AccountNavigationSticky account={account} />}
-            navigation={<AccountNavigation inView={inView} account={account} />}
+            navigation={<AccountNavigation account={account} />}
             ticker={!isTestnet(symbol) ? <Ticker symbol={symbol} tooltipPos="bottom" /> : undefined}
         >
-            <BalanceWrapper ref={ref}>
+            <BalanceWrapper>
                 <CoinLogo size={24} symbol={symbol} />
                 <Balance noMargin>
                     <FormattedCryptoAmount value={formattedBalance} symbol={symbol} />
