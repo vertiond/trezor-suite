@@ -17,7 +17,7 @@ const StyledAccountNavigation = styled.div`
     }
 `;
 
-const Main = styled.div<{ inView: boolean }>`
+const Main = styled.div<{ inView?: boolean }>`
     ${props => (props.inView ? `display: none` : `display: flex;`)}
     align-items: center;
 `;
