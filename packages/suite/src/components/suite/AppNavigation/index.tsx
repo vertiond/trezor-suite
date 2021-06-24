@@ -1,7 +1,15 @@
 import React, { useRef, useLayoutEffect, useState } from 'react';
 import styled from 'styled-components';
-import { variables, IconProps, useTheme, Button, Icon, Dropdown } from '@trezor/components';
-import { Translation } from '@suite-components';
+import {
+    variables,
+    CoinLogo,
+    IconProps,
+    useTheme,
+    Button,
+    Icon,
+    Dropdown,
+} from '@trezor/components';
+import { FiatValue, FormattedCryptoAmount, AccountLabeling, Translation } from '@suite-components';
 import { useSelector, useActions } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
 import { Route } from '@suite-types';
@@ -132,9 +140,59 @@ export type AppNavigationItem = {
     isHidden?: () => boolean;
 };
 
+const Main = styled.div<{ inView: boolean }>`
+    ${props =>
+        !props.inView
+            ? `
+            display: flex;`
+            : `
+            display: none;
+`}
+    align-items: center;
+`;
+
+const BalanceWrapperContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 0 0 13px;
+`;
+
+const Balance = styled.div`
+    white-space: nowrap;
+    font-size: ${variables.FONT_SIZE.SMALL};
+`;
+
+const FiatBalanceWrapper = styled.div`
+    color: ${props => props.theme.TYPE_LIGHT_GREY};
+    margin-left: 0.5ch;
+`;
+
+const LabelWrapper = styled.div`
+    font-size: ${variables.FONT_SIZE.NORMAL};
+    font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 13px 0 0;
+`;
+
+const BalanceInner = styled.div`
+    display: flex;
+    font-size: ${variables.FONT_SIZE.SMALL};
+    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+`;
+
+const StyledFiatValue = styled.div`
+    font-size: ${variables.FONT_SIZE.SMALL};
+    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+`;
+
 interface Props {
     items: AppNavigationItem[];
     primaryContent?: React.ReactNode;
+    account?: Account;
+    inView: boolean;
 }
 interface MenuWidths {
     primary: number;
@@ -155,7 +213,7 @@ const isSubsection = (routeName: Route['name']): boolean =>
 const isSecondaryMenuOverflown = ({ primary, secondary, wrapper }: MenuWidths) =>
     primary + secondary >= wrapper;
 
-const AppNavigation = ({ items, primaryContent }: Props) => {
+const AppNavigation = ({ items, primaryContent, account, inView }: Props) => {
     const theme = useTheme();
     const [condensedSecondaryMenuVisible, setCondensedSecondaryMenuVisible] = useState<boolean>(
         false,
@@ -188,10 +246,43 @@ const AppNavigation = ({ items, primaryContent }: Props) => {
     const itemsSecondaryWithExtra = itemsSecondary.filter(item => item.extra);
     const itemsSecondaryWithoutExtra = itemsSecondary.filter(item => !item.extra);
 
+    if (!account) return null;
+
+    const { symbol, formattedBalance } = account;
+
     return (
         <Wrapper ref={wrapper}>
             {routeName && isSubsection(routeName) ? (
                 <Primary>
+                    <Main inView={inView}>
+                        <CoinLogo size={22} symbol={symbol} />
+                        <BalanceWrapperContainer>
+                            <LabelWrapper>
+                                <AccountLabeling account={account} />
+                            </LabelWrapper>
+                            <BalanceInner>
+                                <Balance>
+                                    <FormattedCryptoAmount
+                                        value={formattedBalance}
+                                        symbol={symbol}
+                                    />
+                                </Balance>
+                                <StyledFiatValue>
+                                    <FiatValue
+                                        amount={formattedBalance}
+                                        symbol={symbol}
+                                        showApproximationIndicator
+                                    >
+                                        {({ value }) =>
+                                            value ? (
+                                                <FiatBalanceWrapper>{value}</FiatBalanceWrapper>
+                                            ) : null
+                                        }
+                                    </FiatValue>
+                                </StyledFiatValue>
+                            </BalanceInner>
+                        </BalanceWrapperContainer>
+                    </Main>
                     <StyledBackLink onClick={() => goto('wallet-index', undefined, true)}>
                         <StyledIcon icon="ARROW_LEFT" size={16} />
                         <Translation id="TR_BACK" />

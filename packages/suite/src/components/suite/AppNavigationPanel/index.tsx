@@ -98,8 +98,8 @@ interface Props {
     dropdown?: React.ReactNode;
     maxWidth: 'small' | 'default';
     children?: React.ReactNode;
-    navigation?: React.ReactNode;
-    navigationSticky?: React.ReactNode;
+    navigation?: React.ReactElement;
+    navigationSticky?: React.ReactElement;
 }
 
 const AppNavigationPanel = (props: Props) => {
@@ -114,7 +114,7 @@ const AppNavigationPanel = (props: Props) => {
                 <StickyMenu visible={!inView}>
                     <StickyMenuInner>
                         <StickyMenuHolder maxWidth={props.maxWidth}>
-                            {props.navigationSticky}
+                            {React.cloneElement(props.navigationSticky, { inView })}
                         </StickyMenuHolder>
                     </StickyMenuInner>
                 </StickyMenu>
@@ -131,7 +131,7 @@ const AppNavigationPanel = (props: Props) => {
                         </TitleRow>
                         {props.children && <Row>{props.children}</Row>}
                     </BasicInfo>
-                    {props.navigation}
+                    {React.cloneElement(props.navigation, { inView })}
                 </Content>
             </Wrapper>
         </>

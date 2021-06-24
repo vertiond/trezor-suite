@@ -17,8 +17,8 @@ const StyledAccountNavigation = styled.div`
     }
 `;
 
-const Main = styled.div`
-    display: flex;
+const Main = styled.div<{ inView: boolean }>`
+    ${props => (props.inView ? `display: none` : `display: flex;`)}
     align-items: center;
 `;
 
@@ -61,21 +61,23 @@ const StyledFiatValue = styled.div`
 
 interface Props {
     account?: Account;
+    inView?: boolean;
 }
 
 const AccountNavigationSticky = (props: Props) => {
-    const { account } = props;
+    const { account, inView } = props;
     if (!account) return null;
 
     const { symbol, formattedBalance } = account;
     return (
         <StyledAccountNavigation>
             <AccountNavigation
+                inView={inView}
                 account={account}
                 filterPosition="secondary"
                 dataTestSuffix="sticky"
                 primaryContent={
-                    <Main>
+                    <Main inView={inView}>
                         <CoinLogo size={22} symbol={symbol} />
                         <BalanceWrapperContainer>
                             <LabelWrapper>
