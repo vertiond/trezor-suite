@@ -20,6 +20,7 @@ import {
     passThroughInitMetadata,
     passThroughSetPin,
 } from './utils/shortcuts';
+import { interceptInvityApi } from './utils/intercept-invity-api';
 
 const command = require('cypress-image-snapshot/command');
 const { skipOn, onlyOn } = require('@cypress/skip-test');
@@ -70,6 +71,7 @@ declare global {
             goToOnboarding: () => Chainable<Subject>;
             skipOn: (nameOrFlag: string | boolean, cb?: () => void) => Cypress.Chainable<any>;
             onlyOn: (nameOrFlag: string | boolean, cb?: () => void) => Cypress.Chainable<any>;
+            interceptInvityApi: () => void;
         }
     }
 }
@@ -114,3 +116,4 @@ Cypress.Commands.add('dispatch', dispatch);
 // skip tests conditionally
 Cypress.Commands.add('skipOn', skipOn);
 Cypress.Commands.add('onlyOn', onlyOn);
+Cypress.Commands.add('interceptInvityApi', interceptInvityApi);

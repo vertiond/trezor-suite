@@ -6,6 +6,7 @@ describe('Coinmarket buy', () => {
         cy.task('startEmu', { wipe: true });
         cy.task('setupEmu', { needs_backup: false });
         cy.viewport(1024, 768).resetDb();
+        cy.interceptInvityApi();
         cy.prefixedVisit('/accounts/coinmarket/buy/');
         cy.passThroughInitialRun();
     });
