@@ -36,7 +36,9 @@ describe('safety_checks Warning For PromptTemporarily', () => {
         // Set safety_checks to `PromptTemporarily'.
         // TODO: do this via the `applySetting` task once https://github.com/trezor/trezor-user-env/issues/54
         // is resolved.
-        cy.getTestElement('@settings/device/safety-checks-button').click();
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
         cy.get(`[data-test="@radio-button-prompt"]`).click();
         cy.getTestElement('@safety-checks-apply').click();
         cy.task('pressYes');
@@ -60,7 +62,9 @@ describe('safety_checks Warning For PromptTemporarily', () => {
 
     it('Warning disappears when safety_checks are set to strict', () => {
         // Open the safety_checks setting modal and change safety_checks to Strict.
-        cy.getTestElement('@settings/device/safety-checks-button').click();
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
         cy.get('[data-test="@radio-button-strict"]').click();
         cy.getTestElement('@safety-checks-apply').click();
         cy.task('pressYes');
