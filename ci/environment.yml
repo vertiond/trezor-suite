@@ -30,8 +30,15 @@ build libs:
   artifacts:
     expire_in: 1 days
     paths:
-      - packages/suite-data/files/
-
+      - packages/rollout/tsconfig.lib.json
+      - packages/suite-storage/tsconfig.json
+      - packages/translation-manager/
+      - packages/suite-data/browser-detection.webpack.js
+      - packages/suite-data/src/guide/index.ts
+      - packages/components/scripts/copyAssets.js
+      - packages/components/tsconfig.json
+      - packages/blockchain-link/tsconfig.json
+      - packages/blockchain-link/tsconfig.workers.json
 
 clear_cache:
   stage: setup environment
