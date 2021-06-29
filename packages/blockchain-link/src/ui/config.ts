@@ -438,6 +438,9 @@ export default [
             debug: true,
         },
         data: {
+            estimateFeeOptions: {
+                blocks: [1],
+            },
             accountInfoOptions: {
                 page: 0,
                 pageSize: 25,
@@ -460,6 +463,9 @@ export default [
             debug: true,
         },
         data: {
+            estimateFeeOptions: {
+                blocks: [1],
+            },
             accountInfoOptions: {
                 page: 0,
                 pageSize: 25,

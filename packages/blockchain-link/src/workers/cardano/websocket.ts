@@ -4,7 +4,7 @@ import { CustomError } from '../../constants/errors';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { create as createDeferred, Deferred } from '../../utils/deferred';
 import { Send } from '../../types/cardano';
-import { AccountInfoParams } from '../../types/params';
+import { AccountInfoParams, EstimateFeeParams } from '../../types/params';
 
 const NOT_INITIALIZED = new CustomError('websocket_not_initialized');
 
@@ -205,6 +205,10 @@ export default class Socket extends EventEmitter {
 
     getServerInfo() {
         return this.send('GET_SERVER_INFO');
+    }
+
+    estimateFee(payload: EstimateFeeParams) {
+        return this.send('ESTIMATE_FEE', payload);
     }
 
     getBlockHash(hashOrNumber: string | number) {

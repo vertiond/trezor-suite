@@ -15,6 +15,7 @@ import { FormState, UseSendFormState, PrecomposedTransactionFinal } from '@walle
 import * as sendFormBitcoinActions from './send/sendFormBitcoinActions';
 import * as sendFormEthereumActions from './send/sendFormEthereumActions';
 import * as sendFormRippleActions from './send/sendFormRippleActions';
+import * as sendFormCardanoActions from './send/sendFormCardanoActions';
 
 export type SendFormAction =
     | {
@@ -95,6 +96,9 @@ export const composeTransaction = (formValues: FormState, formState: UseSendForm
     }
     if (account.networkType === 'ripple') {
         return dispatch(sendFormRippleActions.composeTransaction(formValues, formState));
+    }
+    if (account.networkType === 'cardano') {
+        return dispatch(sendFormCardanoActions.composeTransaction(formValues, formState));
     }
 };
 
@@ -255,6 +259,11 @@ export const signTransaction = (
     if (account.networkType === 'ripple') {
         serializedTx = await dispatch(
             sendFormRippleActions.signTransaction(formValues, enhancedTxInfo),
+        );
+    }
+     if (account.networkType === 'cardano') {
+        serializedTx = await dispatch(
+            sendFormCardanoActions.signTransaction(formValues, enhancedTxInfo),
         );
     }
 

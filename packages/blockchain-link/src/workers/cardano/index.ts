@@ -119,6 +119,26 @@ const getTransaction = async (
     }
 };
 
+const estimateFee = async (data: { id: number } & MessageTypes.EstimateFee): Promise<void> => {
+    try {
+        const socket = await connect();
+        const resp = await socket.estimateFee(data.payload);
+        const feeOptions: { feePerUnit: string }[] = [];
+
+        resp.forEach(feeItem => {
+            feeOptions.push({ feePerUnit: feeItem.lovelacePerByte });
+        });
+
+        common.response({
+            id: data.id,
+            type: RESPONSES.ESTIMATE_FEE,
+            payload: feeOptions,
+        });
+    } catch (error) {
+        common.errorHandler({ id: data.id, error });
+    }
+};
+
 const pushTransaction = async (
     data: { id: number } & MessageTypes.PushTransaction
 ): Promise<void> => {
@@ -373,6 +393,9 @@ onmessage = (event: { data: Message }) => {
             break;
         case MESSAGES.GET_TRANSACTION:
             getTransaction(data);
+            break;
+        case MESSAGES.ESTIMATE_FEE:
+            estimateFee(data);
             break;
         case MESSAGES.GET_ACCOUNT_INFO:
             getAccountInfo(data);

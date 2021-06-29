@@ -38,6 +38,7 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
         'getAddress',
         'ethereumGetAddress',
         'rippleGetAddress',
+        'cardanoGetAddress',
         'applySettings',
         'changePin',
         'pushTransaction',
@@ -60,8 +61,8 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
     });
 
     try {
-        const connectSrc = resolveStaticPath('connect/');
-        // 'https://localhost:8088/';
+        // const connectSrc = resolveStaticPath('connect/');
+        const connectSrc = 'https://localhost:8088/';
         // 'https://connect.corp.sldev.cz/develop/';
 
         await TrezorConnect.init({

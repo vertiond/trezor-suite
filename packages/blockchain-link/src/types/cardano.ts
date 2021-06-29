@@ -1,10 +1,14 @@
 /* eslint-disable camelcase */
-import { AccountInfoParams } from './params';
+import { AccountInfoParams, EstimateFeeParams } from './params';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface Subscribe {
     subscribed: boolean;
 }
+
+export type Fee = {
+    lovelacePerByte: string;
+}[];
 
 export interface Address {
     address: string;
@@ -143,5 +147,6 @@ declare function FSend(
     params: { addresses: string[] }
 ): Promise<Subscribe>;
 declare function FSend(method: 'UNSUBSCRIBE_ADDRESS'): Promise<Subscribe>;
+declare function FSend(method: 'ESTIMATE_FEE', params: EstimateFeeParams): Promise<Fee>;
 
 export type Send = typeof FSend;
