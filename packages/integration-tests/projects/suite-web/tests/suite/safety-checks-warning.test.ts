@@ -29,6 +29,7 @@ describe('safety_checks Warning For PromptTemporarily', () => {
         // Start in the device settings to easily open safety_checks setting modal.
         cy.prefixedVisit('/');
         cy.passThroughInitialRun();
+        cy.discoveryShouldFinish();
         cy.getTestElement('@suite/menu/settings').click();
         cy.getTestElement('@suite/menu/settings-index').click();
         cy.getTestElement('@settings/menu/device').click();
@@ -45,17 +46,35 @@ describe('safety_checks Warning For PromptTemporarily', () => {
     });
 
     it('Dismissible warning appears', () => {
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
+        cy.get(`[data-test="@radio-button-prompt"]`).click();
+        cy.getTestElement('@safety-checks-apply').click();
+        cy.task('pressYes');
         cy.getTestElement('@banner/safety-checks/button');
         cy.getTestElement('@banner/safety-checks/dismiss');
     });
 
     it('CTA button opens device settings', () => {
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
+        cy.get(`[data-test="@radio-button-prompt"]`).click();
+        cy.getTestElement('@safety-checks-apply').click();
+        cy.task('pressYes');
         cy.getTestElement('@banner/safety-checks/button').click();
         // In CI the path is prefixed with a branch name. Test only against the end of the path.
         cy.location('pathname').should('match', /\/settings\/device\/$/);
     });
 
     it('Dismiss button hides the warning', () => {
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
+        cy.get(`[data-test="@radio-button-prompt"]`).click();
+        cy.getTestElement('@safety-checks-apply').click();
+        cy.task('pressYes');
         cy.getTestElement('@banner/safety-checks/dismiss').click();
         cy.getTestElement('@banner/safety-checks/button').should('not.exist');
     });
@@ -73,17 +92,29 @@ describe('safety_checks Warning For PromptTemporarily', () => {
     });
 
     it('Dismissed warning re-appears when safety_checks are set to strict and then to Prompt again.', () => {
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
+        cy.get(`[data-test="@radio-button-prompt"]`).click();
+        cy.getTestElement('@safety-checks-apply').click();
+        cy.task('pressYes');
+        cy.wait(666);
         // Dismiss the warning.
         cy.getTestElement('@banner/safety-checks/dismiss').click();
         // Open the safety_checks setting modal and change safety_checks to Strict.
-        cy.getTestElement('@settings/device/safety-checks-button').click();
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
         cy.get('[data-test="@radio-button-strict"]').click();
         cy.getTestElement('@safety-checks-apply').click();
         cy.task('pressYes');
+        cy.wait(666);
         // Assert the warning is gone.
         cy.getTestElement('@banner/safety-checks/button').should('not.exist');
         // Set safety_checks back to PromptTemporarily
-        cy.getTestElement('@settings/device/safety-checks-button').click();
+        cy.getTestElement('@settings/device/safety-checks-button').click({
+            scrollBehavior: 'bottom',
+        });
         cy.get(`[data-test="@radio-button-prompt"]`).click();
         cy.getTestElement('@safety-checks-apply').click();
         cy.task('pressYes');
