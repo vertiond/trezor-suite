@@ -341,19 +341,15 @@ const init = (instances: any[]) => {
 init(CONFIG);
 
 CONFIG.forEach(i => {
-    // UI does not work correctly set the worker here
-    const worker = CardanoWorker;
+    let worker = BlockbookWorker;
 
-    // if (i.blockchain.worker.includes('blockbook')) {
-    //     console.log('BlockbookWorker');
-    //     worker = BlockbookWorker;
-    // } else if (i.blockchain.worker.includes('cardano')) {
-    //     console.log('CardanoWorker');
-    //     worker = CardanoWorker;
-    // } else if (i.blockchain.worker.includes('ripple')) {
-    //     console.log('RippleWorker');
-    //     worker = RippleWorker;
-    // }
+    if (i.blockchain.worker.includes('ripple')) {
+        worker = RippleWorker;
+    }
+
+    if (i.blockchain.worker.includes('cardano')) {
+        worker = CardanoWorker;
+    }
 
     const b = new BlockchainLink({
         ...i.blockchain,
