@@ -1,7 +1,7 @@
 import { BlockfrostUtxos, BlockfrostTransaction, BlockfrostAccountInfo } from '../../types/cardano';
 import { Utxo } from '../../types/responses';
 import BigNumber from 'bignumber.js';
-import { Transaction, AccountInfo, AccountAddresses } from '../../types/common';
+import { Transaction, AccountInfo, AccountAddresses, TokenInfo } from '../../types/common';
 
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
@@ -28,8 +28,27 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
 const getTxType = (
     blockfrostTxData: BlockfrostTransaction,
     accountAddress?: AccountAddresses
-): 'self' | 'recv' | 'sent' => {
-    return 'self';
+): 'self' | 'recv' | 'sent' => 'self';
+
+export const transformTokenInfo = (
+    tokens: BlockfrostAccountInfo['tokens']
+): TokenInfo[] | undefined => {
+    if (!tokens || !Array.isArray(tokens)) return undefined;
+    const info = tokens.reduce(
+        (arr, t) =>
+            arr.concat([
+                {
+                    type: 'CARDANO',
+                    name: t.unit,
+                    address: t.unit,
+                    symbol: t.unit,
+                    balance: t.quantity,
+                    decimals: -1,
+                },
+            ]),
+        [] as TokenInfo[]
+    );
+    return info.length > 0 ? info : undefined;
 };
 
 export const transformTransaction = (
@@ -67,7 +86,7 @@ export const transformAccountInfo = (info: BlockfrostAccountInfo): AccountInfo =
 
     const result = {
         ...info,
-        tokens: [],
+        tokens: transformTokenInfo(info.tokens),
         history: {
             transactions: !cardanoTxs
                 ? []
