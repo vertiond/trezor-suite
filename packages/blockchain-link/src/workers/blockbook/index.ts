@@ -247,8 +247,6 @@ const pushTransaction = async (
     try {
         const socket = await connect();
 
-        if (typeof data.payload !== 'string') return;
-
         const resp = await socket.pushTransaction(data.payload);
         common.response({
             id: data.id,

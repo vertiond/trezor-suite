@@ -83,12 +83,6 @@ const handleClick = (event: MouseEvent) => {
         case 'push-transaction': {
             const hexString = getInputValue('push-transaction-tx');
 
-            if (blockchain.settings.name.toLocaleLowerCase().includes('cardano')) {
-                const uint8array = Uint8Array.from(Buffer.from(hexString, 'hex'));
-                blockchain.pushTransaction(uint8array).then(onResponse).catch(onError);
-                break;
-            }
-
             blockchain.pushTransaction(hexString).then(onResponse).catch(onError);
             break;
         }

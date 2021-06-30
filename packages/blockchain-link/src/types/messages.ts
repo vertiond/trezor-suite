@@ -109,7 +109,7 @@ export interface Unsubscribe {
 
 export interface PushTransaction {
     type: typeof MESSAGES.PUSH_TRANSACTION;
-    payload: string | Uint8Array;
+    payload: string;
 }
 
 export type Message =
