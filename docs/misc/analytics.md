@@ -40,16 +40,17 @@ List of available configured endpoints:
 
 Example URI:
 
-`https://data.trezor.io/suite/log/web/stable.log?c_v=1.8&c_type=transport-type&c_commit=4d09d88476dab2e6b2fbfb833b749e9ac62251c2&c_instance_id=qlT0xL2XKV&c_session_id=FZjilOYQic&type=bridge&version=2.0.30`
+`https://data.trezor.io/suite/log/web/stable.log?c_v=1.8&c_type=transport-type&c_commit=4d09d88476dab2e6b2fbfb833b749e9ac62251c2&c_instance_id=qlT0xL2XKV&c_session_id=FZjilOYQic&c_timestamp=1624893047903&type=bridge&version=2.0.30`
 
 Which tracks:
 ```
 {
-  c_v: '1.9',
+  c_v: '1.11',
   c_type: 'transport-type',
   c_commit: '4d09d88476dab2e6b2fbfb833b749e9ac62251c2',
   c_instance_id: 'qlT0xL2XKV',
   c_session_id: 'FZjilOYQic',
+  c_timestamp: 1624893047903,
   type: 'bridge',
   version: '2.0.30'
 }
@@ -62,6 +63,7 @@ Attributes which are always tracked:
 - **c_commit**: current revision of app
 - **c_instance_id**: until user does not wipe storage, the id is still same
 - **c_session_id**: id changed on every launch of app
+- **c_timestamp**: time in ms when event is created
   
 Other attributes are connected to a specific type of events.
 
@@ -88,8 +90,26 @@ Breaking change should bump major version. Any other change bumps minor version.
 4. **Option**: Edit NAT to resolve requests to `https://data.trezor.io/suite/log/web/stable.log` to your local server 
    
 ## Changelog
+### 1.11
+Added:
+- c_timestamp: number (time of created in ms sent with every event)
+- menu/settings/dropdown
+  - option: 'guide' (+ old ones)
+- menu/guide
+- guide/feedback/navigation
+  - type: 'overview' | 'bug' | 'suggestion'
+- guide/feedback/submit
+  - type: 'bug' | 'suggestion'
+- guide/header/navigation
+  - type: 'back' | 'close'
+- guide/report
+  - type: 'overview' | 'bug' | 'suggestion'
+
 ### 1.10
-- removed newDevice, usedDevice from initial-run-completed
+Removed:
+- initial-run-completed
+  - newDevice
+  - usedDevice
 
 ### 1.9
 Changed:

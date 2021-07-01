@@ -10,11 +10,11 @@ import { getFwUpdateVersion, getFwVersion } from '@suite-utils/device';
 import { useDevice, useFirmware, useActions } from '@suite-hooks';
 import { ReconnectDevicePrompt, InstallButton, FirmwareOffer } from '@firmware-components';
 import * as onboardingActions from '@onboarding-actions/onboardingActions';
-import { AcquiredDevice } from '@suite/types/suite';
+import { TrezorDevice } from '@suite/types/suite';
 
 interface Props {
-    cachedDevice: AcquiredDevice;
-    setCachedDevice: React.Dispatch<React.SetStateAction<AcquiredDevice>>;
+    cachedDevice?: TrezorDevice;
+    setCachedDevice: React.Dispatch<React.SetStateAction<TrezorDevice | undefined>>;
     // This component is shared between Onboarding flow and standalone fw update modal with few minor UI changes
     // If it is set to true, then you know it is being rendered in standalone fw update modal
     standaloneFwUpdate?: boolean;
@@ -47,18 +47,17 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
             // we never store state of the device while it is in bootloader, we want just "normal" mode
             setCachedDevice(liveDevice);
         }
-    }, [cachedDevice.id, liveDevice, setCachedDevice]);
+    }, [cachedDevice?.id, liveDevice, setCachedDevice]);
 
     // User is following instructions for disconnecting/reconnecting a device in bootloader mode; We'll use cached version of the device
     const device = status === 'waiting-for-bootloader' ? cachedDevice : liveDevice;
-    const expectedModel = device?.features?.major_version || 2;
 
     let content;
 
     if (!device?.connected || !device?.features) {
         // Most users won't see this as they should come here with a connected device.
         // This is just for people who want to shoot themselves in the foot and disconnect the device before proceeding with fw update flow
-        // Be aware that disconnection after fw installation () is completed is fineand won't be caught by this, because device variable will point to cached device
+        // Be aware that disconnection after fw installation () is completed is fine and won't be caught by this, because device variable will point to cached device
         return <ConnectDevicePromptManager device={device} />;
     }
 
@@ -68,7 +67,7 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
         content = {
             heading: <Translation id="TR_INSTALL_FIRMWARE" />,
             description: <Translation id="TR_FIRMWARE_SUBHEADING" />,
-            body: cachedDevice.firmwareRelease?.isLatest ? (
+            body: cachedDevice?.firmwareRelease?.isLatest ? (
                 <FirmwareOffer
                     newVersion={getFwUpdateVersion(cachedDevice)}
                     releaseChangelog={cachedDevice.firmwareRelease}
@@ -136,10 +135,7 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
             <>
                 {/* Modal above a fw update offer. Instructs user to reconnect the device in bootloader */}
                 {status === 'waiting-for-bootloader' && (
-                    <ReconnectDevicePrompt
-                        deviceVersion={expectedModel}
-                        requestedMode="bootloader"
-                    />
+                    <ReconnectDevicePrompt expectedDevice={device} requestedMode="bootloader" />
                 )}
 
                 <OnboardingStepBox

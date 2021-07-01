@@ -1,11 +1,15 @@
-/* eslint-disable jsx-a11y/media-has-caption */
 import styled, { css } from 'styled-components';
 import React, { useRef } from 'react';
 import Lottie from 'lottie-react';
+import * as semver from 'semver';
+
 import { resolveStaticPath } from '@suite-utils/nextjs';
 import { useTheme } from '@suite-hooks';
 import LottieT1Connect from './lottie/t1_connect.json';
 import LottieTTConnect from './lottie/tt_connect.json';
+import { getDeviceModel, getFwVersion } from '@suite-utils/device';
+
+import type { TrezorDevice } from '@suite/types/suite';
 
 const Wrapper = styled.div<{ size?: number; shape?: Shape }>`
     width: 100%;
@@ -60,47 +64,62 @@ type Shape = 'CIRCLE' | 'ROUNDED' | 'ROUNDED-SMALL';
 
 type Props = {
     size?: number;
+    device?: TrezorDevice;
     type: DeviceAnimationType;
-    version?: string;
     loop?: boolean;
     shape?: Shape;
 };
 
-const DeviceAnimation = ({ size, type, version, loop = false, shape, ...props }: Props) => {
+const DeviceAnimation = ({ size, type, loop = false, shape, device, ...props }: Props) => {
     const { themeVariant } = useTheme();
     const hologramRef = useRef<HTMLVideoElement>(null);
-    const trezorVersion = version === '1' ? version : 't';
-    const animationType = type.toLowerCase();
+
+    // if device features are not available, use T model animations
+    const deviceModel = device?.features ? getDeviceModel(device) : 'T';
+
+    // T1 bootloader before firmware version 1.8.0 can only be invoked by holding both buttons
+    const deviceFwVersion = device?.features ? getFwVersion(device) : '';
+    let animationType = type;
+    if (
+        type === 'BOOTLOADER' &&
+        deviceModel === '1' &&
+        semver.valid(deviceFwVersion) &&
+        semver.satisfies(deviceFwVersion, '<1.8.0')
+    ) {
+        animationType = 'BOOTLOADER_TWO_BUTTONS';
+    }
+
+    const animationFileName = animationType.toLowerCase();
 
     return (
         <Wrapper size={size} shape={shape} {...props}>
-            {type === 'CONNECT' && (
+            {animationType === 'CONNECT' && (
                 <StyledLottie
-                    animationData={trezorVersion === '1' ? LottieT1Connect : LottieTTConnect}
+                    animationData={deviceModel === '1' ? LottieT1Connect : LottieTTConnect}
                     loop={loop}
                 />
             )}
-            {type === 'BOOTLOADER' && (
+            {animationType === 'BOOTLOADER' && (
                 <StyledVideo loop={loop} autoPlay muted width={size} height={size}>
                     <source
                         src={resolveStaticPath(
-                            `videos/onboarding/t${trezorVersion}_${animationType}_${themeVariant}.mp4`,
+                            `videos/onboarding/t${deviceModel}_${animationFileName}_${themeVariant}.mp4`,
                         )}
                         type="video/mp4"
                     />
                 </StyledVideo>
             )}
-            {type === 'BOOTLOADER_TWO_BUTTONS' && (
+            {animationType === 'BOOTLOADER_TWO_BUTTONS' && (
                 <StyledVideo loop={loop} autoPlay muted width={size} height={size}>
                     <source
                         src={resolveStaticPath(
-                            `videos/onboarding/t1_${animationType}_${themeVariant}.mp4`,
+                            `videos/onboarding/t1_${animationFileName}_${themeVariant}.mp4`,
                         )}
                         type="video/mp4"
                     />
                 </StyledVideo>
             )}
-            {type === 'HOLOGRAM' && (
+            {animationType === 'HOLOGRAM' && (
                 <StyledVideo
                     loop={loop}
                     autoPlay
@@ -114,17 +133,17 @@ const DeviceAnimation = ({ size, type, version, loop = false, shape, ...props }:
                 >
                     <source
                         src={resolveStaticPath(
-                            `videos/onboarding/t${trezorVersion}_${animationType}.webm`,
+                            `videos/onboarding/t${deviceModel}_${animationFileName}.webm`,
                         )}
                         type="video/webm"
                     />
                 </StyledVideo>
             )}
-            {type === 'SUCCESS' && (
+            {animationType === 'SUCCESS' && (
                 <StyledVideo loop={loop} autoPlay muted width={size} height={size}>
                     <source
                         src={resolveStaticPath(
-                            `videos/onboarding/t${trezorVersion}_${animationType}_${themeVariant}.webm`,
+                            `videos/onboarding/t${deviceModel}_${animationFileName}_${themeVariant}.webm`,
                         )}
                         type="video/webm"
                     />

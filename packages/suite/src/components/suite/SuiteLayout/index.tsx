@@ -1,6 +1,8 @@
 import React, { useState, createContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { connect } from 'react-redux';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 import { variables, scrollbarStyles } from '@trezor/components';
 import SuiteBanners from '@suite-components/Banners';
 import { AppState } from '@suite-types';
@@ -10,7 +12,7 @@ import MenuSecondary from '@suite-components/MenuSecondary';
 import { MAX_WIDTH, DESKTOP_TITLEBAR_HEIGHT } from '@suite-constants/layout';
 import { DiscoveryProgress } from '@wallet-components';
 import NavigationBar from '../NavigationBar';
-import { useLayoutSize, useSelector, useActions } from '@suite-hooks';
+import { useLayoutSize, useSelector, useActions, useAnalytics } from '@suite-hooks';
 import { isDesktop } from '@suite-utils/env';
 import * as guideActions from '@suite-actions/guideActions';
 
@@ -27,15 +29,24 @@ const Body = styled.div`
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow: auto;
+    overflow-y: hidden;
+    overflow-x: hidden;
 `;
 
 // AppWrapper and MenuSecondary creates own scrollbars independently
-const Columns = styled.div`
+const Columns = styled.div<{ guideOpen?: boolean }>`
     display: flex;
     flex-direction: row;
     flex: 1 0 100%;
     overflow: auto;
+    padding: 0;
+    transition: all 0.3s ease;
+
+    ${props =>
+        props.guideOpen &&
+        css`
+            padding: 0 ${variables.LAYOUT_SIZE.GUIDE_PANEL_WIDTH} 0 0;
+        `}
 `;
 
 const AppWrapper = styled.div`
@@ -75,11 +86,22 @@ const DefaultPaddings = styled.div`
     }
 `;
 
-const StyledGuidePanel = styled(GuidePanel)`
+const StyledGuidePanel = styled(GuidePanel)<{ open?: boolean }>`
     height: 100%;
     width: ${variables.LAYOUT_SIZE.GUIDE_PANEL_WIDTH};
     flex: 0 0 ${variables.LAYOUT_SIZE.GUIDE_PANEL_WIDTH};
     z-index: ${variables.Z_INDEX.GUIDE_PANEL};
+    border-left: 1px solid ${props => props.theme.STROKE_GREY};
+    position: absolute;
+    right: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+
+    ${props =>
+        props.open &&
+        css`
+            transform: translateX(0);
+        `}
 `;
 
 const mapStateToProps = (state: AppState) => ({
@@ -134,7 +156,7 @@ const ScrollAppWrapper = ({ url, children }: ScrollAppWrapperProps) => {
 
 const BodyNormal = ({ url, menu, appMenu, children, guideOpen, isMenuInline }: NormalBodyProps) => (
     <Body>
-        <Columns>
+        <Columns guideOpen={guideOpen}>
             {!isMenuInline && menu && <MenuSecondary>{menu}</MenuSecondary>}
             <ScrollAppWrapper url={url}>
                 {isMenuInline && menu}
@@ -143,7 +165,7 @@ const BodyNormal = ({ url, menu, appMenu, children, guideOpen, isMenuInline }: N
                     <MaxWidthWrapper>{children}</MaxWidthWrapper>
                 </DefaultPaddings>
             </ScrollAppWrapper>
-            {guideOpen && <StyledGuidePanel />}
+            <StyledGuidePanel open={guideOpen} />
         </Columns>
     </Body>
 );
@@ -162,14 +184,31 @@ const BodyMobile = ({ url, menu, appMenu, children }: MobileBodyProps) => (
 
 type SuiteLayoutProps = Omit<Props, 'menu' | 'appMenu'>;
 const SuiteLayout = (props: SuiteLayoutProps) => {
+    const analytics = useAnalytics();
+
     // TODO: if (props.layoutSize === 'UNAVAILABLE') return <SmallLayout />;
     const { isMobileLayout, layoutSize } = useLayoutSize();
     const { guideOpen } = useSelector(state => ({
         guideOpen: state.guide.open,
     }));
-    const { openGuide } = useActions({
+    const { openGuide, closeGuide } = useActions({
         openGuide: guideActions.open,
+        closeGuide: guideActions.close,
     });
+    useHotkeys(
+        'f1,esc',
+        e => {
+            e.preventDefault();
+            if (guideOpen) {
+                closeGuide();
+            }
+            if (!guideOpen && e.key.toLowerCase() === 'f1') {
+                openGuide();
+            }
+        },
+        [guideOpen, closeGuide, openGuide],
+    );
+
     const [title, setTitle] = useState<string | undefined>(undefined);
     const [menu, setMenu] = useState<any>(undefined);
     // There are three layout configurations WRT the guide and menu:
@@ -214,7 +253,16 @@ const SuiteLayout = (props: SuiteLayoutProps) => {
                     </BodyMobile>
                 )}
             </LayoutContext.Provider>
-            {!isMobileLayout && <GuideButton onClick={openGuide} />}
+            {!isMobileLayout && (
+                <GuideButton
+                    onClick={() => {
+                        openGuide();
+                        analytics.report({
+                            type: 'menu/guide',
+                        });
+                    }}
+                />
+            )}
         </PageWrapper>
     );
 };

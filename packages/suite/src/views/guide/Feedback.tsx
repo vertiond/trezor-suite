@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { Translation } from '@suite-components';
-import { useActions, useDevice } from '@suite-hooks';
-import { Textarea, Select, variables } from '@trezor/components';
+
+import { CollapsibleBox, Translation } from '@suite-components';
+import { Textarea, Select, variables, Button } from '@trezor/components';
+import { useActions, useAnalytics, useDevice, useSelector } from '@suite-hooks';
 import * as guideActions from '@suite-actions/guideActions';
 import { ViewWrapper, Header, Content } from '@guide-components';
 import { Rating, Category, FeedbackType, UserData } from '@suite-types/guide';
@@ -24,18 +25,9 @@ const Headline = styled.div`
     width: 100%;
 `;
 
-const Submit = styled.button`
-    font-size: ${variables.FONT_SIZE.SMALL};
-    font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
-    text-align: center;
-    color: ${props => props.theme.TYPE_WHITE};
-    background: ${props => props.theme.BG_GREEN};
-    border-radius: 8px;
-    border: none;
-    padding: 10px;
+const Submit = styled(Button)`
     width: 100%;
     margin: 0 0 20px;
-    cursor: pointer;
 `;
 
 const SelectWrapper = styled.div`
@@ -44,16 +36,6 @@ const SelectWrapper = styled.div`
 
 const TextareaWrapper = styled.div`
     position: relative;
-`;
-
-const FeedbackInfoNotice = styled.small`
-    display: block;
-    font-size: 10px;
-    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
-    text-align: center;
-    color: ${props => props.theme.TYPE_LIGHT_GREY};
-    padding: 0 0 8px;
-    width: 100%;
 `;
 
 const CharacterCount = styled.div`
@@ -81,10 +63,7 @@ const RatingItem = styled.button<{ selected?: boolean }>`
     border: 1px solid ${props => props.theme.STROKE_GREY};
     cursor: pointer;
     font-size: 30px;
-
-    &:hover {
-        background: ${props => props.theme.STROKE_GREY};
-    }
+    background-color: inherit;
 
     ${props =>
         props.selected &&
@@ -96,6 +75,17 @@ const RatingItem = styled.button<{ selected?: boolean }>`
                 background: ${props.theme.BG_GREEN};
             }
         `};
+`;
+
+const AnonymousDataList = styled.ul`
+    margin-left: 20px;
+`;
+
+const AnonymousDataItem = styled.li`
+    margin-bottom: 4px;
+    font-size: ${variables.FONT_SIZE.SMALL};
+    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+    color: ${props => props.theme.TYPE_DARK_GREY};
 `;
 
 type RatingItem = {
@@ -131,15 +121,67 @@ const ratingOptions: RatingItem[] = [
     },
 ];
 
+/** A format compatible with React Select component. */
+type FeedbackCategoryOption = {
+    label: React.ReactNode;
+    value: Category;
+};
+
 const Feedback = ({ type }: Props) => {
+    const analytics = useAnalytics();
+
     const { device } = useDevice();
     const { setView, sendFeedback } = useActions({
         setView: guideActions.setView,
         sendFeedback: guideActions.sendFeedback,
     });
+
+    const router = useSelector(state => state.router);
     const [description, setDescription] = React.useState('');
     const [rating, setRating] = React.useState<RatingItem>();
-    const [category, setCategory] = React.useState<Category>('dashboard');
+
+    const feedbackCategories: { [key in Category]: React.ReactNode } = {
+        dashboard: <Translation id="TR_FEEDBACK_CATEGORY_DASHBOARD" />,
+        account: <Translation id="TR_FEEDBACK_CATEGORY_ACCOUNT" />,
+        settings: <Translation id="TR_FEEDBACK_CATEGORY_SETTINGS" />,
+        send: <Translation id="TR_FEEDBACK_CATEGORY_SEND" />,
+        receive: <Translation id="TR_FEEDBACK_CATEGORY_RECEIVE" />,
+        trade: <Translation id="TR_FEEDBACK_CATEGORY_TRADE" />,
+        other: <Translation id="TR_FEEDBACK_CATEGORY_OTHER" />,
+    };
+
+    // Router apps does not match 1:1 to Feedback Categories
+    const getDefaultCategory = (): Category | undefined => {
+        const { app, route } = router;
+        const routePattern = route?.pattern || '';
+
+        if (routePattern.startsWith('/accounts/coinmarket')) {
+            return 'trade';
+        }
+        if (routePattern.startsWith('/accounts/send')) {
+            return 'send';
+        }
+        if (routePattern.startsWith('/accounts/receive')) {
+            return 'receive';
+        }
+
+        switch (app) {
+            case 'dashboard':
+                return 'dashboard';
+            case 'wallet':
+                return 'account';
+            case 'settings':
+                return 'settings';
+            default:
+                return undefined;
+        }
+    };
+    const [category, setCategory] = React.useState(getDefaultCategory());
+
+    const categoryToOption = (category: Category): FeedbackCategoryOption => ({
+        value: category,
+        label: feedbackCategories[category],
+    });
 
     useEffect(() => {
         if (description.length >= MESSAGE_CHARACTER_LIMIT) {
@@ -170,7 +212,9 @@ const Feedback = ({ type }: Props) => {
                 type: 'BUG',
                 payload: {
                     description,
-                    category,
+                    // By the time of submission a category must be selected.
+                    // Otherwise the submit button would be disabled.
+                    category: category!,
                     ...userData,
                 },
             });
@@ -185,7 +229,21 @@ const Feedback = ({ type }: Props) => {
             });
         }
         setView('GUIDE_DEFAULT');
-    }, [device, firmwareType, type, setView, sendFeedback, description, category, rating?.id]);
+        analytics.report({
+            type: 'guide/feedback/submit',
+            payload: { type: type === 'BUG' ? 'bug' : 'suggestion' },
+        });
+    }, [
+        analytics,
+        device,
+        firmwareType,
+        type,
+        setView,
+        sendFeedback,
+        description,
+        category,
+        rating?.id,
+    ]);
 
     return (
         <ViewWrapper>
@@ -208,20 +266,17 @@ const Feedback = ({ type }: Props) => {
                         <SelectWrapper>
                             <Select
                                 isSearchable={false}
-                                defaultValue={{ label: 'Dashboard', value: 'dashboard' }}
-                                options={[
-                                    { label: 'Dashboard', value: 'dashboard' },
-                                    { label: 'Accounts', value: 'account' },
-                                    { label: 'Settings', value: 'settings' },
-                                    { label: 'Send', value: 'send' },
-                                    { label: 'Receive', value: 'receive' },
-                                    { label: 'Trade', value: 'trade' },
-                                    { label: 'Other', value: 'other' },
-                                ]}
+                                defaultValue={category && categoryToOption(category)}
+                                options={Object.keys(feedbackCategories).map(category =>
+                                    categoryToOption(category as Category),
+                                )}
                                 borderWidth={1}
                                 borderRadius={8}
-                                onChange={(option: { value: Category; label: string }) =>
+                                onChange={(option: FeedbackCategoryOption) =>
                                     setCategory(option.value)
+                                }
+                                placeholder={
+                                    <Translation id="TR_FEEDBACK_CATEGORY_SELECT_PLACEHOLDER" />
                                 }
                                 noTopLabel
                             />
@@ -276,13 +331,37 @@ const Feedback = ({ type }: Props) => {
                     </CharacterCount>
                 </TextareaWrapper>
 
-                <Submit onClick={onSubmit}>
+                <Submit
+                    onClick={onSubmit}
+                    isDisabled={
+                        description.length === 0 ||
+                        (type === 'SUGGESTION' && rating === undefined) ||
+                        (type === 'BUG' && category === undefined)
+                    }
+                >
                     <Translation id="TR_GUIDE_FEEDBACK_SEND_REPORT" />
                 </Submit>
 
-                <FeedbackInfoNotice>
-                    <Translation id="TR_GUIDE_FEEDBACK_BROWSER_INFO_NOTICE" />
-                </FeedbackInfoNotice>
+                <CollapsibleBox
+                    heading={<Translation id="TR_GUIDE_FEEDBACK_SYSTEM_INFO_NOTICE" />}
+                    headerJustifyContent="center"
+                    variant="tiny"
+                >
+                    <AnonymousDataList>
+                        <AnonymousDataItem>
+                            <Translation id="TR_FEEDBACK_ANALYTICS_ITEM_OS" />
+                        </AnonymousDataItem>
+                        <AnonymousDataItem>
+                            <Translation id="TR_FEEDBACK_ANALYTICS_ITEM_BROWSER" />
+                        </AnonymousDataItem>
+                        <AnonymousDataItem>
+                            <Translation id="TR_FEEDBACK_ANALYTICS_ITEM_FW" />
+                        </AnonymousDataItem>
+                        <AnonymousDataItem>
+                            <Translation id="TR_FEEDBACK_ANALYTICS_ITEM_APP" />
+                        </AnonymousDataItem>
+                    </AnonymousDataList>
+                </CollapsibleBox>
             </Content>
         </ViewWrapper>
     );

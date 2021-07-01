@@ -242,7 +242,7 @@ export const selectDevice = (device?: Device | TrezorDevice) => (
  *
  * Use `forgetDevice` to forget a device regardless if its current state.
  */
-export const rememberDevice = (payload: TrezorDevice, forceRemember?: true): SuiteAction => ({
+export const toggleRememberDevice = (payload: TrezorDevice, forceRemember?: true): SuiteAction => ({
     type: SUITE.REMEMBER_DEVICE,
     payload,
     remember: !payload.remember || !!forceRemember,
@@ -354,6 +354,23 @@ export const handleDeviceDisconnect = (device: Device) => (
 
     const available = deviceUtils.getFirstDeviceInstance(devices);
     dispatch({ type: SUITE.SELECT_DEVICE, payload: available[0] });
+};
+
+/**
+ * Triggered by `trezor-connect DEVICE_EVENT` via suiteMiddleware
+ * Remove all data related to all instances of disconnected device if they are not remembered
+ * @param {Device} device
+ */
+export const forgetDisconnectedDevices = (device: Device) => (
+    dispatch: Dispatch,
+    getState: GetState,
+) => {
+    const deviceInstances = getState().devices.filter(d => d.id === device.id);
+    deviceInstances.forEach(d => {
+        if (d.features && !d.remember) {
+            dispatch(forgetDevice(d));
+        }
+    });
 };
 
 /**

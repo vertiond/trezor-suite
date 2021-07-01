@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { RadioButton } from '.';
-import { storiesOf } from '@storybook/react';
-import { text, boolean } from '@storybook/addon-knobs';
+import React from 'react';
+import { useArgs } from '@storybook/client-api';
 import styled from 'styled-components';
+
+import { RadioButton } from '.';
 import { H2 } from '../../typography/Heading';
 
 const Wrapper = styled.div`
@@ -13,17 +13,30 @@ const Wrapper = styled.div`
     }
 `;
 
-const CustomContent = styled.div``;
+export default {
+    title: 'Form/RadioButton',
+    argTypes: {
+        option: {
+            control: {
+                options: { '1': 'option1', '2': 'option2', '3': 'option3' },
+                type: 'radio',
+            },
+        },
+    },
+    args: { option: 'option1' },
+};
 
-storiesOf('Form', module).add('Radio Button', () => {
-    const [option, setOption] = useState('option1');
+export const Basic = () => {
+    const [{ option }, updateArgs] = useArgs();
+    const setOption = (option: string) => updateArgs({ option });
+
     return (
         <Wrapper>
             <RadioButton onClick={() => setOption('option1')} isChecked={option === 'option1'}>
-                <CustomContent>
+                <div>
                     <H2>Some heading</H2>
                     First option (example of custom content)
-                </CustomContent>
+                </div>
             </RadioButton>
             <RadioButton onClick={() => setOption('option2')} isChecked={option === 'option2'}>
                 Second option
@@ -33,4 +46,4 @@ storiesOf('Form', module).add('Radio Button', () => {
             </RadioButton>
         </Wrapper>
     );
-});
+};

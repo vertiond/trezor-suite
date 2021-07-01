@@ -124,8 +124,13 @@ const definedMessages = defineMessages({
             'Please close the tab in your browser or click the button below to acquire the device since Trezor can be only used in one session.',
         id: 'TR_ACQUIRE_DEVICE_DESCRIPTION',
     },
+    TR_RECONNECT_DEVICE_DESCRIPTION: {
+        defaultMessage:
+            'If closing tabs and refreshing this page didn’t help, try reconnecting your Trezor.',
+        id: 'TR_RECONNECT_DEVICE_DESCRIPTION',
+    },
     TR_ACQUIRE_DEVICE_TITLE: {
-        defaultMessage: 'Trezor is being used in a browser',
+        defaultMessage: 'Another session is running',
         id: 'TR_ACQUIRE_DEVICE_TITLE',
     },
     TR_ACTIVATE_ALL: {
@@ -443,15 +448,16 @@ const definedMessages = defineMessages({
     },
     TR_EXCHANGE_RECEIVE_ACCOUNT_QUESTION_TOOLTIP: {
         id: 'TR_EXCHANGE_RECEIVE_ACCOUNT_QUESTION_TOOLTIP',
-        defaultMessage: 'TR_EXCHANGE_RECEIVE_ACCOUNT_QUESTION_TOOLTIP',
+        defaultMessage:
+            "This is the account within your wallet where you'll find your coins once the transaction is finished.",
     },
     TR_EXCHANGE_RECEIVE_NON_SUITE_ACCOUNT_QUESTION_TOOLTIP: {
         id: 'TR_EXCHANGE_RECEIVE_NON_SUITE_ACCOUNT_QUESTION_TOOLTIP',
-        defaultMessage: 'TR_EXCHANGE_RECEIVE_NON_SUITE_ACCOUNT_QUESTION_TOOLTIP',
+        defaultMessage: 'Receiving account is outside of Suite.',
     },
     TR_EXCHANGE_RECEIVE_NON_SUITE_ADDRESS_QUESTION_TOOLTIP: {
         id: 'TR_EXCHANGE_RECEIVE_NON_SUITE_ADDRESS_QUESTION_TOOLTIP',
-        defaultMessage: 'TR_EXCHANGE_RECEIVE_NON_SUITE_ADDRESS_QUESTION_TOOLTIP',
+        defaultMessage: 'This is the specific alphanumeric address that will receive your coins.',
     },
     TR_EXCHANGE_SELECT_RECEIVE_ACCOUNT: {
         id: 'TR_EXCHANGE_SELECT_RECEIVE_ACCOUNT',
@@ -475,7 +481,8 @@ const definedMessages = defineMessages({
     },
     TR_EXCHANGE_RECEIVE_ADDRESS_QUESTION_TOOLTIP: {
         id: 'TR_EXCHANGE_RECEIVE_ADDRESS_QUESTION_TOOLTIP',
-        defaultMessage: 'TR_EXCHANGE_RECEIVE_ADDRESS_QUESTION_TOOLTIP',
+        defaultMessage:
+            'This is the specific alphanumeric address that will receive your coins. Verify this address on your Trezor.',
     },
     TR_EXCHANGE_EXTRA_FIELD: {
         defaultMessage: '{extraFieldName}',
@@ -4627,9 +4634,13 @@ const definedMessages = defineMessages({
         id: 'TR_LANDING_CONTINUE',
         defaultMessage: 'Continue in browser',
     },
+    TR_HOLD_BOTH_BUTTONS: {
+        id: 'TR_HOLD_BOTH_BUTTONS',
+        defaultMessage: 'Hold both buttons while connecting device',
+    },
     TR_HOLD_LEFT_BUTTON: {
         id: 'TR_HOLD_LEFT_BUTTON',
-        defaultMessage: 'Hold left or both buttons while connecting device',
+        defaultMessage: 'Hold left button while connecting device',
     },
     BACKUP_BACKUP_ALREADY_FINISHED_HEADING: {
         id: 'BACKUP_BACKUP_ALREADY_FINISHED',
@@ -5380,6 +5391,54 @@ const definedMessages = defineMessages({
         id: 'TR_GIVE_FEEDBACK',
         defaultMessage: 'Give Feedback',
     },
+    TR_FEEDBACK_ANALYTICS_ITEM_OS: {
+        id: 'TR_FEEDBACK_ANALYTICS_ITEM_OS',
+        defaultMessage: 'Operating system',
+    },
+    TR_FEEDBACK_ANALYTICS_ITEM_BROWSER: {
+        id: 'TR_FEEDBACK_ANALYTICS_ITEM_BROWSER',
+        defaultMessage: 'Browser',
+    },
+    TR_FEEDBACK_ANALYTICS_ITEM_FW: {
+        id: 'TR_FEEDBACK_ANALYTICS_ITEM_FW',
+        defaultMessage: 'Device firmware version',
+    },
+    TR_FEEDBACK_ANALYTICS_ITEM_APP: {
+        id: 'TR_FEEDBACK_ANALYTICS_ITEM_APP',
+        defaultMessage: 'Suite version',
+    },
+    TR_FEEDBACK_CATEGORY_SELECT_PLACEHOLDER: {
+        id: 'TR_FEEDBACK_CATEGORY_SELECT_PLACEHOLDER',
+        defaultMessage: 'Select category...',
+    },
+    TR_FEEDBACK_CATEGORY_DASHBOARD: {
+        id: 'TR_FEEDBACK_CATEGORY_DASHBOARD',
+        defaultMessage: 'Dashboard',
+    },
+    TR_FEEDBACK_CATEGORY_ACCOUNT: {
+        id: 'TR_FEEDBACK_CATEGORY_ACCOUNT',
+        defaultMessage: 'Account',
+    },
+    TR_FEEDBACK_CATEGORY_SETTINGS: {
+        id: 'TR_FEEDBACK_CATEGORY_SETTINGS',
+        defaultMessage: 'Settings',
+    },
+    TR_FEEDBACK_CATEGORY_SEND: {
+        id: 'TR_FEEDBACK_CATEGORY_SEND',
+        defaultMessage: 'Send',
+    },
+    TR_FEEDBACK_CATEGORY_RECEIVE: {
+        id: 'TR_FEEDBACK_CATEGORY_RECEIVE',
+        defaultMessage: 'Receive',
+    },
+    TR_FEEDBACK_CATEGORY_TRADE: {
+        id: 'TR_FEEDBACK_CATEGORY_TRADE',
+        defaultMessage: 'Trade',
+    },
+    TR_FEEDBACK_CATEGORY_OTHER: {
+        id: 'TR_FEEDBACK_CATEGORY_OTHER',
+        defaultMessage: 'Other',
+    },
     FIRMWARE_USER_HAS_SEED_CHECKBOX_DESC: {
         id: 'FIRMWARE_USER_HAS_SEED_CHECKBOX_DESC',
         defaultMessage: 'Yes, I do!',
@@ -6038,9 +6097,9 @@ const definedMessages = defineMessages({
         id: 'TR_GUIDE_FEEDBACK_SEND_REPORT',
         defaultMessage: `Send report`,
     },
-    TR_GUIDE_FEEDBACK_BROWSER_INFO_NOTICE: {
-        id: 'TR_GUIDE_FEEDBACK_BROWSER_INFO_NOTICE',
-        defaultMessage: `Your browser info will be shared anonymously`,
+    TR_GUIDE_FEEDBACK_SYSTEM_INFO_NOTICE: {
+        id: 'TR_GUIDE_FEEDBACK_SYSTEM_INFO_NOTICE',
+        defaultMessage: `Your basic system info will be shared anonymously`,
     },
     TR_GUIDE_FEEDBACK_SENT: {
         id: 'TR_GUIDE_FEEDBACK_SENT',
@@ -6196,14 +6255,47 @@ const definedMessages = defineMessages({
         id: 'TR_DATA_ANALYTICS_CATEGORY_3_ITEM_1',
         defaultMessage: 'Category 3 Item 1',
     },
-    TR_TROUBLESHOOTING_TIP_BRIDGE_TITLE: {
-        id: 'TR_TOUBLESHOOTING_TIP_BRIDGE_TITLE',
-        defaultMessage: 'Make sure Trezor Bridge is installed and running',
+    TR_TROUBLESHOOTING_BRIDGE_IS_NOT_RUNNING: {
+        defaultMessage: 'Steps to make sure Trezor Bridge is running',
+        id: 'TR_TROUBLESHOOTING_BRIDGE_IS_NOT_RUNNING',
     },
-    TR_TROUBLESHOOTING_TIP_BRIDGE_DESCRIPTION: {
-        id: 'TR_TROUBLESHOOTING_TIP_BRIDGE_DESCRIPTION',
+    TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_TITLE: {
+        defaultMessage: 'Ensure the Trezor Bridge process is running',
+        id: 'TR_TROUBLESHOOTING_BRIDGE_STATUS_TITLE',
+    },
+    TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_DESCRIPTION: {
+        defaultMessage: 'Visit <a>Trezor Bridge status page</a>',
+        id: 'TR_TROUBLESHOOTING_BRIDGE_STATUS_DESCRIPTION',
+    },
+    TR_TROUBLESHOOTING_TIP_BRIDGE_INSTALL_TITLE: {
+        id: 'TR_TOUBLESHOOTING_TIP_BRIDGE_INSTALL_TITLE',
+        defaultMessage: 'If you couldn’t see Trezor Bridge running, download and install it',
+    },
+    TR_TROUBLESHOOTING_TIP_BRIDGE_INSTALL_DESCRIPTION: {
+        id: 'TR_TROUBLESHOOTING_TIP_BRIDGE_INSTALL_DESCRIPTION',
+        defaultMessage: '<a>Download Trezor Bridge</a>',
+    },
+    TR_TROUBLESHOOTING_TIP_BRIDGE_USE_TITLE: {
+        id: 'TR_TOUBLESHOOTING_TIP_BRIDGE_USE_TITLE',
         defaultMessage:
-            '<a>Download Trezor Bridge</a> to enable communication between a browser and your device.',
+            'If the above tips didn’t work, you can try using Trezor Bridge instead of WebUSB',
+    },
+    TR_TROUBLESHOOTING_TIP_BRIDGE_USE_DESCRIPTION: {
+        id: 'TR_TROUBLESHOOTING_TIP_BRIDGE_USE_DESCRIPTION',
+        defaultMessage: '<a>Download Trezor Bridge</a> and click the button below.',
+    },
+    TR_TROUBLESHOOTING_TIP_UDEV_INSTALL_DESCRIPTION: {
+        id: 'TR_TROUBLESHOOTING_TIP_UDEV_INSTALL_DESCRIPTION',
+        defaultMessage:
+            'Try installing <a>udev rules</a>. Make sure to first save them to desktop before opening.',
+    },
+    TR_TROUBLESHOOTING_CLOSE_TABS: {
+        defaultMessage: 'Close other tabs and windows that might be using your Trezor',
+        id: 'TR_TROUBLESHOOTING_CLOSE_TABS',
+    },
+    TR_TROUBLESHOOTING_CLOSE_TABS_DESCRIPTION: {
+        defaultMessage: 'After closing other tabs and windows, try refreshing this page.',
+        id: 'TR_TROUBLESHOOTING_CLOSE_TABS_DESCRIPTION',
     },
     TR_TROUBLESHOOTING_TIP_CABLE_TITLE: {
         id: 'TR_TROUBLESHOOTING_TIP_CABLE_TITLE',
@@ -6216,7 +6308,7 @@ const definedMessages = defineMessages({
     },
     TR_TROUBLESHOOTING_TIP_USB_PORT_TITLE: {
         id: 'TR_TROUBLESHOOTING_TIP_USB_PORT_TITLE',
-        defaultMessage: 'Try a different USB or port',
+        defaultMessage: 'Try a different USB port',
     },
     TR_TROUBLESHOOTING_TIP_USB_PORT_DESCRIPTION: {
         id: 'TR_TROUBLESHOOTING_TIP_USB_PORT_DESCRIPTION',

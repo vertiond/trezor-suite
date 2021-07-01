@@ -1,53 +1,60 @@
 import React from 'react';
-import { Textarea } from '../../../index';
-import { storiesOf } from '@storybook/react';
-import { text, boolean, select, number } from '@storybook/addon-knobs';
+import { useArgs } from '@storybook/client-api';
 
-storiesOf('Form', module).add('Textarea', () => {
-    const value: any = text('Value', 'Input value');
-    const state: any = select(
-        'State',
-        {
-            None: null,
-            Success: 'success',
-            Warning: 'warning',
-            Error: 'error',
-        },
-        null
-    );
-    const display: any = select(
-        'Display',
-        {
-            'Default (normal)': null,
-            Short: 'short',
-            Block: 'block',
-        },
-        null
-    );
+import { Textarea } from '.';
 
-    const topLabel: string = text('Top label', '');
-    const bottomText: string = text('Bottom text', '');
-    const placeholder: string = text('Placeholder', '');
-    const disabled = boolean('Disabled', false);
-    const monospace = boolean('Monospace', false);
-    const rows = number('Rows', 5, {
-        min: 1,
-        max: 30,
-        range: true,
-        step: 1,
-    });
+export default {
+    title: 'Form/Textarea',
+    args: {
+        value: 'Textarea',
+        label: 'Label',
+        bottomText: '',
+        placeholder: '',
+        disabled: false,
+        monospace: false,
+        state: null,
+        rows: 5,
+    },
+    argTypes: {
+        state: {
+            control: {
+                options: {
+                    'None (default)': null,
+                    Success: 'success',
+                    Warning: 'warning',
+                    Error: 'error',
+                },
+                type: 'radio',
+            },
+        },
+        rows: {
+            control: {
+                min: 1,
+                max: 30,
+                step: 1,
+                type: 'range',
+            },
+        },
+    },
+};
+
+export const Basic = ({ ...args }) => {
+    const [{ value }, updateArgs] = useArgs();
+    const handleValue = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        updateArgs({ value: e.target.value });
+    };
 
     return (
         <Textarea
-            {...(disabled ? { disabled } : {})}
-            {...(state ? { state } : {})}
-            {...(display ? { display } : {})}
-            {...(topLabel ? { topLabel } : {})}
-            {...(bottomText ? { bottomText } : {})}
-            {...(placeholder ? { placeholder } : {})}
-            {...(rows !== 5 ? { rows } : {})}
-            {...(monospace ? { monospace } : {})}
+            disabled={args.disabled}
+            state={args.state}
+            label={args.label}
+            bottomText={args.bottomText}
+            placeholder={args.placeholder}
+            monospace={args.monospace}
+            rows={args.rows}
             value={value}
+            onChange={handleValue}
         />
     );
-});
+};

@@ -1,10 +1,11 @@
 import React from 'react';
 import { useSpring, config, animated } from 'react-spring';
+import styled from 'styled-components';
+
 import { variables, Icon } from '@trezor/components';
 import { DeviceAnimation } from '@onboarding-components';
 import { Translation } from '@suite-components';
-import { useTheme, useDevice } from '@suite-hooks';
-import styled from 'styled-components';
+import { useDevice, useTheme } from '@suite-hooks';
 
 const Wrapper = styled(animated.div)`
     display: flex;
@@ -67,11 +68,11 @@ const ConnectDevicePrompt = ({ children, connected, showWarning }: Props) => {
     });
 
     return (
-        <Wrapper style={fadeStyles} data-test="@onboarding/connect-device">
+        <Wrapper style={fadeStyles} data-test="@connect-device-prompt">
             <ImageWrapper>
                 <DeviceAnimation
                     type="CONNECT"
-                    version={device?.features?.model}
+                    device={device}
                     loop={!connected}
                     shape="CIRCLE"
                     size={100}
