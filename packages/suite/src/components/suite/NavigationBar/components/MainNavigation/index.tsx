@@ -6,6 +6,7 @@ import { Translation } from '@suite-components';
 import { MAIN_MENU_ITEMS } from '@suite-constants/menu';
 import { useAnalytics, useActions, useSelector, useAccountSearch } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
+import HoverAnimation from '@suite-views/hover-animation';
 
 interface ComponentProps {
     isActive: boolean;
@@ -67,32 +68,6 @@ const ItemTitleWrapper = styled.span`
 const ItemTitle = styled.span<ComponentProps>`
     color: ${props => props.theme.TYPE_LIGHT_GREY};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
-
-    &:after {
-        content: '';
-        position: absolute;
-        top: -4px;
-        left: -4px;
-        right: -4px;
-        bottom: -4px;
-        z-index: -1;
-        border-radius: ${variables.BORDER_RADIUS.HOVER};
-        transition: all ${variables.HOVER_TRANSITION.DURATION}
-            ${variables.HOVER_TRANSITION.ANIMATION};
-        background-color: transparent;
-    }
-
-    &:hover,
-    &:focus,
-    &:active {
-        &:after {
-            background-color: ${props => props.theme.BG_HOVER_ITEM};
-            top: -12px;
-            left: -12px;
-            bottom: -12px;
-            right: -12px;
-        }
-    }
 
     ${props =>
         props.isActive &&
@@ -178,9 +153,11 @@ const MainNavigation = (props: Props) => {
                         isDisabled={isDisabled}
                     >
                         <ItemTitleWrapper>
-                            <ItemTitle isActive={isActive} isDisabled={isDisabled}>
-                                <Translation id={translationId} />
-                            </ItemTitle>
+                            <HoverAnimation>
+                                <ItemTitle isActive={isActive} isDisabled={isDisabled}>
+                                    <Translation id={translationId} />
+                                </ItemTitle>
+                            </HoverAnimation>
                             {/* if the button is disabled, display "SOON" badge */}
                             {isDisabled && <NewBadge>soon</NewBadge>}
                         </ItemTitleWrapper>

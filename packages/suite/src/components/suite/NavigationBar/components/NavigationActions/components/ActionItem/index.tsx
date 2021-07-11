@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useTheme, Icon, IconProps, variables } from '@trezor/components';
+import HoverAnimation from '@suite-views/hover-animation';
 
 const Wrapper = styled.div<Pick<Props, 'isOpen' | 'marginLeft'>>`
     width: 45px;
@@ -14,30 +15,6 @@ const Wrapper = styled.div<Pick<Props, 'isOpen' | 'marginLeft'>>`
     ${props => props.marginLeft && `margin-left: 8px`};
     transition: background ${variables.HOVER_TRANSITION.DURATION}
         ${variables.HOVER_TRANSITION.ANIMATION};
-
-    &:after {
-        content: '';
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        right: 4px;
-        bottom: 4px;
-        z-index: -1;
-        border-radius: ${variables.BORDER_RADIUS.HOVER};
-        transition: all ${variables.HOVER_TRANSITION.DURATION}
-            ${variables.HOVER_TRANSITION.ANIMATION};
-        background-color: transparent;
-    }
-
-    &:hover {
-        &:after {
-            top: 0px;
-            left: 0px;
-            right: 0px;
-            bottom: 0px;
-            background-color: ${props => props.theme.BG_HOVER_ITEM};
-        }
-    }
 
     ${props =>
         props.isOpen &&
@@ -158,17 +135,19 @@ const ActionItem = React.forwardRef((props: Props, ref: React.Ref<HTMLDivElement
 
     return (
         <Wrapper isActive={props.isActive} isOpen={props.isOpen} {...props} ref={ref}>
-            {iconComponent}
-            {props.indicator === 'alert' && (
-                <AlertDotWrapper>
-                    <AlertDot />
-                </AlertDotWrapper>
-            )}
-            {props.indicator === 'check' && (
-                <Indicator>
-                    <Icon icon="CHECK" size={10} color={theme.TYPE_GREEN} />
-                </Indicator>
-            )}
+            <HoverAnimation>
+                {iconComponent}
+                {props.indicator === 'alert' && (
+                    <AlertDotWrapper>
+                        <AlertDot />
+                    </AlertDotWrapper>
+                )}
+                {props.indicator === 'check' && (
+                    <Indicator>
+                        <Icon icon="CHECK" size={10} color={theme.TYPE_GREEN} />
+                    </Indicator>
+                )}
+            </HoverAnimation>
         </Wrapper>
     );
 });

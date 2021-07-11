@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { variables } from '@trezor/components';
 import { Translation, ExternalLink } from '@suite-components';
+import HoverAnimation from '@suite-views/hover-animation';
 
 interface TextColumnProps {
     title?: React.ReactNode;
@@ -38,27 +39,14 @@ const Title = styled.div`
 const StyledExternalLink = styled(ExternalLink)`
     position: relative;
     padding: 4px 6px;
+    padding-right: 0;
     margin-left: -4px;
-    &:after {
-        content: '';
-        position: absolute;
-        border-radius: ${variables.BORDER_RADIUS.HOVER};
-        transition: all ${variables.HOVER_TRANSITION.DURATION}
-            ${variables.HOVER_TRANSITION.ANIMATION};
-        top: -4px;
-        left: -4px;
-        right: -4px;
-        bottom: -4px;
-        background: transparent;
-    }
 `;
 
 const StyledExternalLinkWrapper = styled.div`
+    display: flex;
     &:hover ${StyledExternalLink} {
         text-decoration: none;
-        &:after {
-            background: ${props => props.theme.BG_HOVER_ITEM};
-        }
     }
 `;
 
@@ -68,9 +56,11 @@ const TextColumn = ({ title, description, learnMore }: TextColumnProps) => (
         {description && <Description>{description}</Description>}
         {learnMore && (
             <StyledExternalLinkWrapper>
-                <StyledExternalLink href={learnMore} size="tiny">
-                    <Translation id="TR_LEARN_MORE" />
-                </StyledExternalLink>
+                <HoverAnimation>
+                    <StyledExternalLink href={learnMore} size="tiny">
+                        <Translation id="TR_LEARN_MORE" />
+                    </StyledExternalLink>
+                </HoverAnimation>
             </StyledExternalLinkWrapper>
         )}
     </Wrapper>

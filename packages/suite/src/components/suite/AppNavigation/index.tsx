@@ -7,6 +7,7 @@ import { useSelector } from '@suite-hooks';
 import { Route } from '@suite-types';
 import AccountStickyContent from '../AccountStickyContent';
 import { MAX_WIDTH, MAX_WIDTH_WALLET_CONTENT } from '@suite-constants/layout';
+import HoverAnimation from '@suite-views/hover-animation';
 
 const { FONT_WEIGHT, FONT_SIZE } = variables;
 
@@ -149,11 +150,10 @@ const StyledNavLink = styled.div<{ active?: boolean }>`
         margin-right: ${SECONDARY_MENU_BUTTON_MARGIN};
         margin-left: 10px;
     }
-
     position: relative;
 `;
 
-const InnerWrap = styled.div<{ settingsWrapper?: boolean }>`
+const InnerWrap = styled.div`
     width: 100%;
     height: 71px;
     display: flex;
@@ -162,14 +162,6 @@ const InnerWrap = styled.div<{ settingsWrapper?: boolean }>`
     padding: 0 16px;
     border-bottom: 1px solid ${props => props.theme.STROKE_GREY};
     background: ${props => props.theme.BG_LIGHT_GREY};
-    ${props =>
-        props.settingsWrapper &&
-        css`
-            height: 52px;
-            & ${StyledNavLink} {
-                padding: 13px 0;
-            }
-        `};
 `;
 
 const IconWrapper = styled.div`
@@ -182,30 +174,6 @@ const Text = styled.div`
 
 const TextHover = styled.div`
     position: relative;
-    &:after {
-        content: '';
-        position: absolute;
-        top: -4px;
-        left: -4px;
-        right: -4px;
-        bottom: -4px;
-        border-radius: ${variables.BORDER_RADIUS.HOVER};
-        transition: all ${variables.HOVER_TRANSITION.DURATION}
-            ${variables.HOVER_TRANSITION.ANIMATION};
-        background-color: transparent;
-    }
-
-    &:hover,
-    &:focus,
-    &:active {
-        &:after {
-            background-color: ${props => props.theme.BG_HOVER_ITEM};
-            top: -12px;
-            left: -12px;
-            bottom: -12px;
-            right: -12px;
-        }
-    }
 `;
 
 const StyledIcon = styled(Icon)`
@@ -309,7 +277,7 @@ const AppNavigation = ({ items, primaryContent, maxWidth }: Props) => {
                     </MenuHolder>
                 </InnerWrap>
             ) : (
-                <InnerWrap settingsWrapper={routeName && routeName.startsWith('settings')}>
+                <InnerWrap>
                     <KeepWidth border={!sticky}>
                         <Primary ref={primary}>
                             {primaryContent ||
@@ -325,21 +293,23 @@ const AppNavigation = ({ items, primaryContent, maxWidth }: Props) => {
                                                 'data-test': item['data-test'],
                                             })}
                                         >
-                                            {item.icon && (
-                                                <IconWrapper>
-                                                    <StyledIcon
-                                                        size={18}
-                                                        icon={item.icon}
-                                                        color={
-                                                            active
-                                                                ? theme.TYPE_DARK_GREY
-                                                                : undefined
-                                                        }
-                                                    />
-                                                </IconWrapper>
-                                            )}
+                                            <HoverAnimation>
+                                                {item.icon && (
+                                                    <IconWrapper>
+                                                        <StyledIcon
+                                                            size={18}
+                                                            icon={item.icon}
+                                                            color={
+                                                                active
+                                                                    ? theme.TYPE_DARK_GREY
+                                                                    : undefined
+                                                            }
+                                                        />
+                                                    </IconWrapper>
+                                                )}
 
-                                            <TextHover>{title}</TextHover>
+                                                <Text>{title}</Text>
+                                            </HoverAnimation>
                                         </StyledNavLink>
                                     );
                                 })}

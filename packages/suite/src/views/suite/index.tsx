@@ -12,6 +12,7 @@ import DeviceRecoveryMode from './device-recovery-mode';
 import SwitchDevice from './switch-device';
 import Udev from './udev';
 import Version from './version';
+import HoverAnimation from './hover-animation';
 
 export {
     Bridge,
@@ -28,4 +29,5 @@ export {
     SwitchDevice,
     Udev,
     Version,
+    HoverAnimation,
 };
