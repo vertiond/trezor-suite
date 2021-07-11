@@ -172,10 +172,6 @@ const Text = styled.div`
     position: relative;
 `;
 
-const TextHover = styled.div`
-    position: relative;
-`;
-
 const StyledIcon = styled(Icon)`
     margin-right: 10px;
 `;
