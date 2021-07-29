@@ -115,6 +115,8 @@ export const transformTransaction = (
     const outgoing = filterTargets(myAddresses, inputs);
     const incoming = filterTargets(myAddresses, outputs);
     const internal = accountAddress ? filterTargets(accountAddress.change, outputs) : [];
+    const totalInput = sumVinVout(vinLength ? inputs : []);
+    const totalOutput = sumVinVout(voutLength ? outputs : []);
 
     if (outgoing.length === 0 && incoming.length === 0) {
         type = 'unknown';
@@ -165,11 +167,11 @@ export const transformTransaction = (
         targets,
         tokens: [],
         details: {
-            vin: [],
-            vout: [],
-            size: 0,
-            totalInput: '0',
-            totalOutput: '0',
+            vin: inputs,
+            vout: outputs,
+            size: blockfrostTxData.txData.size,
+            totalInput: totalInput ? totalInput.toString() : '0',
+            totalOutput: totalOutput ? totalOutput.toString() : '0',
         },
     };
 };
