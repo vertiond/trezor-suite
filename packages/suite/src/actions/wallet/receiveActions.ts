@@ -96,9 +96,9 @@ export const showAddress = (path: string, address: string) => async (
         case 'ethereum':
             fn = TrezorConnect.ethereumGetAddress;
             break;
-        case 'cardano':
-            fn = TrezorConnect.cardanoGetAddress;
-            break;
+        // case 'cardano':
+        //     fn = TrezorConnect.cardanoGetAddress;
+        //     break;
         case 'ripple':
             fn = TrezorConnect.rippleGetAddress;
             break;
