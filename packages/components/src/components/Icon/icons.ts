@@ -81,6 +81,8 @@ export const ICONS = {
     CALENDAR: require('../../images/icons/calendar.svg'),
     PDF: require('../../images/icons/pdf.svg'),
     CSV: require('../../images/icons/csv.svg'),
+    BINARY: require('../../images/icons/binary.svg'),
+    IMAGE: require('../../images/icons/image.svg'),
     MEDIUM: require('../../images/icons/medium.svg'),
     GAS: require('../../images/icons/gas.svg'),
     TAG: require('../../images/icons/tag.svg'),
@@ -113,6 +115,7 @@ export const ICONS = {
     PACKAGE: require('../../images/icons/package.svg'),
     VERIFIED: require('../../images/icons/verified.svg'),
     ANCHOR: require('../../images/icons/anchor.svg'),
+    PENCIL: require('../../images/icons/pencil.svg'),
     PENCIL_LINE: require('../../images/icons/pencil-line.svg'),
     KEY: require('../../images/icons/key.svg'),
 };

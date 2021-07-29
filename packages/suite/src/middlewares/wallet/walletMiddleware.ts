@@ -78,10 +78,18 @@ const walletMiddleware = (api: MiddlewareAPI<Dispatch, AppState>) => (next: Disp
         }
     }
 
+    if (
+        action.type === SUITE.FORGET_DEVICE &&
+        prevState.wallet.selectedAccount.account?.deviceState === action.payload.state
+    ) {
+        // if currently selected account is related to forgotten device
+        resetReducers = true;
+    }
+
     if (prevRouter.app === 'wallet' && action.type === ROUTER.LOCATION_CHANGE) {
         // leaving wallet app or switching between accounts
         resetReducers =
-            (prevRouter.app !== nextRouter.app && !nextRouter.route?.isModal) ||
+            (prevRouter.app !== nextRouter.app && !nextRouter.route?.isForegroundApp) ||
             (nextRouter.app === 'wallet' && nextRouter.hash !== prevRouter.hash);
     }
     if (resetReducers) {

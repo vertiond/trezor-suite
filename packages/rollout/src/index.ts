@@ -10,7 +10,7 @@ type ParsedFeatures = ReturnType<typeof parseFeatures>;
 /**
  * Returns firmware binary after necessary modifications. Should be ok to install.
  */
-const modifyFirmware = ({ fw, features }: { fw: ArrayBuffer; features: ParsedFeatures }) => {
+export const modifyFirmware = ({ fw, features }: { fw: ArrayBuffer; features: ParsedFeatures }) => {
     // ---------------------
     // Model T modifications
     // ---------------------
@@ -31,7 +31,14 @@ const modifyFirmware = ({ fw, features }: { fw: ArrayBuffer; features: ParsedFea
             [1, 8, 0]
         )
     ) {
-        return fw.slice(256);
+        const fwView = new Uint8Array(fw);
+        // this condition was added in order to upload firmware process being equivalent as in trezorlib python code
+        if (
+            String.fromCharCode(...Array.from(fwView.slice(0, 4))) === 'TRZR' &&
+            String.fromCharCode(...Array.from(fwView.slice(256, 260))) === 'TRZF'
+        ) {
+            return fw.slice(256);
+        }
     }
     return fw;
 };
@@ -93,7 +100,7 @@ const isRequired = (changelog: ReturnType<typeof getChangelog>) => {
     return changelog.some(item => item.required);
 };
 
-const isLatest = (release: Release, latest: Release) =>
+const isEqual = (release: Release, latest: Release) =>
     versionUtils.isEqual(release.version, latest.version);
 
 interface GetInfoProps {
@@ -125,7 +132,6 @@ export const getInfo = ({ features, releases }: GetInfoProps) => {
         fw_minor,
         fw_patch,
     } = parsedFeatures;
-    const latest = parsedReleases[0];
 
     if (score) {
         parsedReleases = parsedReleases.filter(item => {
@@ -133,6 +139,8 @@ export const getInfo = ({ features, releases }: GetInfoProps) => {
             return item.rollout >= score;
         });
     }
+
+    const latest = parsedReleases[0];
 
     if (major_version === 2 && bootloader_mode) {
         // sorry for this if, I did not figure out how to narrow types properly
@@ -171,12 +179,14 @@ export const getInfo = ({ features, releases }: GetInfoProps) => {
         return null;
     }
 
+    const isLatest = isEqual(parsedReleases[0], latest);
     const changelog = getChangelog(parsedReleases, parsedFeatures);
 
     return {
         changelog,
         release: parsedReleases[0],
-        isLatest: isLatest(parsedReleases[0], latest),
+        isLatest,
+        latest,
         isRequired: isRequired(changelog),
         isNewer: isNewer(parsedReleases[0], parsedFeatures),
     };
@@ -184,7 +194,6 @@ export const getInfo = ({ features, releases }: GetInfoProps) => {
 
 interface GetBinaryProps extends GetInfoProps {
     baseUrl: string;
-    baseUrlBeta: string;
     btcOnly?: boolean;
     version?: Release['version'];
     intermediary?: boolean;
@@ -200,7 +209,6 @@ export const getBinary = async ({
     features,
     releases,
     baseUrl,
-    baseUrlBeta,
     version,
     btcOnly,
     intermediary = false,
@@ -233,9 +241,8 @@ export const getBinary = async ({
             'version provided as param does not match firmware version found by features in bootloader'
         );
     }
-    const url = releaseByFirmware.channel === 'beta' ? baseUrlBeta : baseUrl;
     const fw = await fetchFirmware(
-        `${url}/${btcOnly ? releaseByFirmware.url_bitcoinonly : releaseByFirmware.url}`
+        `${baseUrl}/${btcOnly ? releaseByFirmware.url_bitcoinonly : releaseByFirmware.url}`
     );
     return {
         ...infoByBootloader,

@@ -4,11 +4,11 @@ export const CHANGELOG_MARKDOWN_URL =
 export const TREZOR_URL = 'https://trezor.io';
 export const TREZOR_COINS_URL = 'https://trezor.io/coins/';
 export const SUPPORT_URL = 'https://trezor.io/support/';
+export const WALLET_ACCESS_URL = 'https://trezor.io/support/technical/i-cannot-access-the-wallet/';
 export const WIKI_URL = 'https://wiki.trezor.io/';
 export const BLOG_URL = 'https://blog.trezor.io/';
 export const SHOP_URL = 'https://shop.trezor.io/';
 export const SUITE_URL = 'https://suite.trezor.io';
-export const SUITE_BRIDGE_URL = 'https://suite.trezor.io/web/bridge/';
 export const TREZOR_DATA_URL = 'https://wallet.trezor.io/data/';
 export const PIN_MANUAL_URL = 'https://wiki.trezor.io/User_manual:Entering_PIN';
 export const DRY_RUN_URL = 'https://wiki.trezor.io/User_manual:Dry-run_recovery';
@@ -52,8 +52,11 @@ export const WIKI_ADVANCED_RECOVERY = 'https://wiki.trezor.io/User_manual:Advanc
 export const WIKI_UDEV_RULES = 'https://wiki.trezor.io/Udev_rules';
 export const WIKI_TOR = 'https://wiki.trezor.io/Glossary:Tor';
 export const WIKI_HOW_TO_RUN = 'https://wiki.trezor.io/Apps:Trezor_Suite#How_to_run';
+export const WIKI_FW_DOWNGRADE = 'https://wiki.trezor.io/Firmware_downgrade';
 export const FEEDBACK_FORM = 'https://satoshilabs.typeform.com/to/Dqb71wm1';
 export const FIRMWARE_COMMIT_URL = 'https://github.com/trezor/trezor-firmware/commit/';
+export const FIRMWARE_BINARIES_URL =
+    'https://github.com/trezor/webwallet-data/tree/master/firmware';
 
 // Tor domain
 export const TOR_DOMAIN = 'trezoriovpjcahpzkrewelclulmszwbqpzmzgub37gbcjlvluxtruqad.onion';

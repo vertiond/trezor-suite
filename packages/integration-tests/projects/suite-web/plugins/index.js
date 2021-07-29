@@ -185,6 +185,12 @@ module.exports = on => {
             controller.disconnect();
             return null;
         },
+        readAndConfirmShamirMnemonicEmu: async options => {
+            await controller.connect();
+            await controller.send({ type: 'emulator-read-and-confirm-shamir-mnemonic', ...options});
+            controller.disconnect();
+            return null;
+        },
         applySettings: async options => {
             const defaults = {
                 passphrase_always_on_device: false,
@@ -201,6 +207,12 @@ module.exports = on => {
         selectNumOfWordsEmu: async num => {
             await controller.connect();
             await controller.send({ type: 'select-num-of-words', num });
+            controller.disconnect();
+            return null;
+        },
+        logTestDetails: async text => {
+            await controller.connect();
+            await controller.send({ type: 'log', text });
             controller.disconnect();
             return null;
         },

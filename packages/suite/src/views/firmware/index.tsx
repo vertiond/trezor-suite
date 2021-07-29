@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import * as routerActions from '@suite-actions/routerActions';
-import { AcquiredDevice } from '@suite-types';
+import { TrezorDevice } from '@suite-types';
 import {
     CheckSeedStep,
     CloseButton,
@@ -36,7 +36,7 @@ const CancelIconWrapper = styled.div`
 
 const Firmware = () => {
     const { theme } = useTheme();
-    const { resetReducer, status, error } = useFirmware();
+    const { resetReducer, status, setStatus, error, firmwareUpdate } = useFirmware();
     const { device } = useSelector(state => ({
         device: state.suite.device,
     }));
@@ -49,7 +49,7 @@ const Firmware = () => {
         resetReducer();
     };
 
-    const [cachedDevice, setCachedDevice] = useState<AcquiredDevice>(device as AcquiredDevice);
+    const [cachedDevice, setCachedDevice] = useState<TrezorDevice | undefined>(device);
 
     // some of the application states can be reused here.
     // some don't make sense handling here as they are handled somewhere up the tree
@@ -90,10 +90,11 @@ const Firmware = () => {
                         cachedDevice={cachedDevice}
                         setCachedDevice={setCachedDevice}
                         standaloneFwUpdate
+                        onInstall={firmwareUpdate}
                     />
                 );
             case 'check-seed': // triggered from FirmwareInitial
-                return <CheckSeedStep />;
+                return <CheckSeedStep onSuccess={() => setStatus('waiting-for-bootloader')} />;
             case 'waiting-for-confirmation': // waiting for confirming installation on a device
             case 'started': // called from firmwareUpdate()
             case 'installing':
@@ -102,7 +103,13 @@ const Firmware = () => {
             case 'reconnect-in-normal': // only relevant for T1, TT auto restarts itself
             case 'partially-done': // only relevant for T1, updating from very old fw is done in 2 fw updates, partially-done means first update was installed
             case 'done':
-                return <FirmwareInstallation cachedDevice={cachedDevice} standaloneFwUpdate />;
+                return (
+                    <FirmwareInstallation
+                        cachedDevice={cachedDevice}
+                        standaloneFwUpdate
+                        onSuccess={onClose}
+                    />
+                );
             default:
                 // 'ensure' type completeness
                 throw new Error(`state "${status}" is not handled here`);

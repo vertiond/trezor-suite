@@ -1,3 +1,4 @@
+import { ExtendedMessageDescriptor } from '@suite-types';
 import { ArrayElement } from '@suite/types/utils';
 
 const networks = [
@@ -99,6 +100,8 @@ const networks = [
             account: 'https://eth1.trezor.io/address/',
         },
         features: ['sign-verify'],
+        label: 'TR_NETWORK_ETHEREUM_LABEL',
+        tooltip: 'TR_NETWORK_ETHEREUM_TOOLTIP',
     },
     {
         name: 'Ethereum Classic',
@@ -280,6 +283,7 @@ const networks = [
         hasSignVerify: true,
         decimals: 8,
         testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
         explorer: {
             tx: 'https://tbtc1.trezor.io/tx/',
             account: 'https://tbtc1.trezor.io/xpub/',
@@ -295,6 +299,7 @@ const networks = [
         hasSignVerify: true,
         decimals: 8,
         testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
         explorer: {
             tx: 'https://tbtc1.trezor.io/tx/',
             account: 'https://tbtc1.trezor.io/xpub/',
@@ -310,6 +315,7 @@ const networks = [
         hasSignVerify: true,
         decimals: 8,
         testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
         explorer: {
             tx: 'https://tbtc1.trezor.io/tx/',
             account: 'https://tbtc1.trezor.io/xpub/',
@@ -325,6 +331,7 @@ const networks = [
         chainId: 3,
         decimals: 18,
         testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
         explorer: {
             tx: 'https://ropsten1.trezor.io/tx/',
             account: 'https://ropsten1.trezor.io/address/',
@@ -338,6 +345,7 @@ const networks = [
         bip44: "m/44'/144'/i'/0/0",
         decimals: 6,
         testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
         explorer: {
             tx: 'https://test.bithomp.com/explorer/',
             account: 'https://test.bithomp.com/explorer/',
@@ -401,6 +409,8 @@ type Network = {
     chainId?: number;
     hasSignVerify?: boolean;
     features?: string[];
+    label?: ExtendedMessageDescriptor['id'];
+    tooltip?: ExtendedMessageDescriptor['id'];
 } & ArrayElement<typeof networks>;
 
 export default [...networks] as Network[];

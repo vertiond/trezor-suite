@@ -1,9 +1,11 @@
 import React from 'react';
+import { darken } from 'polished';
+import styled from 'styled-components';
+
 import { Translation } from '@suite-components';
 import * as guideActions from '@suite-actions/guideActions';
-import { useActions, useDevice } from '@suite-hooks';
-import styled from 'styled-components';
-import { variables } from '@trezor/components';
+import { useActions, useAnalytics, useSelector } from '@suite-hooks';
+import { Icon, variables } from '@trezor/components';
 import { resolveStaticPath } from '@suite-utils/nextjs';
 import { getFwVersion } from '@suite-utils/device';
 import { ViewWrapper, Header, Content } from '@guide-components';
@@ -14,11 +16,18 @@ const FeedbackTypeButton = styled.button`
     cursor: pointer;
     border-radius: 8px;
     width: 100%;
-    background: ${props => props.theme.BG_GREY};
     margin: 0 0 10px;
     display: flex;
     align-items: center;
     padding: 10px 13px;
+    background: ${props => props.theme.BG_GREY_ALT};
+
+    transition: ${props =>
+        `background ${props.theme.HOVER_TRANSITION_TIME} ${props.theme.HOVER_TRANSITION_EFFECT}`};
+
+    &:hover {
+        background: ${props => darken(props.theme.HOVER_DARKEN_FILTER, props.theme.BG_GREY_ALT)};
+    }
 `;
 
 const Details = styled.div`
@@ -34,7 +43,14 @@ const FeedbackButtonImage = styled.img`
     display: block;
 `;
 
-const DetailItem = styled.div``;
+const DetailItem = styled.div`
+    display: inline-flex;
+    align-items: center;
+`;
+
+const StyledIcon = styled(Icon)`
+    padding: 0 6px;
+`;
 
 const Label = styled.div`
     padding: 0 0 0 15px;
@@ -54,10 +70,18 @@ const LabelSubheadline = styled.div`
 `;
 
 const FeedbackTypeSelection = () => {
+    const analytics = useAnalytics();
     const { setView } = useActions({
         setView: guideActions.setView,
     });
-    const { device } = useDevice();
+    const { desktopUpdate, device } = useSelector(state => ({
+        desktopUpdate: state.desktopUpdate,
+        device: state.suite.device,
+    }));
+
+    const appUpToDate = !desktopUpdate?.enabled || desktopUpdate?.state === 'not-available';
+
+    const firmwareUpToDate = device?.firmware === 'valid';
     const firmwareVersion = device?.features ? (
         getFwVersion(device)
     ) : (
@@ -71,7 +95,15 @@ const FeedbackTypeSelection = () => {
                 label={<Translation id="TR_GUIDE_VIEW_HEADLINE_HELP_US_IMPROVE" />}
             />
             <Content>
-                <FeedbackTypeButton onClick={() => setView('FEEDBACK_BUG')}>
+                <FeedbackTypeButton
+                    onClick={() => {
+                        setView('FEEDBACK_BUG');
+                        analytics.report({
+                            type: 'guide/feedback/navigation',
+                            payload: { type: 'bug' },
+                        });
+                    }}
+                >
                     <FeedbackButtonImage
                         src={resolveStaticPath('images/suite/3d/recovery.png')}
                         width="48"
@@ -87,7 +119,15 @@ const FeedbackTypeSelection = () => {
                         </LabelSubheadline>
                     </Label>
                 </FeedbackTypeButton>
-                <FeedbackTypeButton onClick={() => setView('FEEDBACK_SUGGESTION')}>
+                <FeedbackTypeButton
+                    onClick={() => {
+                        setView('FEEDBACK_SUGGESTION');
+                        analytics.report({
+                            type: 'guide/feedback/navigation',
+                            payload: { type: 'suggestion' },
+                        });
+                    }}
+                >
                     <FeedbackButtonImage
                         src={resolveStaticPath('images/suite/3d/understand.png')}
                         width="48"
@@ -105,10 +145,28 @@ const FeedbackTypeSelection = () => {
                 </FeedbackTypeButton>
                 <Details>
                     <DetailItem>
-                        <Translation id="TR_APP" />: {process.env.VERSION}
+                        <Translation id="TR_APP" />
+                        :&nbsp;
+                        {appUpToDate ? (
+                            <>
+                                <StyledIcon icon="CHECK" size={10} />
+                                <Translation id="TR_UP_TO_DATE" />
+                            </>
+                        ) : (
+                            process.env.VERSION
+                        )}
                     </DetailItem>
                     <DetailItem>
-                        <Translation id="TR_FIRMWARE" />: {firmwareVersion}
+                        <Translation id="TR_FIRMWARE" />
+                        :&nbsp;
+                        {firmwareUpToDate ? (
+                            <>
+                                <StyledIcon icon="CHECK" size={10} />
+                                <Translation id="TR_UP_TO_DATE" />
+                            </>
+                        ) : (
+                            firmwareVersion
+                        )}
                     </DetailItem>
                 </Details>
             </Content>

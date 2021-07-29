@@ -9,6 +9,7 @@ export const SCREEN_SIZE = {
 } as const;
 
 export const LAYOUT_SIZE = {
+    MENU_SECONDARY_WIDTH: '300px',
     GUIDE_PANEL_WIDTH: '350px',
 } as const;
 
@@ -31,6 +32,7 @@ export const FONT_SIZE = {
 } as const;
 
 export const NEUE_FONT_SIZE = {
+    NANO: '10px',
     TINY: '12px',
     SMALL: '14px',
     NORMAL: '16px',
@@ -151,6 +153,8 @@ export const ICONS: IconType[] = [
     'CALENDAR',
     'PDF',
     'CSV',
+    'BINARY',
+    'IMAGE',
     'MEDIUM',
     'TAG',
     'GAS',
@@ -180,6 +184,7 @@ export const ICONS: IconType[] = [
     'PACKAGE',
     'VERIFIED',
     'ANCHOR',
+    'PENCIL',
     'PENCIL_LINE',
     'KEY',
 ];

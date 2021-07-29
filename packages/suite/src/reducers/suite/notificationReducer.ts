@@ -75,6 +75,10 @@ export type ToastPayload = (
           type: 'auto-updater-no-new';
       }
     | {
+          type: 'auto-updater-new-version-first-run';
+          version: string;
+      }
+    | {
           type: 'user-feedback-send-success' | 'user-feedback-send-error';
       }
 ) &
@@ -84,6 +88,7 @@ interface Common {
     id: number; // programmer provided, might be used to find and close notification programmatically
     device?: TrezorDevice; // used to close notifications for device
     closed?: boolean;
+    error?: string;
 }
 
 export type EventPayload = (

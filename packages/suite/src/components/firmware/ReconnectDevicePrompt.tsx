@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import compareVersions from 'compare-versions';
+import * as semver from 'semver';
+
 import { H1, Button, variables } from '@trezor/components';
 import { Translation, WebusbButton } from '@suite-components';
-import { DeviceAnimation, DeviceAnimationType } from '@onboarding-components';
+import DeviceAnimation from '@onboarding-components/DeviceAnimation';
 import { useDevice, useFirmware } from '@suite-hooks';
 import { isDesktop, isMacOs } from '@suite-utils/env';
 import { DESKTOP_WRAPPER_BORDER_WIDTH } from '@suite-constants/layout';
+import { getDeviceModel, getFwVersion } from '@suite/utils/suite/device';
+
+import type { TrezorDevice } from '@suite/types/suite';
 
 const Wrapper = styled.div`
     display: flex;
@@ -101,7 +105,10 @@ const Heading = styled(H1)`
     font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
 `;
 
-const getTextForMode = (requestedMode: 'bootloader' | 'normal', deviceVersion: number) => {
+const getTextForMode = (requestedMode: 'bootloader' | 'normal', device?: TrezorDevice) => {
+    const deviceFwVersion = device?.features ? getFwVersion(device) : '';
+    const deviceModel = device?.features ? getDeviceModel(device) : 'T';
+
     const text = {
         bootloader: {
             headingStart: <Translation id="TR_RECONNECT_IN_BOOTLOADER" />,
@@ -114,8 +121,14 @@ const getTextForMode = (requestedMode: 'bootloader' | 'normal', deviceVersion: n
                 {
                     dataTest: '@firmware/connect-in-bootloader-message',
                     label:
-                        deviceVersion === 1 ? (
-                            <Translation id="TR_HOLD_LEFT_BUTTON" />
+                        // eslint-disable-next-line no-nested-ternary
+                        deviceModel === '1' ? (
+                            semver.valid(deviceFwVersion) &&
+                            semver.satisfies(deviceFwVersion, '<1.8.0') ? (
+                                <Translation id="TR_HOLD_BOTH_BUTTONS" />
+                            ) : (
+                                <Translation id="TR_HOLD_LEFT_BUTTON" />
+                            )
                         ) : (
                             <Translation id="TR_SWIPE_YOUR_FINGERS" />
                         ),
@@ -133,7 +146,7 @@ const getTextForMode = (requestedMode: 'bootloader' | 'normal', deviceVersion: n
                 {
                     dataTest: '@firmware/connect-in-normal-message',
                     label:
-                        deviceVersion === 1 ? (
+                        deviceModel === '1' ? (
                             <Translation id="FIRMWARE_CONNECT_IN_NORMAL_MODEL_1" />
                         ) : (
                             <Translation id="FIRMWARE_CONNECT_IN_NORMAL_MODEL_2" />
@@ -142,16 +155,18 @@ const getTextForMode = (requestedMode: 'bootloader' | 'normal', deviceVersion: n
             ],
         },
     };
+
     return text[requestedMode];
 };
 interface Props {
-    deviceVersion: number;
+    expectedDevice?: TrezorDevice;
     requestedMode: 'bootloader' | 'normal';
+    onSuccess?: () => void;
 }
 
-const ReconnectDevicePrompt = ({ deviceVersion, requestedMode }: Props) => {
+const ReconnectDevicePrompt = ({ expectedDevice, requestedMode, onSuccess }: Props) => {
     const { device } = useDevice();
-    const { firmwareUpdate, isWebUSB } = useFirmware();
+    const { isWebUSB } = useFirmware();
     // local state to track if the user actually unplugged the device. Otherwise if the device is
     // in bootloader and we prompt user to reconnect again in bootloader we would immediately render success state
     const [wasUnplugged, setWasUnplugged] = useState(false);
@@ -166,7 +181,7 @@ const ReconnectDevicePrompt = ({ deviceVersion, requestedMode }: Props) => {
     const activeStep = device?.connected ? 0 : 1; // 0: disconnect device, 1: instructions to reconnect in bootloader
     const showWebUSB = !device?.connected && isWebUSB;
     const isStepActive = (num: number) => activeStep === num;
-    const text = getTextForMode(requestedMode, deviceVersion);
+    const text = getTextForMode(requestedMode, device);
 
     // Either the device is connect and in bl mode OR
     // special case where device isn't reporting bootloader mode, but it is already in it.
@@ -180,23 +195,11 @@ const ReconnectDevicePrompt = ({ deviceVersion, requestedMode }: Props) => {
         requestedMode === 'bootloader' ? reconnectedInBootloader : reconnectedInNormal;
 
     const successAction =
-        requestedMode === 'bootloader' ? (
-            <Button onClick={firmwareUpdate} data-test="@firmware/install-button">
+        requestedMode === 'bootloader' && onSuccess ? (
+            <Button onClick={onSuccess} data-test="@firmware/install-button">
                 <Translation id="TR_INSTALL" />
             </Button>
         ) : undefined;
-
-    // T1 bootloader before firmware version 1.8.0 can only be invoked by holding both buttons
-    const animationVersion = deviceVersion === 1 ? '1' : 'T';
-    const firmwareSemver = `${device?.features?.major_version}.${device?.features?.minor_version}.${device?.features?.patch_version}`;
-    let animationType: DeviceAnimationType = 'BOOTLOADER';
-    if (
-        animationVersion === '1' &&
-        compareVersions.validate(firmwareSemver) &&
-        compareVersions.compare(firmwareSemver, '1.8.0', '<')
-    ) {
-        animationType = 'BOOTLOADER_TWO_BUTTONS';
-    }
 
     return (
         <Overlay
@@ -204,10 +207,10 @@ const ReconnectDevicePrompt = ({ deviceVersion, requestedMode }: Props) => {
         >
             <Wrapper data-test={`@firmware/reconnect-device/${requestedMode}`}>
                 <StyledDeviceAnimation
-                    type={animationType}
+                    type="BOOTLOADER"
                     size={200}
                     shape="ROUNDED"
-                    version={animationVersion}
+                    device={expectedDevice}
                     loop
                 />
                 <Content>

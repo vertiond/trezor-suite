@@ -2,43 +2,37 @@ import React, { useRef, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { P, Icon } from '@trezor/components';
 import { Translation } from '@suite-components';
+import { IconType } from '@trezor/components/src/support/types';
 
 interface Props {
-    accept: 'text/csv' | 'image/*';
-    onSuccess: (data: string) => void;
+    // 'accept' attribute for underlying HTML file input
+    accept?: string;
+    // icon displayed inside Dropzone
+    icon?: IconType;
+    // function which is called after the file is selected
+    onSelect: (data: File, setError: (msg: string) => void) => void;
+    className?: string;
 }
 
-export const useDropZone = ({ accept, onSuccess }: Props) => {
+export const useDropZone = ({ accept, onSelect, className }: Props) => {
     const available = useRef(window.File && window.FileReader && window.FileList && window.Blob);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [error, setError] = useState<string | undefined>(undefined);
+    const [filename, setFilename] = useState<string>();
 
     const readFileContent = useCallback(
-        (file: File) => {
-            if (!file || file.type !== accept) {
-                setError('file-type');
+        (file?: File) => {
+            if (!file) {
+                setFilename(undefined);
+                setError('empty');
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (typeof reader.result !== 'string') {
-                    setError('empty');
-                    return;
-                }
-                onSuccess(reader.result);
-            };
-            reader.onerror = () => {
-                setError(reader.error!.message);
-                reader.abort();
-            };
-            if (accept === 'text/csv') {
-                reader.readAsText(file);
-            } else {
-                reader.readAsDataURL(file);
-            }
+            setError(undefined);
+            setFilename(file.name);
+            onSelect(file, setError);
         },
-        [accept, onSuccess],
+        [onSelect],
     );
 
     const onClick = useCallback(() => {
@@ -52,9 +46,20 @@ export const useDropZone = ({ accept, onSuccess }: Props) => {
         event.preventDefault();
     }, []);
 
+    const onDragEnter = useCallback(event => {
+        event.preventDefault();
+        event.currentTarget?.classList?.add('dragging');
+    }, []);
+
+    const onDragLeave = useCallback(event => {
+        event.preventDefault();
+        event.currentTarget?.classList?.remove('dragging');
+    }, []);
+
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
+            event.currentTarget?.classList?.remove('dragging');
             if (event.dataTransfer) {
                 readFileContent(event.dataTransfer.files[0]);
             } else {
@@ -83,13 +88,14 @@ export const useDropZone = ({ accept, onSuccess }: Props) => {
     const getWrapperProps = useMemo(
         () => () => ({
             onClick,
-            onDragEnter: prevent,
+            onDragEnter,
             onDragOver: prevent,
-            onDragLeave: prevent,
+            onDragLeave,
             onDrop,
             ref: wrapperRef,
+            className,
         }),
-        [onClick, prevent, onDrop],
+        [onClick, prevent, onDrop, className, onDragEnter, onDragLeave],
     );
 
     const getInputProps = useMemo(
@@ -109,6 +115,7 @@ export const useDropZone = ({ accept, onSuccess }: Props) => {
     return {
         available: available.current,
         error,
+        filename,
         getWrapperProps,
         getInputProps,
     };
@@ -125,8 +132,12 @@ const Wrapper = styled.div`
     cursor: pointer;
     min-height: 300px;
     transition: background-color 0.3s;
-    &:hover {
+    &:hover,
+    &.dragging {
         background: ${props => props.theme.BG_GREY};
+    }
+    * {
+        pointer-events: none;
     }
 `;
 
@@ -144,14 +155,14 @@ const Label = styled.div`
 `;
 
 export const DropZone = (props: Props) => {
-    const { getWrapperProps, getInputProps, error } = useDropZone(props);
+    const { getWrapperProps, getInputProps, error, filename } = useDropZone(props);
 
     return (
         <Wrapper {...getWrapperProps()}>
             <StyledInput {...getInputProps()} />
             <Label>
-                <StyledIcon icon="CSV" />
-                <Translation id="TR_DROPZONE" />
+                <StyledIcon icon={props.icon || 'BINARY'} />
+                {filename || <Translation id="TR_DROPZONE" />}
             </Label>
             {error && (
                 <P>

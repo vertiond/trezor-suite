@@ -4,9 +4,11 @@ import ConnectDeviceImage from './images/ConnectDeviceImage';
 import Image, { Props as ImageProps } from './images/Image';
 import CheckItem from './CheckItem';
 import ExternalLink from './ExternalLink';
-import Preloader from './Preloader';
+import PrerequisitesGuide from './PrerequisitesGuide';
 import FormattedNumber from './FormattedNumber';
 import SuiteLayout, { LayoutContext } from './SuiteLayout';
+import WelcomeLayout from './WelcomeLayout';
+
 import Card from './Card';
 import NotificationCard from './NotificationCard';
 import PinInput from './PinInput';
@@ -21,6 +23,7 @@ import { HiddenPlaceholder } from './HiddenPlaceholder';
 import QrCode from './QrCode';
 import { QuestionTooltip } from './QuestionTooltip';
 import TransactionsGraph from './TransactionsGraph';
+
 import DeviceInvalidModeLayout from './DeviceInvalidModeLayout';
 import AppNavigationPanel from './AppNavigationPanel';
 import AppNavigation from './AppNavigation';
@@ -42,6 +45,12 @@ import HomescreenGallery from './HomescreenGallery';
 import PinMatrix from './PinMatrix';
 import CollapsibleBox from './CollapsibleBox';
 import DeviceMatrixExplanation from './DeviceMatrixExplanation';
+import AccountFormCloseButton from './AccountFormCloseButton';
+import TroubleshootingTips from './TroubleshootingTips';
+import ConnectDevicePrompt from './ConnectDevicePrompt';
+import Coin from './Coin';
+import CoinsGroup from './CoinsGroup';
+import CoinsList from './CoinsGroup/CoinsList';
 
 export {
     Backdrop,
@@ -49,8 +58,9 @@ export {
     CheckItem,
     DeviceInvalidModeLayout,
     ExternalLink,
-    Preloader,
+    PrerequisitesGuide,
     FormattedNumber,
+    WelcomeLayout,
     SuiteLayout,
     LayoutContext,
     Card,
@@ -94,5 +104,11 @@ export {
     PinMatrix,
     CollapsibleBox,
     DeviceMatrixExplanation,
+    AccountFormCloseButton,
+    TroubleshootingTips,
+    ConnectDevicePrompt,
+    Coin,
+    CoinsGroup,
+    CoinsList,
 };
 export type { ImageProps, ModalProps };

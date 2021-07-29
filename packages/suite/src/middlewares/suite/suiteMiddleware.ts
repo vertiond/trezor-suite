@@ -23,6 +23,12 @@ const suite = (api: MiddlewareAPI<Dispatch, AppState>) => (next: Dispatch) => as
         api.dispatch({ type: SUITE.APP_CHANGED, payload: getApp(action.url) });
     }
 
+    // this action needs to be processed before propagation to deviceReducer
+    // otherwise device will not be accessible and related data will not be removed (accounts, txs...)
+    if (action.type === DEVICE.DISCONNECT) {
+        api.dispatch(suiteActions.forgetDisconnectedDevices(action.payload));
+    }
+
     // pass action to reducers
     next(action);
 
@@ -45,7 +51,7 @@ const suite = (api: MiddlewareAPI<Dispatch, AppState>) => (next: Dispatch) => as
                     d => d.forceRemember && d.remember,
                 );
                 forcedDevices.forEach(d => {
-                    api.dispatch(suiteActions.rememberDevice(d));
+                    api.dispatch(suiteActions.toggleRememberDevice(d));
                 });
                 api.dispatch(
                     suiteActions.selectDevice(

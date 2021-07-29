@@ -9,7 +9,7 @@ import {
     Fingerprint,
 } from '@firmware-components';
 import { useSelector, useFirmware, useOnboarding } from '@suite-hooks';
-import { AcquiredDevice } from '@suite-types';
+import { TrezorDevice } from '@suite-types';
 import { getFwVersion } from '@suite-utils/device';
 
 const FirmwareStep = () => {
@@ -18,7 +18,7 @@ const FirmwareStep = () => {
     }));
     const { goToNextStep } = useOnboarding();
     const { status, error, resetReducer, firmwareUpdate, showFingerprintCheck } = useFirmware();
-    const [cachedDevice, setCachedDevice] = useState<AcquiredDevice>(device as AcquiredDevice);
+    const [cachedDevice, setCachedDevice] = useState<TrezorDevice | undefined>(device);
 
     if (showFingerprintCheck && device) {
         // Some old firmwares ask for verifying firmware fingerprint by dispatching ButtonRequest_FirmwareCheck
@@ -72,7 +72,11 @@ const FirmwareStep = () => {
         case 'initial':
         case 'waiting-for-bootloader': // waiting for user to reconnect in bootloader
             return (
-                <FirmwareInitial cachedDevice={cachedDevice} setCachedDevice={setCachedDevice} />
+                <FirmwareInitial
+                    cachedDevice={cachedDevice}
+                    setCachedDevice={setCachedDevice}
+                    onInstall={firmwareUpdate}
+                />
             );
         case 'waiting-for-confirmation': // waiting for confirming installation on a device
         case 'started': // called from firmwareUpdate()
@@ -82,7 +86,7 @@ const FirmwareStep = () => {
         case 'reconnect-in-normal': // only relevant for T1, TT auto restarts itself
         case 'partially-done': // only relevant for T1, updating from very old fw is done in 2 fw updates, partially-done means first update was installed
         case 'done':
-            return <FirmwareInstallation cachedDevice={cachedDevice} />;
+            return <FirmwareInstallation cachedDevice={cachedDevice} onSuccess={goToNextStep} />;
         default:
             // 'ensure' type completeness
             throw new Error(`state "${status}" is not handled here`);

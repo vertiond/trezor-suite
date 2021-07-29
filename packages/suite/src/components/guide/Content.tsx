@@ -3,8 +3,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
     height: 100%;
-    overflow-y: auto;
-    padding: 0 22px;
+    padding: 15px 22px 0;
 `;
 
 interface Props {

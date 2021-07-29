@@ -1,56 +1,62 @@
 import React from 'react';
+import { useArgs } from '@storybook/client-api';
+
 import { Select } from '.';
-import { storiesOf } from '@storybook/react';
-import { text, boolean, select } from '@storybook/addon-knobs';
 
-storiesOf('Form', module).add('Select', () => {
-    const isSearchable = boolean('Searchable', false);
-    const isClearable = boolean('Clearable', false);
-    const isClean = boolean('IsClean', false);
-    const isDisabled = boolean('Disabled', false);
-    const withDropdownIndicator = boolean('withDropdownIndicator', true);
-    const topLabel = text('Top label', 'Input label');
-    const values: any = {
-        None: null,
-        Hello: { value: 'hello', label: 'Hello' },
-        World: { value: 'world', label: 'World' },
-    };
+const values: any = {
+    'None (default)': null,
+    Low: { label: 'low', value: 'low' },
+    Medium: { label: 'medium', value: 'medium' },
+    High: { label: 'high', value: 'high' },
+    Custom: { label: 'custom', value: 'custom' },
+};
 
-    const options = Object.keys(values)
-        .filter((k: string) => values[k])
-        .map((k: string) => values[k]);
+const options = Object.keys(values)
+    .filter((k: string) => values[k])
+    .map((k: string) => values[k]);
 
-    const display: any = select(
-        'Display',
-        {
-            'Default (normal)': null,
-            Short: 'short',
-            Block: 'block',
+export default {
+    title: 'Form/Select',
+    argTypes: {
+        option: {
+            control: {
+                disable: true,
+            },
         },
-        null
-    );
-
-    const variant: any = select(
-        'Variant',
-        {
-            'Default (large)': null,
-            Small: 'small',
+        variant: {
+            control: {
+                options: { 'Large (default)': null, Small: 'small' },
+                type: 'radio',
+            },
         },
-        null
-    );
+    },
+    args: {
+        option: 'low',
+        variant: null,
+        isSearchable: false,
+        isClearable: false,
+        isClean: false,
+        isDisabled: false,
+        withDropdownIndicator: true,
+    },
+};
 
+export const Basic = ({ ...args }) => {
+    const [{ option }, updateArgs] = useArgs();
+    const setOption = (option: { label: string; value: 'string' }) => updateArgs({ option });
+
+    console.log(option);
     return (
         <Select
-            {...(!isSearchable ? { isSearchable } : {})}
-            {...(isClearable ? { isClearable } : {})}
-            {...(isClean ? { isClean } : {})}
-            {...(isDisabled ? { isDisabled } : {})}
-            {...(withDropdownIndicator ? {} : { withDropdownIndicator })}
-            {...(display ? { display } : {})}
-            {...(variant ? { variant } : {})}
-            value={select('Value', values, null)}
+            isSearchable={args.isSearchable}
+            isClearable={args.isClearable}
+            isClean={args.isClean}
+            isDisabled={args.isDisabled}
+            withDropdownIndicator={args.withDropdownIndicator}
+            variant={args.variant}
+            value={option}
+            onChange={setOption}
             options={options}
-            topLabel={topLabel}
         />
     );
-});
+};

@@ -32,7 +32,6 @@ export const THEME = {
         TYPE_LIGHTER_GREY: '#bdbdbd',
         TYPE_WHITE: '#ffffff',
 
-        SCROLLBAR_THUMB: '#dcdcdc',
         STROKE_GREY: '#e8e8e8',
         STROKE_GREY_ALT: '#e8e8e8',
         STROKE_LIGHT_GREY: '#f4f4f4',
@@ -52,6 +51,10 @@ export const THEME = {
         BOX_SHADOW_BLACK_20: 'rgba(0, 0, 0, 0.2)',
         BOX_SHADOW_MODAL: 'rgba(77, 77, 77, 0.2)',
         BOX_SHADOW_OPTION_CARD: 'rgba(77, 77, 77, 0.12)',
+
+        HOVER_DARKEN_FILTER: 0.04,
+        HOVER_TRANSITION_TIME: '150ms',
+        HOVER_TRANSITION_EFFECT: 'ease-out',
     },
     dark: {
         THEME: 'dark',
@@ -83,7 +86,6 @@ export const THEME = {
         TYPE_LIGHTER_GREY: '#bdbdbd',
         TYPE_WHITE: '#fafafa',
 
-        SCROLLBAR_THUMB: '#7F7F7F',
         STROKE_GREY: '#3a3b3c',
         STROKE_GREY_ALT: '#5c5d5e', // used for light border on BG_WHITE_ALT in dark mode
         STROKE_LIGHT_GREY: '#3a3b3c', // graph grid uses different color in black theme
@@ -104,6 +106,10 @@ export const THEME = {
         BOX_SHADOW_MODAL: 'rgba(0, 0, 0, 0.5)', // shadow around modal
         BOX_SHADOW_OPTION_CARD: 'rgba(0, 0, 0, 0.2)', // shadow around Options card in onboarding
         IMAGE_FILTER: 'brightness(0.8) contrast(1.2) saturate(1.2)',
+
+        HOVER_DARKEN_FILTER: -0.04,
+        HOVER_TRANSITION_TIME: '150ms',
+        HOVER_TRANSITION_EFFECT: 'ease-out',
     },
     // black theme is not used currently, but will be in the future
     black: {
@@ -136,7 +142,6 @@ export const THEME = {
         TYPE_LIGHTER_GREY: '#bdbdbd',
         TYPE_WHITE: '#fafafa',
 
-        SCROLLBAR_THUMB: '#7F7F7F',
         STROKE_GREY: '#262626',
         STROKE_GREY_ALT: '#262626',
         STROKE_LIGHT_GREY: '#1a1a1a', // graph grid
@@ -157,6 +162,10 @@ export const THEME = {
         BOX_SHADOW_MODAL: 'rgba(0, 0, 0, 0.5)', // shadow around modal
         BOX_SHADOW_OPTION_CARD: 'rgba(0, 0, 0, 0.2)', // shadow around Options card in onboarding
         IMAGE_FILTER: 'brightness(0.8) contrast(1.2) saturate(1.2)',
+
+        HOVER_DARKEN_FILTER: -0.04,
+        HOVER_TRANSITION_TIME: '150ms',
+        HOVER_TRANSITION_EFFECT: 'ease-out',
     },
 } as const;
 

@@ -1,13 +1,20 @@
 import React from 'react';
-import { Checkbox } from '.';
-import { storiesOf } from '@storybook/react';
-import { text, boolean } from '@storybook/addon-knobs';
+import { useArgs } from '@storybook/client-api';
 
-storiesOf('Form', module).add('Checkbox', () => {
-    const isChecked = boolean('Checked', false);
+import { Checkbox } from '.';
+
+export default {
+    title: 'Form/Checkbox',
+    args: { label: 'Checkbox', isChecked: false },
+};
+
+export const Basic = ({ ...args }) => {
+    const [{ isChecked }, updateArgs] = useArgs();
+    const handleIsChecked = () => updateArgs({ isChecked: !isChecked });
+
     return (
-        <Checkbox onClick={() => {}} {...(isChecked ? { isChecked } : {})}>
-            {text('Label', 'Checkbox')}
+        <Checkbox isChecked={isChecked} onClick={handleIsChecked}>
+            {args.label}
         </Checkbox>
     );
-});
+};

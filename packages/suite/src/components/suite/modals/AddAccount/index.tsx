@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import { Button } from '@trezor/components';
-import { Translation } from '@suite-components';
+import { Translation, Modal } from '@suite-components';
 import { NETWORKS } from '@wallet-config';
 import { Account, Network } from '@wallet-types';
 import { TrezorDevice } from '@suite-types';
@@ -8,12 +9,28 @@ import { useSelector, useActions } from '@suite-hooks';
 import * as accountActions from '@wallet-actions/accountActions';
 import * as walletSettingsActions from '@settings-actions/walletSettingsActions';
 import * as routerActions from '@suite-actions/routerActions';
+import { partition } from '@suite-utils/array';
 
-import NetworkUnavailable from './components/NetworkUnavailable';
-import NetworkInternal from './components/NetworkInternal';
-import AddAccountButton from './components/AddAccountButton';
-import Wrapper from './components/Wrapper';
+import { AccountTypeSelect } from './components/AccountTypeSelect';
+import { SelectNetwork } from './components/SelectNetwork';
+import { EnableNetwork } from './components/EnableNetwork';
+import { AddAccountButton } from './components/AddAccountButton';
 
+const StyledModal = styled(props => <Modal {...props} />)`
+    min-height: 550px;
+    text-align: left;
+`;
+
+const Actions = styled.div`
+    display: flex;
+    justify-content: center;
+    padding-top: 24px;
+`;
+
+const Expander = styled.div`
+    display: flex;
+    flex: 1;
+`;
 interface Props {
     device: TrezorDevice;
     onCancel: () => void;
@@ -21,111 +38,96 @@ interface Props {
     noRedirect?: boolean;
 }
 
-const AddAccount = (props: Props) => {
+const AddAccountModal = ({ device, onCancel, symbol, noRedirect }: Props) => {
     const { changeAccountVisibility, changeCoinVisibility, goto } = useActions({
         changeAccountVisibility: accountActions.changeAccountVisibility,
         changeCoinVisibility: walletSettingsActions.changeCoinVisibility,
         goto: routerActions.goto,
     });
-    const { app, accounts, enabledNetworks, selectedAccount } = useSelector(state => ({
+    const { app, accounts, enabledNetworks: enabledNetworksSymbols } = useSelector(state => ({
         app: state.router.app,
         accounts: state.wallet.accounts,
         enabledNetworks: state.wallet.settings.enabledNetworks,
-        selectedAccount: state.wallet.selectedAccount,
     }));
 
     // Collect all Networks without "accountType" (normal)
     const internalNetworks = NETWORKS.filter(n => !n.accountType && !n.isHidden);
 
     // Collect device unavailable capabilities
-    const unavailableCapabilities = props.device.features
-        ? props.device.unavailableCapabilities
-        : {};
+    const unavailableCapabilities = device.features ? device.unavailableCapabilities : {};
 
-    // if symbol is passed in the props, preselect it and pin it (do not allow the user to change it)
-    // otherwise default value is currently selected network or first network item on the list (btc)
-    const symbol = props.symbol ? props.symbol : selectedAccount.account?.symbol;
-    const preselectedNetwork = symbol
-        ? (internalNetworks.find(n => n.symbol === symbol) as Network)
-        : internalNetworks[0];
+    // applied only when changing account in coinmarket exchange receive options context so far
+    const networkPinned = !!symbol;
+    const preselectedNetwork = symbol && internalNetworks.find(n => n.symbol === symbol);
 
-    const [network, setNetwork] = useState<Network>(preselectedNetwork);
-    const [accountType, setAccountType] = useState<Network | undefined>(undefined);
+    const [selectedNetwork, selectNetwork] = useState<Network | undefined>(preselectedNetwork);
 
-    // Common props for Wrapper
-    const wrapperProps = {
-        selectedNetwork: network,
-        internalNetworks,
-        onSelectNetwork: (network: Network) => {
-            setNetwork(network);
-            setAccountType(undefined);
-        },
-        onSelectAccountType: setAccountType,
-        onCancel: props.onCancel,
+    const selectedNetworkEnabled =
+        !!selectedNetwork && enabledNetworksSymbols.includes(selectedNetwork.symbol);
+
+    const [enabledNetworks, disabledNetworks] = partition(internalNetworks, network =>
+        enabledNetworksSymbols.includes(network.symbol),
+    );
+    const hasDisabledNetworks = !!disabledNetworks?.length;
+
+    const [disabledMainnetNetworks, disabledTestnetNetworks] = partition(
+        disabledNetworks,
+        network => !network?.testnet,
+    );
+
+    const handleNetworkSelection = (symbol?: Network['symbol']) => {
+        if (symbol) {
+            const networkToSelect = NETWORKS.find(n => n.symbol === symbol);
+
+            // To prevent account type selection reset
+            const alreadySelected =
+                !!networkToSelect && networkToSelect?.symbol === selectedNetwork?.symbol;
+
+            if (networkToSelect && !networkPinned && !alreadySelected) {
+                selectNetwork(networkToSelect);
+            }
+        } else {
+            selectNetwork(undefined);
+        }
     };
 
-    // Check device capabilities
-    // Display: unavailable network
-    const capability = unavailableCapabilities[network.symbol];
-    if (capability) {
-        return (
-            <Wrapper {...wrapperProps}>
-                <NetworkUnavailable capability={capability} network={network} />
-            </Wrapper>
-        );
-    }
-
-    // Display: Network is not enabled in settings
-    if (!enabledNetworks.includes(network.symbol)) {
-        const onEnableNetwork = () => {
-            props.onCancel();
-            changeCoinVisibility(network.symbol, true);
-            if (app === 'wallet' && !props.noRedirect) {
+    const onEnableNetwork = () => {
+        onCancel();
+        if (selectedNetwork) {
+            changeCoinVisibility(selectedNetwork.symbol, true);
+            if (app === 'wallet' && !noRedirect) {
                 // redirect to account only if added from "wallet" app
                 goto('wallet-index', {
-                    symbol: network.symbol,
+                    symbol: selectedNetwork.symbol,
                     accountIndex: 0,
                     accountType: 'normal',
                 });
             }
-        };
-
-        return (
-            <Wrapper
-                {...wrapperProps}
-                actionButton={
-                    <Button variant="primary" onClick={onEnableNetwork}>
-                        <Translation
-                            id="TR_ENABLE_NETWORK_BUTTON"
-                            values={{ networkName: network.name }}
-                        />
-                    </Button>
-                }
-                pinNetwork={!!props.symbol}
-            />
-        );
-    }
+        }
+    };
 
     // Collect all empty accounts related to selected device and selected accountType
-    const currentType = (accountType ? accountType.accountType : undefined) || 'normal';
-    const emptyAccounts = accounts.filter(
-        a =>
-            a.deviceState === props.device.state &&
-            a.symbol === network.symbol &&
-            a.accountType === currentType &&
-            a.empty,
-    );
+    const currentType = selectedNetwork?.accountType ?? 'normal';
+    const emptyAccounts = selectedNetwork
+        ? accounts.filter(
+              a =>
+                  a.deviceState === device.state &&
+                  a.symbol === selectedNetwork.symbol &&
+                  a.accountType === currentType &&
+                  a.empty,
+          )
+        : [];
 
     // Collect possible accountTypes
     const accountTypes =
-        network.networkType === 'bitcoin'
-            ? NETWORKS.filter(n => n.symbol === network.symbol)
+        selectedNetworkEnabled && selectedNetwork?.networkType === 'bitcoin'
+            ? NETWORKS.filter(n => n.symbol === selectedNetwork.symbol)
             : undefined;
 
     const onEnableAccount = (account: Account) => {
-        props.onCancel();
+        onCancel();
         changeAccountVisibility(account);
-        if (app === 'wallet' && !props.noRedirect) {
+        if (app === 'wallet' && !noRedirect) {
             // redirect to account only if added from "wallet" app
             goto('wallet-index', {
                 symbol: account.symbol,
@@ -135,24 +137,63 @@ const AddAccount = (props: Props) => {
         }
     };
 
-    // Display: default add account window
+    const selectedNetworks = selectedNetwork ? [selectedNetwork.symbol] : [];
+
     return (
-        <Wrapper
-            {...wrapperProps}
-            selectedAccountType={accountType}
-            accountTypes={accountTypes}
-            actionButton={
-                <AddAccountButton
-                    network={network}
-                    accounts={emptyAccounts}
-                    onEnableAccount={onEnableAccount}
-                />
-            }
-            pinNetwork={!!props.symbol}
+        <StyledModal
+            cancelable
+            onCancel={onCancel}
+            heading={<Translation id="MODAL_ADD_ACCOUNT_TITLE" />}
         >
-            <NetworkInternal network={accountType || network} accountTypes={accountTypes} />
-        </Wrapper>
+            <SelectNetwork
+                networks={
+                    selectedNetwork && selectedNetworkEnabled ? [selectedNetwork] : enabledNetworks
+                }
+                networkCanChange={!!selectedNetwork && selectedNetworkEnabled && !networkPinned}
+                selectedNetworks={selectedNetworks}
+                unavailableCapabilities={unavailableCapabilities}
+                handleNetworkSelection={handleNetworkSelection}
+            />
+            {!selectedNetworkEnabled && hasDisabledNetworks && (
+                <EnableNetwork
+                    networks={disabledMainnetNetworks}
+                    testnetNetworks={disabledTestnetNetworks}
+                    selectedNetworks={selectedNetworks}
+                    unavailableCapabilities={unavailableCapabilities}
+                    handleNetworkSelection={handleNetworkSelection}
+                />
+            )}
+            {selectedNetwork && (
+                <>
+                    {accountTypes && accountTypes?.length > 1 && (
+                        <AccountTypeSelect
+                            network={selectedNetwork}
+                            accountTypes={accountTypes}
+                            onSelectAccountType={selectNetwork}
+                        />
+                    )}
+
+                    <Expander />
+
+                    <Actions>
+                        {selectedNetworkEnabled ? (
+                            <AddAccountButton
+                                emptyAccounts={emptyAccounts}
+                                onEnableAccount={onEnableAccount}
+                            />
+                        ) : (
+                            <Button variant="primary" onClick={onEnableNetwork}>
+                                <Translation
+                                    id="TR_ENABLE_NETWORK_BUTTON"
+                                    values={{ networkName: selectedNetwork.name }}
+                                />
+                            </Button>
+                        )}
+                    </Actions>
+                </>
+            )}
+        </StyledModal>
     );
 };
 
-export default AddAccount;
+export default AddAccountModal;

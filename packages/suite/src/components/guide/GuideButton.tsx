@@ -1,6 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { variables } from '@trezor/components';
 import styled from 'styled-components';
+
+import { variables } from '@trezor/components';
 import { resolveStaticPath } from '@suite-utils/nextjs';
 
 const Wrapper = styled.button`
@@ -27,7 +28,7 @@ const Wrapper = styled.button`
 
 const GuideButton = (props: ButtonHTMLAttributes<HTMLButtonElement>) => (
     <Wrapper {...props}>
-        <img src={resolveStaticPath('/images/suite/lamp.png')} width="15" height="27" alt="" />
+        <img src={resolveStaticPath('/images/suite/lightbulb.svg')} width="18" height="18" alt="" />
     </Wrapper>
 );
 

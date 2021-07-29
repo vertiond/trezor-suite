@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Icon, variables } from '@trezor/components';
 import { animated, useSpring } from 'react-spring';
-import { useMeasure } from 'react-use';
+import useMeasure from 'react-use/lib/useMeasure';
+
+import { Icon, variables } from '@trezor/components';
 
 const Wrapper = styled.div<Pick<Props, 'variant'>>`
     display: flex;
@@ -11,7 +12,7 @@ const Wrapper = styled.div<Pick<Props, 'variant'>>`
     margin-bottom: 20px;
 
     ${props =>
-        props.variant === 'small' &&
+        (props.variant === 'tiny' || props.variant === 'small') &&
         css`
             border-radius: 4px;
         `}
@@ -23,19 +24,40 @@ const Wrapper = styled.div<Pick<Props, 'variant'>>`
         `}
 `;
 
-const Header = styled.div<Pick<Props, 'variant'>>`
+const Header = styled.div<Pick<Props, 'variant' | 'headerJustifyContent'>>`
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: ${props => props.headerJustifyContent};
     align-items: center;
     cursor: pointer;
-    padding: ${props => (props.variant === 'large' ? '24px 30px' : '12px 16px')};
+
+    ${props =>
+        props.variant === 'tiny' &&
+        css`
+            padding: 8px 16px;
+        `}
+    ${props =>
+        props.variant === 'small' &&
+        css`
+            padding: 12px 16px;
+        `}
+    ${props =>
+        props.variant === 'large' &&
+        css`
+            padding: 24px 30px;
+        `}
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled.div<Pick<Props, 'headerJustifyContent'>>`
     display: flex;
     align-items: center;
+    ${props =>
+        props.headerJustifyContent === 'center' &&
+        css`
+            padding-left: 2px;
+        `}
 `;
+
 const IconLabel = styled.div`
     margin-right: 6px;
     margin-left: 28px;
@@ -44,31 +66,60 @@ const IconLabel = styled.div`
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
 `;
 
-const Heading = styled.span`
-    color: ${props => props.theme.TYPE_DARK_GREY};
-    font-size: ${variables.FONT_SIZE.SMALL};
+const Heading = styled.span<Pick<Props, 'variant'>>`
+    color: ${props => props.theme.TYPE_LIGHT_GREY};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+
+    ${props =>
+        props.variant === 'tiny' &&
+        css`
+            font-size: ${variables.NEUE_FONT_SIZE.NANO};
+        `}
+
+    ${props =>
+        (props.variant === 'small' || props.variant === 'large') &&
+        css`
+            font-size: ${variables.NEUE_FONT_SIZE.SMALL};
+        `}
 `;
 
-const Content = styled(animated.div)<Pick<Props, 'noContentPadding' | 'variant'>>`
+// DOM elements should not contain camelCase attributes (noContentPadding prop renamed to snake-case no-content-padding)
+// DOM attributes should not be boolean values (noContentPadding prop converted to string)
+const Content = styled(animated.div)<{ variant: Props['variant']; 'no-content-padding': string }>`
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-top: 1px solid ${props => props.theme.STROKE_GREY};
 
     ${props =>
-        !props.noContentPadding &&
+        props['no-content-padding'] === 'false' &&
+        props.variant === 'tiny' &&
         css`
-            padding: 20px ${props.variant === 'large' ? '30px' : '16px'};
+            padding: 15px 16px;
+        `}
+
+    ${props =>
+        props['no-content-padding'] === 'false' &&
+        props.variant === 'small' &&
+        css`
+            padding: 20px 16px;
+        `}
+
+    ${props =>
+        props['no-content-padding'] === 'false' &&
+        props.variant === 'large' &&
+        css`
+            padding: 20px 30px;
         `}
 `;
 
 interface Props extends React.HtmlHTMLAttributes<HTMLDivElement> {
     heading: React.ReactNode;
-    variant: 'small' | 'large';
+    variant: 'tiny' | 'small' | 'large';
     iconLabel?: React.ReactNode;
     children?: React.ReactNode;
     noContentPadding?: boolean;
+    headerJustifyContent?: 'space-between' | 'center';
 }
 
 const CollapsibleBox = ({
@@ -77,6 +128,7 @@ const CollapsibleBox = ({
     children,
     noContentPadding,
     variant = 'small',
+    headerJustifyContent = 'space-between',
     ...rest
 }: Props) => {
     const [collapsed, setCollapsed] = useState(true);
@@ -95,17 +147,18 @@ const CollapsibleBox = ({
         <Wrapper variant={variant} {...rest}>
             <Header
                 variant={variant}
+                headerJustifyContent={headerJustifyContent}
                 onClick={() => {
                     setCollapsed(!collapsed);
                     setAnimatedIcon(true);
                 }}
             >
-                <Heading>{heading ?? iconLabel}</Heading>
-                <IconWrapper>
-                    {heading && <IconLabel>{iconLabel}</IconLabel>}
+                <Heading variant={variant}>{heading ?? iconLabel}</Heading>
+                <IconWrapper headerJustifyContent={headerJustifyContent}>
+                    {heading && iconLabel && <IconLabel>{iconLabel}</IconLabel>}
                     <Icon
                         icon="ARROW_DOWN"
-                        size={20}
+                        size={variant === 'tiny' ? 12 : 20}
                         canAnimate={animatedIcon}
                         isActive={!collapsed}
                     />
@@ -113,7 +166,7 @@ const CollapsibleBox = ({
             </Header>
             <animated.div style={{ ...slideInStyles, overflow: 'hidden' }}>
                 <animated.div ref={heightRef} style={{ overflow: 'hidden' }}>
-                    <Content variant={variant} noContentPadding={noContentPadding}>
+                    <Content variant={variant} no-content-padding={(!!noContentPadding).toString()}>
                         {children}
                     </Content>
                 </animated.div>

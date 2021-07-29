@@ -54,9 +54,10 @@ const storageMiddleware = (api: MiddlewareAPI<Dispatch, AppState>) => (next: Dis
 
         case ACCOUNT.REMOVE: {
             action.payload.forEach(account => {
-                storageActions.removeAccount(account);
+                storageActions.removeAccountDraft(account);
                 storageActions.removeAccountTransactions(account);
                 storageActions.removeAccountGraph(account);
+                storageActions.removeAccount(account);
             });
             break;
         }
