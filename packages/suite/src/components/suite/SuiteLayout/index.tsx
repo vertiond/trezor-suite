@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { connect } from 'react-redux';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { variables, scrollbarStyles } from '@trezor/components';
+import { variables } from '@trezor/components';
 import SuiteBanners from '@suite-components/Banners';
 import { AppState } from '@suite-types';
 import { Metadata } from '@suite-components';
@@ -60,7 +60,9 @@ const AppWrapper = styled.div`
     align-items: center;
     position: relative;
 
-    ${scrollbarStyles}
+    @media screen and (max-width: ${variables.SCREEN_SIZE.LG}) {
+        overflow-x: hidden;
+    }
 `;
 
 const MaxWidthWrapper = styled.div`

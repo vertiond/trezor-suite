@@ -7,13 +7,13 @@
 
 import { getInfo, getBinary } from '../src';
 import { Release, VersionArray } from '../src/utils/parse';
+import { isNewerOrEqual } from '../src/utils/version';
 
 const { getDeviceFeatures } = global.JestMocks;
 
 const RELEASES_T2 = JSON.parse(process.env.RELEASES_T2) as Release[];
 const RELEASES_T1 = JSON.parse(process.env.RELEASES_T1) as Release[];
 const BASE_URL = process.env.BASE_FW_URL;
-const BETA_BASE_URL = process.env.BETA_BASE_FW_URL;
 
 describe('Find firmware info for: ', () => {
     it('bootloader 1.0.0 -> firmware version 1.6.3', async () => {
@@ -41,14 +41,11 @@ describe('Find firmware info for: ', () => {
             version: [1, 6, 3],
             releases: RELEASES_T1,
             baseUrl: BASE_URL,
-            baseUrlBeta: BETA_BASE_URL,
         });
         expect(withBinary).toMatchObject({ release: { version: [1, 6, 3] } });
     });
 
-    it('bootloader 1.5.1 -> firmware version 1.10.0', async () => {
-        // currently, this is expected to fail after there is new firmware update, since the last version is hardcoded
-        const targetVersion = [1, 10, 1] as VersionArray;
+    it('bootloader 1.5.1 -> firmware version 1.10.0+', async () => {
         const info = getInfo({
             features: getDeviceFeatures({
                 bootloader_mode: true,
@@ -59,7 +56,9 @@ describe('Find firmware info for: ', () => {
             }),
             releases: RELEASES_T1,
         });
-        expect(info).toMatchObject({ release: { version: targetVersion } });
+
+        const targetVersion = info!.release.version;
+        expect(isNewerOrEqual(targetVersion, [1, 10, 0])).toBe(true);
 
         // validate that with binary returns the same firmware
         const withBinary = await getBinary({
@@ -73,7 +72,6 @@ describe('Find firmware info for: ', () => {
             version: targetVersion,
             releases: RELEASES_T1,
             baseUrl: BASE_URL,
-            baseUrlBeta: BETA_BASE_URL,
         });
         expect(withBinary).toMatchObject({ release: { version: targetVersion } });
     });

@@ -152,6 +152,8 @@ export const ICONS: IconType[] = [
     'CALENDAR',
     'PDF',
     'CSV',
+    'BINARY',
+    'IMAGE',
     'MEDIUM',
     'TAG',
     'GAS',
@@ -181,6 +183,7 @@ export const ICONS: IconType[] = [
     'PACKAGE',
     'VERIFIED',
     'ANCHOR',
+    'PENCIL',
     'PENCIL_LINE',
     'KEY',
 ];

@@ -129,6 +129,11 @@ const definedMessages = defineMessages({
             'If closing tabs and refreshing this page didn’t help, try reconnecting your Trezor.',
         id: 'TR_RECONNECT_DEVICE_DESCRIPTION',
     },
+    TR_RECONNECT_DEVICE_DESCRIPTION_DESKTOP: {
+        defaultMessage:
+            'If closing tabs and reopening the Trezor Suite app didn’t help, try reconnecting your Trezor.',
+        id: 'TR_RECONNECT_DEVICE_DESCRIPTION_DESKTOP',
+    },
     TR_ACQUIRE_DEVICE_TITLE: {
         defaultMessage: 'Another session is running',
         id: 'TR_ACQUIRE_DEVICE_TITLE',
@@ -1595,6 +1600,19 @@ const definedMessages = defineMessages({
         defaultMessage: 'Wipe device',
         id: 'TR_DEVICE_SETTINGS_BUTTON_WIPE_DEVICE',
     },
+    TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_BUTTON: {
+        defaultMessage: 'Install firmware',
+        id: 'TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_BUTTON',
+    },
+    TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_TITLE: {
+        defaultMessage: 'Install custom firmware',
+        id: 'TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_TITLE',
+    },
+    TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_DESCRIPTION: {
+        defaultMessage:
+            'It is possible to install custom firmware for your Trezor device if needed. Installing custom firmware will erase its memory and may make it unusable. Never use this process unless you really know what you are doing.',
+        id: 'TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_DESCRIPTION',
+    },
     TR_DEVICE_SETTINGS_DEVICE_EDIT_LABEL: {
         defaultMessage: 'Edit Label',
         id: 'TR_DEVICE_SETTINGS_DEVICE_EDIT_LABEL',
@@ -2185,6 +2203,14 @@ const definedMessages = defineMessages({
         defaultMessage: 'Ethereum',
         id: 'TR_NETWORK_ETHEREUM',
     },
+    TR_NETWORK_ETHEREUM_LABEL: {
+        defaultMessage: 'inc. ERC-20 tokens',
+        id: 'TR_NETWORK_ETHEREUM_LABEL',
+    },
+    TR_NETWORK_ETHEREUM_TOOLTIP: {
+        defaultMessage: 'Supported tokens',
+        id: 'TR_NETWORK_ETHEREUM_TOOLTIP',
+    },
     TR_NETWORK_ETHEREUM_CLASSIC: {
         defaultMessage: 'Ethereum Classic',
         id: 'TR_NETWORK_ETHEREUM_CLASSIC',
@@ -2747,10 +2773,18 @@ const definedMessages = defineMessages({
         defaultMessage: 'Testnet coins',
         id: 'TR_TESTNET_COINS',
     },
+    TR_TESTNET_COINS_DESCRIPTION: {
+        defaultMessage: 'These coins are used only for testing and hold no value.',
+        id: 'TR_TESTNET_COINS_DESCRIPTION',
+    },
     TR_TESTNET_COINS_EXPLAINED: {
         defaultMessage:
             "Testnet coins don't have any value but you still may use them to learn and experiment.",
         id: 'TR_TESTNET_COINS_EXPLAINED',
+    },
+    TR_TESTNET_COINS_LABEL: {
+        defaultMessage: 'TEST COIN',
+        id: 'TR_TESTNET_COINS_LABEL',
     },
     TR_THE_PIN_LAYOUT_IS_DISPLAYED: {
         defaultMessage: 'The PIN layout is displayed on your Trezor.',
@@ -3210,7 +3244,7 @@ const definedMessages = defineMessages({
     },
     TOAST_AUTH_FAILED: {
         id: 'TOAST_AUTH_FAILED',
-        defaultMessage: 'Authorization error: {error}',
+        defaultMessage: 'Authorization error {error}',
     },
     TOAST_AUTH_CONFIRM_ERROR: {
         id: 'TOAST_AUTH_CONFIRM_ERROR',
@@ -3291,6 +3325,10 @@ const definedMessages = defineMessages({
     TOAST_AUTO_UPDATER_NO_NEW: {
         id: 'TOAST_AUTO_UPDATER_NO_NEW',
         defaultMessage: 'No new updates available.',
+    },
+    TOAST_AUTO_UPDATER_NEW_VERSION_FIRST_RUN: {
+        id: 'TOAST_AUTO_UPDATER_NEW_VERSION_FIRST_RUN',
+        defaultMessage: 'New version ({version}) installed successfully.',
     },
     TOAST_GENERIC_ERROR: {
         id: 'TOAST_GENERIC_ERROR',
@@ -3570,6 +3608,14 @@ const definedMessages = defineMessages({
     TR_CRYPTOCURRENCY: {
         id: 'TR_CRYPTOCURRENCY',
         defaultMessage: 'Cryptocurrency',
+    },
+    TR_SELECT_COIN: {
+        id: 'TR_SELECT_COIN',
+        defaultMessage: 'Select coin',
+    },
+    TR_ACTIVATE_COINS: {
+        id: 'TR_ACTIVATE_COINS',
+        defaultMessage: 'Activate more coins',
     },
     TR_COIN_SETTINGS: {
         id: 'TR_COIN_SETTINGS',
@@ -4838,12 +4884,12 @@ const definedMessages = defineMessages({
         id: 'RECIPIENT_FORMAT_DEPRECATED',
     },
     RECIPIENT_FORMAT_UPPERCASE: {
-        defaultMessage: 'Unsupported address format. {convert}',
+        defaultMessage: 'Unsupported address format. <a>Convert to lowercase</a>',
         id: 'RECIPIENT_FORMAT_UPPERCASE',
     },
-    RECIPIENT_FORMAT_UPPERCASE_CONVERT: {
-        defaultMessage: 'Convert to lowercase',
-        id: 'RECIPIENT_FORMAT_UPPERCASE_CONVERT',
+    RECIPIENT_FORMAT_CHECKSUM: {
+        defaultMessage: 'Address is not valid. <a>Convert to checksum address</a>',
+        id: 'RECIPIENT_FORMAT_CHECKSUM',
     },
     RECIPIENT_CANNOT_SEND_TO_MYSELF: {
         defaultMessage: 'Cannot send to myself',
@@ -5245,6 +5291,30 @@ const definedMessages = defineMessages({
     TR_CUSTOM_BACKEND_BACKEND_ALREADY_ADDED: {
         id: 'TR_CUSTOM_BACKEND_BACKEND_ALREADY_ADDED',
         defaultMessage: 'The backend is already added',
+    },
+    TR_CUSTOM_FIRMWARE_BUTTON_DOWNLOAD: {
+        id: 'TR_CUSTOM_FIRMWARE_BUTTON_DOWNLOAD',
+        defaultMessage: 'Download on Trezor.io',
+    },
+    TR_CUSTOM_FIRMWARE_BUTTON_INSTALL: {
+        id: 'TR_CUSTOM_FIRMWARE_BUTTON_INSTALL',
+        defaultMessage: 'Install firmware',
+    },
+    TR_CUSTOM_FIRMWARE_TITLE_DOWNLOAD: {
+        id: 'TR_CUSTOM_FIRMWARE_TITLE_DOWNLOAD',
+        defaultMessage: 'Select a compatible firmware',
+    },
+    TR_CUSTOM_FIRMWARE_TITLE_INSTALL: {
+        id: 'TR_CUSTOM_FIRMWARE_TITLE_INSTALL',
+        defaultMessage: 'Install firmware',
+    },
+    TR_CUSTOM_FIRMWARE_TITLE_UPLOAD: {
+        id: 'TR_CUSTOM_FIRMWARE_TITLE_UPLOAD',
+        defaultMessage: 'Upload that firmware',
+    },
+    TR_CUSTOM_FIRMWARE_VERSION: {
+        id: 'TR_CUSTOM_FIRMWARE_VERSION',
+        defaultMessage: 'custom',
     },
     SETTINGS_ADV_COIN_CONN_INFO_TITLE: {
         id: 'SETTINGS_ADV_COIN_CONN_INFO_TITLE',
@@ -5793,6 +5863,49 @@ const definedMessages = defineMessages({
         id: 'TR_SUITE_WEB_LANDING_HOW_TO_VERIFY',
         defaultMessage: 'How to verify and run on Linux',
     },
+    TR_SUITE_WEB_LANDING_START_FEATURES_1_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_1_HEADLINE',
+        defaultMessage: 'Desktop app',
+    },
+    TR_SUITE_WEB_LANDING_START_FEATURES_1_TEXT: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_1_TEXT',
+        defaultMessage:
+            'Enhanced security and privacy, new design and improved performance, all in one software suite.',
+    },
+    TR_SUITE_WEB_LANDING_START_FEATURES_2_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_2_HEADLINE',
+        defaultMessage: 'Buy and exchange crypto',
+    },
+    TR_SUITE_WEB_LANDING_START_FEATURES_2_TEXT: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_2_TEXT',
+        defaultMessage:
+            "Compare competitive rates, buy and exchange coins within Trezor's secure environment. Powered by +Invity.",
+    },
+    TR_SUITE_WEB_LANDING_START_FEATURES_3_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_3_HEADLINE',
+        defaultMessage: 'Native altcoin support',
+    },
+    TR_SUITE_WEB_LANDING_START_FEATURES_3_TEXT: {
+        id: 'TR_SUITE_WEB_LANDING_START_FEATURES_3_TEXT',
+        defaultMessage: 'ETH, XRP, ETC and more now supported \ndirectly through the app.',
+    },
+    TR_SUITE_WEB_LANDING_START_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_HEADLINE',
+        defaultMessage: 'Managing crypto just got{lineBreak}<em>safer and easier</em>',
+    },
+    TR_SUITE_WEB_LANDING_START_SUB_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_SUB_HEADLINE',
+        defaultMessage: 'Take control of your Trezor with our desktop & browser app.',
+    },
+    TR_SUITE_WEB_LANDING_START_SUB_SOON: {
+        id: 'TR_SUITE_WEB_LANDING_START_SUB_SOON',
+        defaultMessage: 'Soon',
+    },
+    TR_SUITE_WEB_LANDING_START_BOTTOM_HEADLINE: {
+        id: 'TR_SUITE_WEB_LANDING_START_BOTTOM_HEADLINE',
+        defaultMessage:
+            'Dozens of <em>brand-new features</em> to discover.{lineBreak}Try Suite now.',
+    },
     TR_DARK_MODE: {
         id: 'TR_DARK_MODE',
         defaultMessage: 'Dark mode',
@@ -6021,6 +6134,10 @@ const definedMessages = defineMessages({
         id: 'TR_SUGGESTION',
         defaultMessage: 'Suggestion',
     },
+    TR_GUIDE_DASHBOARD: {
+        id: 'TR_GUIDE_DASHBOARD',
+        defaultMessage: 'Dashboard',
+    },
     TR_GUIDE_BUG_LABEL: {
         id: 'TR_GUIDE_BUG_LABEL',
         defaultMessage: 'Report a faulty behaviour',
@@ -6036,26 +6153,6 @@ const definedMessages = defineMessages({
     TR_GUIDE_CATEGORIES: {
         id: 'TR_GUIDE_CATEGORIES',
         defaultMessage: 'Categories',
-    },
-    TR_GUIDE_CATEGORY_CRYPTO_BASICS: {
-        id: 'TR_GUIDE_CATEGORY_CRYPTO_BASICS',
-        defaultMessage: 'Crypto basics',
-    },
-    TR_GUIDE_CATEGORY_TREZOR_SUITE: {
-        id: 'TR_GUIDE_CATEGORY_TREZOR_SUITE',
-        defaultMessage: 'Trezor Suite',
-    },
-    TR_GUIDE_CATEGORY_TREZOR: {
-        id: 'TR_GUIDE_CATEGORY_TREZOR',
-        defaultMessage: 'Trezor',
-    },
-    TR_GUIDE_CATEGORY_CURRENCIES: {
-        id: 'TR_GUIDE_CATEGORY_CURRENCIES',
-        defaultMessage: 'Currencies',
-    },
-    TR_GUIDE_CATEGORY_DICTIONARY: {
-        id: 'TR_GUIDE_CATEGORY_DICTIONARY',
-        defaultMessage: 'Dictionary',
     },
     TR_GUIDE_ARTICLES: {
         id: 'TR_GUIDE_ARTICLES',
@@ -6297,6 +6394,11 @@ const definedMessages = defineMessages({
         defaultMessage: 'After closing other tabs and windows, try refreshing this page.',
         id: 'TR_TROUBLESHOOTING_CLOSE_TABS_DESCRIPTION',
     },
+    TR_TROUBLESHOOTING_CLOSE_TABS_DESCRIPTION_DESKTOP: {
+        defaultMessage:
+            'After closing other browser tabs and windows, try quitting and reopening the Trezor Suite app.',
+        id: 'TR_TROUBLESHOOTING_CLOSE_TABS_DESCRIPTION_DESKTOP',
+    },
     TR_TROUBLESHOOTING_TIP_CABLE_TITLE: {
         id: 'TR_TROUBLESHOOTING_TIP_CABLE_TITLE',
         defaultMessage: 'Try a different cable',
@@ -6329,6 +6431,19 @@ const definedMessages = defineMessages({
     TR_TROUBLESHOOTING_TIP_RESTART_COMPUTER_DESCRIPTION: {
         id: 'TR_TROUBLESHOOTING_TIP_RESTART_COMPUTER_DESCRIPTION',
         defaultMessage: 'Just in case',
+    },
+    TR_TROUBLESHOOTING_UNREADABLE_WEBUSB: {
+        id: 'TR_TROUBLESHOOTING_UNREADABLE_WEBUSB',
+        defaultMessage:
+            'Your device is connected properly, but your internet browser can not communicate with it at the moment. You will need to install Trezor Bridge.',
+    },
+    TR_TROUBLESHOOTING_UNREADABLE_UDEV: {
+        id: 'TR_TROUBLESHOOTING_UNREADABLE_UDEV',
+        defaultMessage: 'Missing udev rules',
+    },
+    TR_TROUBLESHOOTING_UNREADABLE_UNKNOWN: {
+        id: 'TR_TROUBLESHOOTING_UNREADABLE_UNKNOWN',
+        defaultMessage: 'Unexpected state: {error}',
     },
     TR_SEEDLESS_SETUP_IS_NOT_SUPPORTED_TITLE: {
         id: 'TR_SEEDLESS_SETUP_IS_NOT_SUPPORTED_TITLE',

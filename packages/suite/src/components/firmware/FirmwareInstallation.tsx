@@ -1,12 +1,10 @@
 import React from 'react';
 import { Button } from '@trezor/components';
-import * as routerActions from '@suite-actions/routerActions';
 import { getTextForStatus } from '@firmware-utils';
 import { Translation, WebusbButton } from '@suite-components';
-import { useActions, useDevice, useFirmware, useOnboarding } from '@suite-hooks';
+import { useDevice, useFirmware } from '@suite-hooks';
 import { FirmwareOffer, ReconnectDevicePrompt } from '@firmware-components';
 import { OnboardingStepBox } from '@onboarding-components';
-import { getFwUpdateVersion, getFwVersion } from '@suite-utils/device';
 import { TrezorDevice } from '@suite-types';
 import ProgressBar from './ProgressBar';
 
@@ -15,8 +13,16 @@ interface Props {
     // This component is shared between Onboarding flow and standalone fw update modal with few minor UI changes
     // If it is set to true, then you know it is being rendered in standalone fw update modal
     standaloneFwUpdate?: boolean;
+    // If true, information about new version is not shown, because we don't know anything about it
+    customFirmware?: boolean;
+    onSuccess: () => void;
 }
-const FirmwareInstallation = ({ cachedDevice, standaloneFwUpdate }: Props) => {
+const FirmwareInstallation = ({
+    cachedDevice,
+    standaloneFwUpdate,
+    customFirmware,
+    onSuccess,
+}: Props) => {
     const { device } = useDevice();
     const {
         status,
@@ -25,22 +31,13 @@ const FirmwareInstallation = ({ cachedDevice, standaloneFwUpdate }: Props) => {
         isWebUSB,
         subsequentInstalling,
     } = useFirmware();
-    const { closeModalApp } = useActions({
-        closeModalApp: routerActions.closeModalApp,
-    });
-    const { goToNextStep } = useOnboarding();
+
     const statusIntlId = getTextForStatus(status);
     const statusText = statusIntlId ? <Translation id={statusIntlId} /> : null;
 
     const getContinueAction = () => {
         if (status === 'done') {
-            // close standalone fw update modal and reset reducer
-            if (standaloneFwUpdate) {
-                closeModalApp();
-                resetReducer();
-            } else {
-                goToNextStep();
-            }
+            onSuccess();
         } else {
             resetReducer();
         }
@@ -99,20 +96,8 @@ const FirmwareInstallation = ({ cachedDevice, standaloneFwUpdate }: Props) => {
                 nested={!!standaloneFwUpdate}
                 disableConfirmWrapper={!!standaloneFwUpdate}
             >
-                {cachedDevice?.firmwareRelease?.isLatest && (
-                    // If the proposed fw update is not latest it means we are gonna install intermediary firmware.
-                    // firmwareRelease will be set to newest release supported by the bootloader. It is fw 1.6.1 for bootloader version 1.4.0,
-                    // which is not the latest fw that will be installed as a subsequent fw update after installation of intermediary fw
-                    // So let's just hide this part of UI in this case.
-                    <FirmwareOffer
-                        currentVersion={
-                            cachedDevice.firmware !== 'none'
-                                ? getFwVersion(cachedDevice)
-                                : undefined
-                        }
-                        newVersion={getFwUpdateVersion(cachedDevice)}
-                        releaseChangelog={cachedDevice.firmwareRelease}
-                    />
+                {cachedDevice?.firmwareRelease && (
+                    <FirmwareOffer device={cachedDevice} customFirmware={customFirmware} />
                 )}
 
                 {status !== 'waiting-for-confirmation' &&

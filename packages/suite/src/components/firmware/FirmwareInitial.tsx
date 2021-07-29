@@ -6,7 +6,6 @@ import {
     OnboardingButtonSkip,
 } from '@onboarding-components';
 import { Translation } from '@suite-components';
-import { getFwUpdateVersion, getFwVersion } from '@suite-utils/device';
 import { useDevice, useFirmware, useActions } from '@suite-hooks';
 import { ReconnectDevicePrompt, InstallButton, FirmwareOffer } from '@firmware-components';
 import * as onboardingActions from '@onboarding-actions/onboardingActions';
@@ -18,9 +17,18 @@ interface Props {
     // This component is shared between Onboarding flow and standalone fw update modal with few minor UI changes
     // If it is set to true, then you know it is being rendered in standalone fw update modal
     standaloneFwUpdate?: boolean;
+    onInstall: () => void;
 }
 
-const getDescription = (required: boolean, standaloneFwUpdate: boolean, reinstall: boolean) => {
+const getDescription = ({
+    required,
+    standaloneFwUpdate,
+    reinstall,
+}: {
+    required: boolean;
+    standaloneFwUpdate: boolean;
+    reinstall: boolean;
+}) => {
     if (required) return 'TR_FIRMWARE_UPDATE_REQUIRED_EXPLAINED';
 
     if (standaloneFwUpdate) {
@@ -31,9 +39,14 @@ const getDescription = (required: boolean, standaloneFwUpdate: boolean, reinstal
     return 'TR_ONBOARDING_NEW_FW_DESCRIPTION';
 };
 
-const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: Props) => {
+const FirmwareInitial = ({
+    cachedDevice,
+    setCachedDevice,
+    onInstall,
+    standaloneFwUpdate = false,
+}: Props) => {
     const { device: liveDevice } = useDevice();
-    const { setStatus, firmwareUpdate, status } = useFirmware();
+    const { setStatus, status } = useFirmware();
     const { goToNextStep } = useActions({
         goToNextStep: onboardingActions.goToNextStep,
     });
@@ -67,13 +80,10 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
         content = {
             heading: <Translation id="TR_INSTALL_FIRMWARE" />,
             description: <Translation id="TR_FIRMWARE_SUBHEADING" />,
-            body: cachedDevice?.firmwareRelease?.isLatest ? (
-                <FirmwareOffer
-                    newVersion={getFwUpdateVersion(cachedDevice)}
-                    releaseChangelog={cachedDevice.firmwareRelease}
-                />
+            body: cachedDevice?.firmwareRelease ? (
+                <FirmwareOffer device={cachedDevice} />
             ) : undefined,
-            innerActions: <InstallButton onClick={firmwareUpdate} />,
+            innerActions: <InstallButton onClick={onInstall} />,
         };
     } else if (device.mode === 'bootloader') {
         // We can check if device.mode is bootloader only after checking that firmware !== none (condition above)
@@ -89,20 +99,22 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
             heading: <Translation id="TR_INSTALL_FIRMWARE" />,
             description: (
                 <Translation
-                    id={getDescription(
-                        device.firmware === 'required',
-                        !!standaloneFwUpdate,
-                        !!device.firmwareRelease?.isLatest,
-                    )}
+                    id={getDescription({
+                        /**
+                         * `device.firmware` is status of the firmware currently installed on the device.
+                         *  available values: 'valid' | 'outdated' | 'required' | 'unknown' | 'none'
+                         *
+                         *  `device.firmwareRelease` on the other hand contains latest available firmware to update to
+                         *   (it is whatever returns getInfo() method from trezor-rollout)
+                         *   so it should not be used here.
+                         */
+                        required: device.firmware === 'required',
+                        standaloneFwUpdate,
+                        reinstall: device.firmware === 'valid',
+                    })}
                 />
             ),
-            body: (
-                <FirmwareOffer
-                    currentVersion={getFwVersion(device)}
-                    newVersion={getFwUpdateVersion(device)}
-                    releaseChangelog={device?.firmwareRelease}
-                />
-            ),
+            body: <FirmwareOffer device={device} />,
             innerActions: (
                 <Button
                     onClick={() =>
@@ -135,7 +147,11 @@ const FirmwareInitial = ({ cachedDevice, setCachedDevice, standaloneFwUpdate }: 
             <>
                 {/* Modal above a fw update offer. Instructs user to reconnect the device in bootloader */}
                 {status === 'waiting-for-bootloader' && (
-                    <ReconnectDevicePrompt expectedDevice={device} requestedMode="bootloader" />
+                    <ReconnectDevicePrompt
+                        expectedDevice={device}
+                        requestedMode="bootloader"
+                        onSuccess={onInstall}
+                    />
                 )}
 
                 <OnboardingStepBox

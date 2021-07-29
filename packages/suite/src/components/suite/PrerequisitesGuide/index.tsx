@@ -40,19 +40,24 @@ const Wrapper = styled.div<{ padded?: boolean }>`
 interface Props {
     prerequisite: PrerequisiteType;
     padded?: boolean;
+    allowSwitchDevice?: boolean;
 }
 
 // PrerequisitesGuide is a shared component used in Preloader and Onboarding
-const PrerequisitesGuide = ({ prerequisite, padded }: Props) => {
-    const { device, transport } = useSelector(state => ({
+const PrerequisitesGuide = ({ prerequisite, padded, allowSwitchDevice }: Props) => {
+    const { device, transport, devices } = useSelector(state => ({
         device: state.suite.device,
+        devices: state.devices.length,
         transport: state.suite.transport,
     }));
+    const webusb = isWebUSB(transport);
+
     return (
         <Wrapper padded={padded}>
             <ConnectDevicePrompt
                 connected={!!device}
                 showWarning={!!(device && deviceNeedsAttention(getStatus(device)))}
+                allowSwitchDevice={allowSwitchDevice && devices > 1}
             >
                 {prerequisite === 'transport-bridge' && (
                     <Translation id="TR_TREZOR_BRIDGE_IS_NOT_RUNNING" />
@@ -63,11 +68,11 @@ const PrerequisitesGuide = ({ prerequisite, padded }: Props) => {
                     case 'transport-bridge':
                         return <Transport />;
                     case 'device-disconnected':
-                        return <DeviceConnect offerWebUsb={isWebUSB(transport)} />;
+                        return <DeviceConnect webusb={webusb} />;
                     case 'device-unacquired':
                         return <DeviceAcquire />;
                     case 'device-unreadable':
-                        return <DeviceUnreadable />;
+                        return <DeviceUnreadable device={device} webusb={webusb} />;
                     case 'device-unknown':
                         return <DeviceUnknown />;
                     case 'device-seedless':
