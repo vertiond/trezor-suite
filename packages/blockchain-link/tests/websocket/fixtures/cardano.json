@@ -152,5 +152,12 @@
             "message": "transaction read error RawCborDecodeError [DecoderErrorDeserialiseFailure \"Byron Tx\" (DeserialiseFailure 0 \"end of input\"),DecoderErrorDeserialiseFailure \"Shelley Tx\" (DeserialiseFailure 0 \"end of input\"),DecoderErrorDeserialiseFailure \"Shelley Tx\" (DeserialiseFailure 0 \"end of input\"),DecoderErrorDeserialiseFailure \"Shelley Tx\" (DeserialiseFailure 0 \"end of input\")]",
             "status_code": 400
         }
+    },
+    "ESTIMATE_FEE": {
+        "data": [
+            {
+                "lovelacePerByte": "44"
+            }
+        ]
     }
 }

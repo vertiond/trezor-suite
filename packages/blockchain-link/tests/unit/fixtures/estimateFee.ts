@@ -55,9 +55,9 @@ export default {
     ],
     cardano: [
         {
-            description: 'estimateFee - not implemented',
-            params: 0,
-            error: 'Unknown message type: m_estimate_fee',
+            description: 'Successfull',
+            params: { blocks: [1] },
+            response: [{ feePerUnit: '44' }],
         },
     ],
 };

@@ -22,7 +22,7 @@ export default {
     cardano: [
         {
             description: 'Successful',
-            params: new Uint8Array(1),
+            params: 'A',
             serverFixtures: [
                 {
                     method: 'PUSH_TRANSACTION',
@@ -37,7 +37,7 @@ export default {
         },
         {
             description: 'Unsuccessful',
-            params: new Uint8Array(1),
+            params: 'A',
             error: 'Message not set',
         },
     ],
