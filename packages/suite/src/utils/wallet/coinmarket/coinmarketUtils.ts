@@ -135,5 +135,6 @@ export const mapTestnetSymbol = (symbol: Network['symbol']) => {
     if (symbol === 'test') return 'btc';
     if (symbol === 'trop') return 'eth';
     if (symbol === 'txrp') return 'xrp';
+    if (symbol === 'tada') return 'ada';
     return symbol;
 };
