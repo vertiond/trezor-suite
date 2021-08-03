@@ -73,6 +73,8 @@ export const getTitleForNetwork = (symbol: Account['symbol']) => {
             return 'TR_NETWORK_XRP';
         case 'txrp':
             return 'TR_NETWORK_XRP_TESTNET';
+        case 'tada':
+            return 'TR_NETWORK_CARDANO_TESTNET';
         default:
             return 'TR_NETWORK_UNKNOWN';
     }
