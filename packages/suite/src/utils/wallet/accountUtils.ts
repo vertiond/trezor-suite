@@ -263,13 +263,14 @@ export const enhanceTokens = (tokens: Account['tokens']) => {
         }));
 };
 
-export const enhanceAccounts = (
+export const enhanceAddresses = (
     addresses: AccountAddresses | undefined,
     networkType: Account['networkType'],
     accountIndex: Account['index'],
 ): AccountAddresses | undefined => {
     if (!addresses) return undefined;
     if (networkType !== 'cardano') return addresses;
+
     const accountIndexStr = accountIndex.toString();
     const used = addresses.used.map(address => ({
         ...address,

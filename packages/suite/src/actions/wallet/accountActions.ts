@@ -45,7 +45,7 @@ export const create = (
             discoveryItem.coin,
         ),
         tokens: accountUtils.enhanceTokens(accountInfo.tokens),
-        addresses: accountUtils.enhanceAccounts(
+        addresses: accountUtils.enhanceAddresses(
             accountInfo.addresses,
             discoveryItem.networkType,
             discoveryItem.index,
