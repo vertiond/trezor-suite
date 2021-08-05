@@ -1,5 +1,5 @@
 import { State as TransactionsState } from '@wallet-reducers/transactionReducer';
-import { AccountInfo, AccountAddress, PrecomposedTransaction } from 'trezor-connect';
+import { AccountInfo, AccountAddresses, PrecomposedTransaction } from 'trezor-connect';
 import BigNumber from 'bignumber.js';
 import { ACCOUNT_TYPE } from '@wallet-constants/account';
 import { Account, Network, CoinFiatRates, WalletParams, Discovery } from '@wallet-types';
@@ -261,6 +261,30 @@ export const enhanceTokens = (tokens: Account['tokens']) => {
             symbol: t.symbol!.toLowerCase(),
             balance: formatAmount(t.balance!, t.decimals),
         }));
+};
+
+export const enhanceAccounts = (
+    addresses: AccountAddresses | undefined,
+    networkType: Account['networkType'],
+    accountIndex: Account['index'],
+): AccountAddresses | undefined => {
+    if (!addresses) return undefined;
+    if (networkType !== 'cardano') return addresses;
+    const accountIndexStr = accountIndex.toString();
+    const used = addresses.used.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+    const unused = addresses.unused.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+    const change = addresses.change.map(address => ({
+        ...address,
+        path: address.path.replace('i', accountIndexStr),
+    }));
+
+    return { used, unused, change };
 };
 
 export const getAccountFiatBalance = (
