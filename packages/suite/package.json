@@ -1,6 +1,6 @@
 {
     "name": "@trezor/suite",
-    "version": "21.8.0",
+    "version": "21.9.0",
     "private": true,
     "scripts": {
         "lint": "yarn lint:styles && yarn lint:js",
@@ -18,8 +18,8 @@
     },
     "dependencies": {
         "@trezor/components": "^1.0.0",
-        "@trezor/suite-data": "21.8.0",
-        "@trezor/suite-storage": "21.8.0",
+        "@trezor/suite-data": "21.9.0",
+        "@trezor/suite-storage": "21.9.0",
         "bignumber.js": "^9.0.1",
         "date-fns": "^2.16.1",
         "date-fns-tz": "^1.0.12",
@@ -29,6 +29,7 @@
         "file-saver": "^2.0.5",
         "framer-motion": "^3.2.1",
         "google-auth-library": "6.0.6",
+        "history": "^4.10.1",
         "immer": "^8.0.0",
         "jws": "^4.0.0",
         "pako": "^1.0.11",
@@ -36,6 +37,7 @@
         "polished": "^4.1.2",
         "qs": "^6.9.4",
         "react": "17.0.1",
+        "react-awesome-reveal": "^3.8.1",
         "react-dom": "17.0.1",
         "react-focus-lock": "^2.5.0",
         "react-hook-form": "6.15.7",
@@ -59,8 +61,8 @@
         "semver": "^7.3.4",
         "styled-components": "5.1.1",
         "trezor-address-validator": "^0.3.22",
-        "trezor-connect": "8.1.29-extended",
-        "ua-parser-js": "^0.7.27",
+        "trezor-connect": "8.1.30-beta.2",
+        "ua-parser-js": "^0.7.28",
         "uuid": "^8.3.2",
         "web3-utils": "^1.2.6",
         "zxcvbn": "^4.4.2"
@@ -99,6 +101,7 @@
         "core-js-bundle": "3.8.2",
         "cross-env": "^7.0.3",
         "fake-indexeddb": "^3.1.2",
+        "intersection-observer": "^0.12.0",
         "jest-watch-typeahead": "^0.6.1",
         "node-fetch": "^2.6.1",
         "react-test-renderer": "^17.0.1",

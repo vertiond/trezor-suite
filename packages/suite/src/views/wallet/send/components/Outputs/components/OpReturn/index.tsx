@@ -6,6 +6,7 @@ import { InputError } from '@wallet-components';
 import { Textarea, Icon, Tooltip } from '@trezor/components';
 import { getInputState } from '@wallet-utils/sendFormUtils';
 import { isHexValid } from '@wallet-utils/validation';
+import { OpenGuideFromTooltip } from '@guide-views';
 import { MAX_LENGTH } from '@suite-constants/inputs';
 
 const Wrapper = styled.div`
@@ -70,7 +71,13 @@ const OpReturn = ({ outputId }: { outputId: number }) => {
                 bottomText={<InputError error={asciiError} />}
                 label={
                     <Label>
-                        <Tooltip content={<Translation id="OP_RETURN_TOOLTIP" />} dashed>
+                        <Tooltip
+                            openGuide={{
+                                node: <OpenGuideFromTooltip id="/suite-basics/send/op_return.md" />,
+                            }}
+                            content={<Translation id="OP_RETURN_TOOLTIP" />}
+                            dashed
+                        >
                             <Translation id="OP_RETURN" />
                         </Tooltip>
                     </Label>

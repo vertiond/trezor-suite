@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const webpack = require('webpack');
-const RemovePlugin = require('remove-files-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -10,6 +8,7 @@ module.exports = {
         path: path.resolve(__dirname, 'files/browser-detection'),
         filename: 'index.js',
     },
+    devtool: 'source-map',
     module: {
         rules: [
             {
@@ -20,6 +19,21 @@ module.exports = {
                         loader: 'ts-loader',
                         options: {
                             transpileOnly: true,
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                mode: 'local',
+                                localIdentName: '[name]__[local]',
+                            },
                         },
                     },
                 ],

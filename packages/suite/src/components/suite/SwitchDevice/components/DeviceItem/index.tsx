@@ -9,6 +9,7 @@ import { TrezorDevice, AcquiredDevice, InjectedModalApplicationProps } from '@su
 import { useSelector, useActions } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
 import * as suiteActions from '@suite-actions/suiteActions';
+import { OpenGuideFromTooltip } from '@guide-views';
 
 import WalletInstance from '../WalletInstance';
 import ColHeader from './components/ColHeader';
@@ -243,6 +244,11 @@ const DeviceItem = ({ device, instances, closeModalApp, backgroundRoute }: Props
                                             />
                                         </WalletsCount>
                                         <ColRememberHeader
+                                            tooltipOpenGuide={{
+                                                node: (
+                                                    <OpenGuideFromTooltip id="/privacy/remember-and-eject.md" />
+                                                ),
+                                            }}
                                             tooltipContent={
                                                 <Translation id="TR_REMEMBER_ALLOWS_YOU_TO" />
                                             }
@@ -250,6 +256,11 @@ const DeviceItem = ({ device, instances, closeModalApp, backgroundRoute }: Props
                                             <Translation id="TR_REMEMBER_HEADING" />
                                         </ColRememberHeader>
                                         <ColEjectHeader
+                                            tooltipOpenGuide={{
+                                                node: (
+                                                    <OpenGuideFromTooltip id="/privacy/remember-and-eject.md" />
+                                                ),
+                                            }}
                                             tooltipContent={
                                                 <Translation id="TR_EJECT_WALLET_EXPLANATION" />
                                             }

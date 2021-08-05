@@ -9,6 +9,7 @@ import * as sendFormActions from '@wallet-actions/sendFormActions';
 import { getInputState } from '@wallet-utils/sendFormUtils';
 import { isHexValid } from '@wallet-utils/validation';
 import { Network } from '@wallet-types';
+import { OpenGuideFromTooltip } from '@guide-views';
 
 const Wrapper = styled.div`
     /* display: flex;
@@ -76,7 +77,13 @@ const Raw = ({ network }: { network: Network }) => {
                     })}
                     bottomText={<InputError error={error} />}
                     label={
-                        <Tooltip content={<Translation id="SEND_RAW_TRANSACTION_TOOLTIP" />} dashed>
+                        <Tooltip
+                            openGuide={{
+                                node: <OpenGuideFromTooltip id="/suite-basics/send/send-raw.md" />,
+                            }}
+                            content={<Translation id="SEND_RAW_TRANSACTION_TOOLTIP" />}
+                            dashed
+                        >
                             <Translation id="SEND_RAW_TRANSACTION" />
                         </Tooltip>
                     }

@@ -2,6 +2,7 @@ import React from 'react';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { DeepPartial } from 'react-hook-form';
+import 'intersection-observer';
 import * as fixtures from '../__fixtures__/useSendForm';
 import sendFormReducer from '@wallet-reducers/sendFormReducer';
 import resizeReducer from '@suite-reducers/resizeReducer';
@@ -53,6 +54,7 @@ export const getInitialState = ({ send, fees, selectedAccount }: Args = {}) => (
     },
     devices: [],
     resize: resizeReducer(undefined, { type: 'foo' } as any),
+    guide: {},
 });
 
 type State = ReturnType<typeof getInitialState>;
