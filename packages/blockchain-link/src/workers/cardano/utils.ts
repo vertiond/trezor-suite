@@ -5,6 +5,16 @@ import { Address } from '../../types';
 import { VinVout } from '../../types/blockbook';
 import { Transaction, AccountInfo, AccountAddresses, TokenInfo, Target } from '../../types/common';
 
+export const hexToString = (input: string) => {
+    const hex = input.toString();
+    let str = '';
+    for (let n = 0; n < hex.length; n += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+    }
+
+    return str;
+};
+
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
 
@@ -33,20 +43,22 @@ export const transformTokenInfo = (
     tokens: BlockfrostAccountInfo['tokens']
 ): TokenInfo[] | undefined => {
     if (!tokens || !Array.isArray(tokens)) return undefined;
-    const info = tokens.reduce(
-        (arr, t) =>
-            arr.concat([
-                {
-                    type: 'CARDANO',
-                    name: t.unit,
-                    address: t.unit,
-                    symbol: t.unit,
-                    balance: t.quantity,
-                    decimals: -1,
-                },
-            ]),
-        [] as TokenInfo[]
-    );
+    const policyIdSize = 56;
+
+    const info = tokens.map(t => {
+        const assetNameInHex = t.unit.slice(policyIdSize);
+        // const policyId = t.unit.substr(0, policyIdSize);
+        const assetName = hexToString(assetNameInHex);
+        return {
+            type: 'CARDANO',
+            name: t.fingerprint,
+            address: t.fingerprint,
+            symbol: assetName,
+            balance: t.quantity,
+            decimals: t.decimals,
+        };
+    });
+
     return info.length > 0 ? info : undefined;
 };
 

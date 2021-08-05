@@ -18,13 +18,13 @@ const Content: React.FC<ContentProps> = ({ selectedAccount, children }) => {
 
     return (
         <WalletLayout title="TR_TOKENS" account={selectedAccount} showEmptyHeaderPlaceholder>
-            {account.networkType === 'ethereum' && (
-                <TokenList
-                    isTestnet={isTestnet(account.symbol)}
-                    explorerUrl={network.explorer.account}
-                    tokens={account.tokens}
-                />
-            )}
+            <TokenList
+                isTestnet={isTestnet(account.symbol)}
+                // @ts-ignore
+                explorerUrl={network.explorer.token ?? network.explorer.account}
+                tokens={account.tokens}
+            />
+
             {children}
         </WalletLayout>
     );
