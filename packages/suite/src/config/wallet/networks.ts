@@ -373,7 +373,7 @@ const networks = [
         decimals: 6,
         testnet: false,
         explorer: {
-            tx: 'https://explorer.cardano.org/en/transaction?id=',
+            tx: 'https://cardanoscan.io/transaction/',
             account: 'https://test.bithomp.com/explorer/',
             token: 'https://cardanoscan.io/token/',
         },
