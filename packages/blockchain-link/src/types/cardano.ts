@@ -39,7 +39,7 @@ export interface BlockfrostAccountInfo {
     empty: boolean;
     availableBalance: string;
     descriptor: string;
-    tokens?: Balance[];
+    tokens?: TokenBalance[];
     history: {
         total: number;
         tokens?: number;
@@ -90,6 +90,11 @@ export interface UtxosData extends UtxoContent {
 export interface Balance {
     unit: string;
     quantity: string;
+}
+
+export interface TokenBalance extends Balance {
+    fingerprint: string;
+    decimals: number;
 }
 
 export interface Output {

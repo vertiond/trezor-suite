@@ -361,6 +361,7 @@ const networks = [
         explorer: {
             tx: 'https://explorer.cardano.org/en/transaction?id=',
             account: 'https://test.bithomp.com/explorer/',
+            token: 'https://cardanoscan.io/token/',
         },
     },
     {
@@ -374,6 +375,7 @@ const networks = [
         explorer: {
             tx: 'https://explorer.cardano.org/en/transaction?id=',
             account: 'https://test.bithomp.com/explorer/',
+            token: 'https://cardanoscan.io/token/',
         },
     },
     {
@@ -386,6 +388,7 @@ const networks = [
         explorer: {
             tx: 'https://explorer.cardano.org/en/transaction?id=',
             account: 'https://test.bithomp.com/explorer/',
+            token: 'https://cardanoscan.io/token/',
         },
     },
     // {

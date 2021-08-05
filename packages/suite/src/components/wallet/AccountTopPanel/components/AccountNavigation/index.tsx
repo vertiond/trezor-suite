@@ -49,7 +49,7 @@ const AccountNavigation = (props: Props) => {
             isHidden: () => {
                 if (!account) return false;
                 const coinsWithTokens = ['ethereum', 'cardano'];
-                return coinsWithTokens.includes(account.networkType);
+                return !coinsWithTokens.includes(account.networkType);
             },
         },
         {
