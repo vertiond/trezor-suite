@@ -98,17 +98,6 @@ export const showAddress = (path: string, address: string) => async (
         coin: account.symbol,
     };
 
-    console.log({
-        addressParameters: {
-            stakingPath: `m/1852'/1815'/${account.index}'/2/0.`,
-            addressType: 0,
-            path,
-        },
-        protocolMagic: 764824073,
-        networkId: 1,
-        showOnTrezor: true,
-    });
-
     TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
 
     switch (account.networkType) {
@@ -117,6 +106,7 @@ export const showAddress = (path: string, address: string) => async (
             break;
         case 'cardano':
             response = await TrezorConnect.cardanoGetAddress({
+                ...params,
                 addressParameters: {
                     stakingPath: getStakingPath(account.accountType, account.index),
                     addressType: getAddressType(account.accountType),
