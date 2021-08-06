@@ -8,6 +8,8 @@ import { AppState } from '@suite-types';
 import { NETWORKS } from '@wallet-config';
 import { toFiatCurrency } from './fiatConverterUtils';
 
+export const isUtxoBased = (account: Account) => account.networkType === 'bitcoin' || account.networkType === 'cardano';
+
 export const parseBIP44Path = (path: string) => {
     const regEx = /m\/(\d+'?)\/(\d+'?)\/(\d+'?)\/([0,1])\/(\d+)/;
     const tokens = path.match(regEx);
