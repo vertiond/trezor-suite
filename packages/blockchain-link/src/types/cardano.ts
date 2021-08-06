@@ -7,8 +7,8 @@ export interface Subscribe {
 }
 
 export type Fee = {
-    lovelacePerByte: string;
-}[];
+    lovelacePerByte: number;
+};
 
 export interface Address {
     address: string;

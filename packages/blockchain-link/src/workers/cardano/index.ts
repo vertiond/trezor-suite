@@ -125,9 +125,7 @@ const estimateFee = async (data: { id: number } & MessageTypes.EstimateFee): Pro
         const resp = await socket.estimateFee(data.payload);
         const feeOptions: { feePerUnit: string }[] = [];
 
-        resp.forEach(feeItem => {
-            feeOptions.push({ feePerUnit: feeItem.lovelacePerByte });
-        });
+        feeOptions.push({ feePerUnit: resp.lovelacePerByte.toString() });
 
         common.response({
             id: data.id,
