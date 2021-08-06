@@ -85,12 +85,12 @@ export const filterTargets = (addresses: Addresses, targets: VinVout[]): VinVout
 
 export const transformInputOutput = (
     data: BlockfrostTransaction['txUtxos']['inputs'] | BlockfrostTransaction['txUtxos']['outputs']
-): Target[] =>
+): VinVout[] =>
     data.map((utxo, i) => ({
         n: i,
         addresses: [utxo.address],
         isAddress: true,
-        amount: utxo.amount.find(a => a.unit === 'lovelace')?.quantity ?? '0',
+        value: utxo.amount.find(a => a.unit === 'lovelace')?.quantity ?? '0',
     }));
 
 const sumVinVout = (
