@@ -4,6 +4,12 @@ import * as suiteActions from '@suite-actions/suiteActions';
 import * as modalActions from '@suite-actions/modalActions';
 import * as notificationActions from '@suite-actions/notificationActions';
 import { GetState, Dispatch } from '@suite-types';
+import {
+    getStakingPath,
+    getProtocolMagic,
+    getNetworkId,
+    getAddressType,
+} from '@wallet-utils/cardanoUtils';
 
 export type ReceiveAction =
     | { type: typeof RECEIVE.DISPOSE }
@@ -103,6 +109,8 @@ export const showAddress = (path: string, address: string) => async (
         showOnTrezor: true,
     });
 
+    TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
+
     switch (account.networkType) {
         case 'ethereum':
             response = await TrezorConnect.ethereumGetAddress(params);
@@ -110,15 +118,12 @@ export const showAddress = (path: string, address: string) => async (
         case 'cardano':
             response = await TrezorConnect.cardanoGetAddress({
                 addressParameters: {
-                    stakingPath: `m/${account.accountType === 'normal' ? 1852 : 44}'/1815'/${
-                        account.index
-                    }'/2/0.`,
-                    addressType: 0,
+                    stakingPath: getStakingPath(account.accountType, account.index),
+                    addressType: getAddressType(account.accountType),
                     path,
                 },
-                protocolMagic: 764824073,
-                networkId: 1,
-                showOnTrezor: true,
+                protocolMagic: getProtocolMagic(account.symbol),
+                networkId: getNetworkId(account.symbol),
             });
             break;
         case 'ripple':
@@ -135,7 +140,6 @@ export const showAddress = (path: string, address: string) => async (
             break;
     }
 
-    TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
     TrezorConnect.off(UI.REQUEST_BUTTON, buttonRequestHandler);
 
     if (response.success) {
