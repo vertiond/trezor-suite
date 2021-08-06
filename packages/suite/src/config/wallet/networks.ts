@@ -359,7 +359,20 @@ const networks = [
         decimals: 6,
         testnet: false,
         explorer: {
-            tx: 'https://explorer.cardano.org/en/transaction?id=',
+            tx: 'https://cardanoscan.io/transaction/',
+            account: 'https://test.bithomp.com/explorer/',
+            token: 'https://cardanoscan.io/token/',
+        },
+    },
+    {
+        name: 'Cardano Testnet',
+        networkType: 'cardano',
+        symbol: 'tada',
+        bip44: "m/1852'/1815'/i'",
+        decimals: 6,
+        testnet: true,
+        explorer: {
+            tx: 'https://cardanoscan.io/transaction/',
             account: 'https://test.bithomp.com/explorer/',
             token: 'https://cardanoscan.io/token/',
         },
@@ -375,34 +388,8 @@ const networks = [
         explorer: {
             tx: 'https://cardanoscan.io/transaction/',
             account: 'https://test.bithomp.com/explorer/',
-            token: 'https://cardanoscan.io/token/',
         },
     },
-    {
-        name: 'Cardano Testnet',
-        networkType: 'cardano',
-        symbol: 'tada',
-        bip44: "m/1852'/1815'/i'",
-        decimals: 6,
-        testnet: true,
-        explorer: {
-            tx: 'https://explorer.cardano.org/en/transaction?id=',
-            account: 'https://test.bithomp.com/explorer/',
-            token: 'https://cardanoscan.io/token/',
-        },
-    },
-    // {
-    //     name: 'Cardano Testnet (Byron)',
-    //     networkType: 'cardano',
-    //     symbol: 'tada',
-    //     bip44: "m/44'/1815'/i'",
-    //     decimals: 6,
-    //     testnet: true,
-    //     explorer: {
-    //         tx: 'https://explorer.cardano.org/en/transaction?id=',
-    //         account: 'https://test.bithomp.com/explorer/',
-    //     },
-    // },
 ] as const;
 
 type Network = {

@@ -91,6 +91,8 @@ export const getBip43Shortcut = (path: string) => {
             return 'p2sh';
         case `44'`:
             return 'p2pkh';
+        case `1852'`:
+            return 'shelley';
         default:
             return 'unknown';
     }
@@ -100,6 +102,7 @@ export const getAccountTypeIntl = (path: string) => {
     const bip43 = getBip43Shortcut(path);
     if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_NATIVE_SEGWIT';
     if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_SEGWIT';
+    if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
     return 'TR_ACCOUNT_TYPE_LEGACY';
 };
 
@@ -107,6 +110,7 @@ export const getBip43Intl = (path: string) => {
     const bip43 = getBip43Shortcut(path);
     if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_BECH32';
     if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_P2SH';
+    if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
     return 'TR_ACCOUNT_TYPE_P2PKH';
 };
 
