@@ -85,7 +85,7 @@ export default class Socket extends EventEmitter {
         // make sure that connection is alive if there are subscriptions
         if (this.ws && this.isConnected()) {
             if (this.subscriptions.length > 0 || this.options.keepAlive) {
-                await this.getBlockHash(0);
+                await this.getBlockHash(1);
             } else {
                 try {
                     this.ws.close();
