@@ -93,7 +93,6 @@ export interface Balance {
 }
 
 export interface TokenBalance extends Balance {
-    fingerprint: string;
     decimals: number;
 }
 
