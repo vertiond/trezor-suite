@@ -13,8 +13,15 @@ import {
 } from '../../types/common';
 import { filterTargets, sumVinVout } from '../utils';
 
-export const hexToString = (hex: string) =>
-    hex ? Buffer.from(hex, 'hex').toString('utf-8') : undefined;
+export const hexToString = (input: string) => {
+    const hex = input.toString();
+    let str = '';
+    for (let n = 0; n < hex.length; n += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+    }
+
+    return str;
+};
 
 export const getFingerprint = (policyId: string, assetName?: string): string =>
     new EmurgoCip(
@@ -61,8 +68,6 @@ export const transformTokenInfo = (
     tokens: BlockfrostAccountInfo['tokens']
 ): TokenInfo[] | undefined => {
     if (!tokens || !Array.isArray(tokens)) return undefined;
-    const policyIdSize = 56;
-
     const info = tokens.map(t => {
         const { fingerprint, assetName } = parseAsset(t.unit);
         return {
