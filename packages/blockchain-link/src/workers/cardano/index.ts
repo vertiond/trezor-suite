@@ -6,6 +6,7 @@ import { SubscriptionAccountInfo } from '../../types/common';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
 import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostTransaction } from '../../types/cardano';
 import { transformUtxos, transformAccountInfo, transformTransaction } from './utils';
 
 declare function postMessage(data: Response): void;
@@ -203,8 +204,7 @@ const onNewBlock = (event: Responses['block_content']) => {
     });
 };
 
-const onTransaction = (event: any) => {
-    if (!event.tx) return;
+const onTransaction = (event: BlockfrostTransaction) => {
     const descriptor = event.address;
     const account = common.getAccount(descriptor);
 
@@ -216,8 +216,8 @@ const onTransaction = (event: any) => {
             payload: {
                 descriptor: account ? account.descriptor : descriptor,
                 tx: account
-                    ? transformTransaction(account.descriptor, account.addresses, event.tx)
-                    : transformTransaction(descriptor, undefined, event.tx),
+                    ? transformTransaction(account.descriptor, account.addresses, event)
+                    : transformTransaction(descriptor, undefined, event),
             },
         },
     });
