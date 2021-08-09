@@ -125,7 +125,7 @@ const AmountDetails = ({ tx, isTestnet }: Props) => {
                             secondColumn={
                                 <FormattedCryptoAmount
                                     value={tx.details.totalInput}
-                                    symbol={assetSymbol}
+                                    symbol={tx.symbol}
                                 />
                             }
                             thirdColumn={
