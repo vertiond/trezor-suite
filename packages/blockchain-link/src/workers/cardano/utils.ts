@@ -246,12 +246,12 @@ export const transformAccountInfo = (info: BlockfrostAccountInfo): AccountInfo =
         ...info,
         tokens: transformTokenInfo(info.tokens),
         history: {
+            ...info.history,
             transactions: !cardanoTxs
                 ? []
-                : cardanoTxs.map(tx => transformTransaction(info.descriptor, info.addresses, tx)),
+                : cardanoTxs?.map(tx => transformTransaction(info.descriptor, info.addresses, tx)),
         },
     };
 
-    // @ts-ignore
     return result;
 };
