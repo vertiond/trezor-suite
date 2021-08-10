@@ -263,7 +263,7 @@ export const signTransaction = (
             sendFormRippleActions.signTransaction(formValues, enhancedTxInfo),
         );
     }
-     if (account.networkType === 'cardano') {
+    if (account.networkType === 'cardano') {
         serializedTx = await dispatch(
             sendFormCardanoActions.signTransaction(formValues, enhancedTxInfo),
         );
