@@ -388,6 +388,7 @@ const networks = [
         explorer: {
             tx: 'https://cardanoscan.io/transaction/',
             account: 'https://test.bithomp.com/explorer/',
+            token: 'https://cardanoscan.io/token/',
         },
     },
 ] as const;

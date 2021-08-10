@@ -15,13 +15,14 @@ interface ContentProps {
 const Content: React.FC<ContentProps> = ({ selectedAccount, children }) => {
     if (selectedAccount.status !== 'loaded') return null;
     const { account, network } = selectedAccount;
+    const explorerUrl =
+        network.networkType === 'cardano' ? network.explorer.token : network.explorer.account;
 
     return (
         <WalletLayout title="TR_TOKENS" account={selectedAccount} showEmptyHeaderPlaceholder>
             <TokenList
                 isTestnet={isTestnet(account.symbol)}
-                // @ts-ignore
-                explorerUrl={network.explorer.token ?? network.explorer.account}
+                explorerUrl={explorerUrl}
                 tokens={account.tokens}
             />
 
