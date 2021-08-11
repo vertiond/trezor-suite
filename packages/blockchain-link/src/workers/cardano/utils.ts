@@ -41,6 +41,30 @@ export const parseAsset = (hex: string) => {
     };
 };
 
+export const HD_HARDENED = 0x80000000;
+
+// eslint-disable-next-line no-bitwise
+export const toHardened = (n: number) => (n | HD_HARDENED) >>> 0;
+
+export const getHDPath = (path: string): number[] => {
+    const parts = path.toLowerCase().split('/');
+    return parts
+        .filter(p => p !== 'm' && p !== '')
+        .map(p => {
+            let hardened = false;
+            if (p.substr(p.length - 1) === "'") {
+                hardened = true;
+                p = p.substr(0, p.length - 1);
+            }
+            let n = parseInt(p, 10);
+            if (hardened) {
+                // hardened index
+                n = toHardened(n);
+            }
+            return n;
+        });
+};
+
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
 

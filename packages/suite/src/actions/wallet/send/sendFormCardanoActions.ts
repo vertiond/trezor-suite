@@ -1,5 +1,5 @@
 import TrezorConnect from 'trezor-connect';
-import { getNetworkId, getProtocolMagic } from '@wallet-utils/cardanoUtils';
+import { getNetworkId, getProtocolMagic, getHDPath } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
 import { getBitcoinComposeOutputs } from '@wallet-utils/sendFormUtils';
@@ -7,8 +7,8 @@ import * as notificationActions from '@suite-actions/notificationActions';
 import {
     FormState,
     UseSendFormState,
-    PrecomposedLevels,
-    PrecomposedTransaction,
+    PrecomposedLevelsCardano,
+    PrecomposedTransactionCardano,
 } from '@wallet-types/sendForm';
 import { Dispatch, GetState } from '@suite-types';
 import BigNumber from 'bignumber.js';
@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js';
 export const composeTransaction = (
     formValues: FormState,
     formState: UseSendFormState,
-) => (): PrecomposedLevels | void => {
+) => (): PrecomposedLevelsCardano | void => {
     const { account, feeInfo } = formState;
     if (!account.addresses || !account.utxo) return;
     const fee = '170000';
@@ -53,7 +53,7 @@ export const composeTransaction = (
             totalSpent: totalOutputWithFee.toString(),
             transaction: {
                 inputs: resultUtxo.map(utxo => ({
-                    address_n: utxo.address,
+                    address_n: getHDPath(utxo.path),
                     amount: utxo.amount,
                     prev_hash: utxo.txid,
                     prev_index: utxo.vout,
