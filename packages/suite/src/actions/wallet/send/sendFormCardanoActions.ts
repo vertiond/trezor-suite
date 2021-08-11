@@ -1,5 +1,5 @@
 import TrezorConnect from 'trezor-connect';
-import { getNetworkId, getProtocolMagic, getHDPath } from '@wallet-utils/cardanoUtils';
+import { getNetworkId, getProtocolMagic } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
 import { getBitcoinComposeOutputs } from '@wallet-utils/sendFormUtils';
@@ -53,7 +53,8 @@ export const composeTransaction = (
             totalSpent: totalOutputWithFee.toString(),
             transaction: {
                 inputs: resultUtxo.map(utxo => ({
-                    address_n: getHDPath(utxo.path),
+                    address: utxo.address,
+                    path: utxo.path,
                     amount: utxo.amount,
                     prev_hash: utxo.txid,
                     prev_index: utxo.vout,
@@ -97,7 +98,7 @@ export const composeTransaction = (
 
 export const signTransaction = (
     formValues: FormState,
-    transactionInfo: PrecomposedTransaction,
+    transactionInfo: PrecomposedTransactionCardano,
 ) => async (dispatch: Dispatch, getState: GetState) => {
     const { selectedAccount } = getState().wallet;
     const { device } = getState().suite;
