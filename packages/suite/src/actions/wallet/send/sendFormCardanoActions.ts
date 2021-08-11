@@ -2,7 +2,6 @@ import TrezorConnect from 'trezor-connect';
 import { getNetworkId, getProtocolMagic } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
-import { getBitcoinComposeOutputs } from '@wallet-utils/sendFormUtils';
 import * as notificationActions from '@suite-actions/notificationActions';
 import {
     FormState,
@@ -20,7 +19,6 @@ export const composeTransaction = (
     const { account, feeInfo } = formState;
     if (!account.addresses || !account.utxo) return;
     const fee = '170000';
-    const composeOutputs = getBitcoinComposeOutputs(formValues, account.symbol);
     const utxosCopy = account.utxo.map(u => ({ ...u }));
     const sortedUtxos = utxosCopy.sort((utxo1, utxo2) =>
         new BigNumber(utxo2.amount).comparedTo(utxo1.amount),
@@ -44,13 +42,14 @@ export const composeTransaction = (
         }
     });
 
-    return [
-        {
+    return {
+        normal: {
             type: 'final',
             fee,
             feePerByte: '0.44',
             bytes: 1,
             totalSpent: totalOutputWithFee.toString(),
+            max: undefined,
             transaction: {
                 inputs: resultUtxo.map(utxo => ({
                     address: utxo.address,
@@ -59,41 +58,15 @@ export const composeTransaction = (
                     prev_hash: utxo.txid,
                     prev_index: utxo.vout,
                 })),
-                outputs: composeOutputs,
+                outputs: formValues.outputs.map(o => ({
+                    address: o.address,
+                    amount: o.amount,
+                    token_bundle: [],
+                })),
+                outputsPermutation: [0],
             },
         },
-    ];
-
-    console.log('resultUtxo', resultUtxo);
-    console.log('sortedUtxos', sortedUtxos);
-    console.log('formValues', formValues);
-    // console.log('sortedUtxos', sortedUtxos);
-    console.log('feeInfo', feeInfo);
-
-    // export type CardanoTxInputType = {
-    //     address_n?: number[];
-    //     prev_hash: string;
-    //     prev_index: number;
-    // };
-
-    // export type CardanoTokenType = {
-    //     asset_name_bytes: string;
-    //     amount: string | number;
-    // };
-
-    // export type CardanoAssetGroupType = {
-    //     policy_id: string;
-    //     tokens: CardanoTokenType[];
-    // };
-
-    // export type CardanoTxOutputType = {
-    //     address?: string;
-    //     amount: number;
-    //     address_parameters?: CardanoAddressParametersType;
-    //     token_bundle: CardanoAssetGroupType[];
-    // };
-
-    // serialization lib lib here
+    };
 };
 
 export const signTransaction = (
