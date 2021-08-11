@@ -54,8 +54,7 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
             confirmations: utxo.blockInfo.confirmations,
             blockHeight: utxo.blockInfo.height || 0,
             amount: lovelaceBalance?.quantity || '0',
-            // blockbook only
-            vout: -1,
+            vout: utxo.utxoData.output_index,
             path: '-1',
         });
     });
