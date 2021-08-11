@@ -55,7 +55,7 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
             blockHeight: utxo.blockInfo.height || 0,
             amount: lovelaceBalance?.quantity || '0',
             vout: utxo.utxoData.output_index,
-            path: '-1',
+            path: utxo.path,
         });
     });
 

@@ -119,6 +119,7 @@ export interface BlockfrostUtxoData {
 
 export interface BlockfrostUtxos {
     address: string;
+    path: string;
     utxoData: BlockfrostUtxoData;
     blockInfo: Responses['block_content'];
 }

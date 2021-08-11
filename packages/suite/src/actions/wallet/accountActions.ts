@@ -50,7 +50,11 @@ export const create = (
             discoveryItem.networkType,
             discoveryItem.index,
         ),
-        utxo: accountInfo.utxo,
+        utxo: accountUtils.enhanceUtxo(
+            accountInfo.utxo,
+            discoveryItem.networkType,
+            discoveryItem.index,
+        ),
         history: accountInfo.history,
         metadata: {
             key: accountInfo.legacyXpub || accountInfo.descriptor,

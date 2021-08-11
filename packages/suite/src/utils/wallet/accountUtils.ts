@@ -8,7 +8,8 @@ import { AppState } from '@suite-types';
 import { NETWORKS } from '@wallet-config';
 import { toFiatCurrency } from './fiatConverterUtils';
 
-export const isUtxoBased = (account: Account) => account.networkType === 'bitcoin' || account.networkType === 'cardano';
+export const isUtxoBased = (account: Account) =>
+    account.networkType === 'bitcoin' || account.networkType === 'cardano';
 
 export const parseBIP44Path = (path: string) => {
     const regEx = /m\/(\d+'?)\/(\d+'?)\/(\d+'?)\/([0,1])\/(\d+)/;
@@ -292,6 +293,23 @@ export const enhanceAddresses = (
     }));
 
     return { used, unused, change };
+};
+
+export const enhanceUtxo = (
+    utxo: Account['utxo'],
+    networkType: Account['networkType'],
+    accountIndex: Account['index'],
+): Account['utxo'] => {
+    if (!utxo) return undefined;
+    if (networkType !== 'cardano') return utxo;
+
+    const accountIndexStr = accountIndex.toString();
+    const enhancedUtxos = utxo.map(utxo => ({
+        ...utxo,
+        path: utxo.path.replace('i', accountIndexStr),
+    }));
+
+    return enhancedUtxos;
 };
 
 export const getAccountFiatBalance = (
