@@ -45,8 +45,10 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
 
     utxos.forEach(utxo => {
+        // TODO: utxos which include some token are excluded
+        const isMultiAsset = utxo.utxoData.amount.find(b => b.unit !== 'lovelace');
         const lovelaceBalance = utxo.utxoData.amount.find(b => b.unit === 'lovelace');
-        if (!lovelaceBalance) return;
+        if (!lovelaceBalance || isMultiAsset) return;
 
         result.push({
             address: utxo.address,
