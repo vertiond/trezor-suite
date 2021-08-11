@@ -26,7 +26,8 @@ export const composeTransaction = (
 
     const resultUtxo: Account['utxo'] = [];
     const totalOutputAmount = formValues.outputs.reduce(
-        (acc, currentValues) => acc.plus(networkAmountToSatoshi(currentValues.amount, 'ada')),
+        (acc, currentValues) =>
+            acc.plus(networkAmountToSatoshi(currentValues.amount, formState.account.symbol)),
         new BigNumber('0'),
     );
 
@@ -36,7 +37,7 @@ export const composeTransaction = (
     sortedUtxos.forEach(utxo => {
         if (totalUsedUtxoAmount.isLessThanOrEqualTo(totalOutputWithFee)) {
             totalUsedUtxoAmount = totalUsedUtxoAmount.plus(
-                networkAmountToSatoshi(utxo.amount, 'ada'),
+                networkAmountToSatoshi(utxo.amount, formState.account.symbol),
             );
             resultUtxo.push(utxo);
         }
@@ -60,10 +61,9 @@ export const composeTransaction = (
                 })),
                 outputs: formValues.outputs.map(o => ({
                     address: o.address,
-                    amount: o.amount,
+                    amount: networkAmountToSatoshi(o.amount, formState.account.symbol),
                     token_bundle: [],
                 })),
-                outputsPermutation: [0],
             },
         },
     };
@@ -91,34 +91,6 @@ export const signTransaction = (
     if (account.networkType !== 'cardano') return;
 
     const { transaction } = transactionInfo;
-
-    // export interface CardanoInput {
-    //     path: string | number[];
-    //     prev_hash: string;
-    //     prev_index: number;
-    // }
-
-    // export type CardanoToken = {
-    //     assetNameBytes: string;
-    //     amount: string;
-    // }
-
-    // export type CardanoAssetGroup = {
-    //     policyId: string;
-    //     tokenAmounts: CardanoToken[];
-    // }
-
-    // export type CardanoOutput =
-    //     | {
-    //           addressParameters: CardanoAddressParameters;
-    //           amount: string;
-    //           tokenBundle?: CardanoAssetGroup[];
-    //       }
-    //     | {
-    //           address: string;
-    //           amount: string;
-    //           tokenBundle?: CardanoAssetGroup[];
-    //       }
 
     const signedTx = await TrezorConnect.cardanoSignTransaction({
         device: {
