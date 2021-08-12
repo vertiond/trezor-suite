@@ -47,6 +47,12 @@ export const composeTransaction = (
         }
     });
 
+    const inputs = resultUtxo.map(utxo => ({
+        path: utxo.path,
+        prev_hash: utxo.txid,
+        prev_index: utxo.vout,
+    }));
+
     const changeAddress = account.addresses.unused[0];
     const changeOutput = {
         type: 'change',
@@ -77,13 +83,7 @@ export const composeTransaction = (
             totalSpent: totalOutputWithFee.toString(),
             max: undefined,
             transaction: {
-                inputs: resultUtxo.map(utxo => ({
-                    address: utxo.address,
-                    path: utxo.path,
-                    amount: utxo.amount,
-                    prev_hash: utxo.txid,
-                    prev_index: utxo.vout,
-                })),
+                inputs,
                 outputs,
             },
         },
