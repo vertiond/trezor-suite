@@ -53,7 +53,7 @@ export const composeTransaction = (
         prev_index: utxo.vout,
     }));
 
-    const changeAddress = account.addresses.unused[0];
+    const changeAddress = account.addresses.change[0];
     const changeOutput = {
         amount: totalUsedUtxoAmount.minus(totalOutputWithFee).toString(),
         addressParameters: {
@@ -71,8 +71,6 @@ export const composeTransaction = (
     }));
     outputs.push(changeOutput);
 
-    console.log('inputs', inputs);
-    console.log('outputs', outputs);
     return {
         normal: {
             type: 'final',

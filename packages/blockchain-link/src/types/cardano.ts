@@ -141,7 +141,7 @@ declare function FSend(
     method: 'GET_TRANSACTION',
     params: { txId: string }
 ): Promise<BlockfrostTransaction>;
-declare function FSend(method: 'PUSH_TRANSACTION', params: { transaction: string }): Promise<any>;
+declare function FSend(method: 'PUSH_TRANSACTION', params: { txData: string }): Promise<any>;
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(method: 'UNSUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(

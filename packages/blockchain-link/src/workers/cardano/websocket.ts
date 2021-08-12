@@ -227,8 +227,8 @@ export default class Socket extends EventEmitter {
         return this.send('GET_TRANSACTION', { txId });
     }
 
-    pushTransaction(transaction: string) {
-        return this.send('PUSH_TRANSACTION', { transaction });
+    pushTransaction(txData: string) {
+        return this.send('PUSH_TRANSACTION', { txData });
     }
 
     subscribeBlock() {
