@@ -1,5 +1,6 @@
+/* eslint-disable no-bitwise */
 import TrezorConnect from 'trezor-connect';
-import { getNetworkId, getProtocolMagic } from '@wallet-utils/cardanoUtils';
+import { getNetworkId, getProtocolMagic, getStakingPath } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
 import * as notificationActions from '@suite-actions/notificationActions';
@@ -27,7 +28,7 @@ export const composeTransaction = (
     const resultUtxo: Account['utxo'] = [];
     const totalOutputAmount = formValues.outputs.reduce(
         (acc, currentValues) =>
-            acc.plus(networkAmountToSatoshi(currentValues.amount, formState.account.symbol)),
+            acc.plus(networkAmountToSatoshi(currentValues.amount, account.symbol)),
         new BigNumber('0'),
     );
 
@@ -36,12 +37,32 @@ export const composeTransaction = (
 
     sortedUtxos.forEach(utxo => {
         if (totalUsedUtxoAmount.isLessThanOrEqualTo(totalOutputWithFee)) {
-            totalUsedUtxoAmount = totalUsedUtxoAmount.plus(
-                networkAmountToSatoshi(utxo.amount, formState.account.symbol),
-            );
+            totalUsedUtxoAmount = totalUsedUtxoAmount.plus(utxo.amount);
             resultUtxo.push(utxo);
         }
     });
+
+    const changeAddress = account.addresses.unused[0];
+
+    const changeOutput = {
+        type: 'change',
+        address: changeAddress.address,
+        amount: totalUsedUtxoAmount.minus(totalOutputWithFee).toString(),
+        addressParameters: {
+            path: changeAddress.path,
+            addressType: 0, // shelley
+            stakingPath: getStakingPath(account.accountType, account.index),
+        },
+        token_bundle: [],
+    };
+
+    const outputs = formValues.outputs
+        .map(o => ({
+            address: o.address,
+            amount: networkAmountToSatoshi(o.amount, account.symbol),
+            token_bundle: [],
+        }))
+        .concat(changeOutput);
 
     return {
         normal: {
@@ -59,11 +80,7 @@ export const composeTransaction = (
                     prev_hash: utxo.txid,
                     prev_index: utxo.vout,
                 })),
-                outputs: formValues.outputs.map(o => ({
-                    address: o.address,
-                    amount: networkAmountToSatoshi(o.amount, formState.account.symbol),
-                    token_bundle: [],
-                })),
+                outputs,
             },
         },
     };
