@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import TrezorConnect from 'trezor-connect';
+import TrezorConnect, { CardanoOutput } from 'trezor-connect';
 import {
     getAddressType,
     getNetworkId,
@@ -55,31 +55,30 @@ export const composeTransaction = (
 
     const changeAddress = account.addresses.unused[0];
     const changeOutput = {
-        type: 'change',
-        address: changeAddress.address,
         amount: totalUsedUtxoAmount.minus(totalOutputWithFee).toString(),
         addressParameters: {
             path: changeAddress.path,
             addressType: getAddressType(account.accountType),
             stakingPath: getStakingPath(account.accountType, account.index),
         },
-        token_bundle: [],
+        // token_bundle: [],
     };
 
-    const outputs = formValues.outputs
-        .map(o => ({
-            address: o.address,
-            amount: networkAmountToSatoshi(o.amount, account.symbol),
-            token_bundle: [],
-        }))
-        .concat(changeOutput);
+    const outputs: CardanoOutput[] = formValues.outputs.map(o => ({
+        address: o.address,
+        amount: networkAmountToSatoshi(o.amount, account.symbol),
+        // token_bundle: [],
+    }));
+    outputs.push(changeOutput);
 
+    console.log('inputs', inputs);
+    console.log('outputs', outputs);
     return {
         normal: {
             type: 'final',
             fee,
             feePerByte: '0.44',
-            bytes: 1,
+            bytes: 300,
             totalSpent: totalOutputWithFee.toString(),
             max: undefined,
             transaction: {
