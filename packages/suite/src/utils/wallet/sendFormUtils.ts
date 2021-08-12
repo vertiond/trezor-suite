@@ -197,6 +197,7 @@ export const getFiatRate = (fiatRates: CoinFiatRates | undefined, currency: stri
 export const getFeeUnits = (networkType: Network['networkType']) => {
     if (networkType === 'ethereum') return 'GWEI';
     if (networkType === 'ripple') return 'Drops';
+    if (networkType === 'cardano') return 'Lovelaces/B';
     return 'sat/B';
 };
 
