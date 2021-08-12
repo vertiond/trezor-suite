@@ -126,6 +126,8 @@ export interface AccountInfo {
         // XRP
         sequence?: number;
         reserve?: string;
+        // cardano
+        cardanoUtxos?: [];
     };
     page?: {
         // blockbook and cardano

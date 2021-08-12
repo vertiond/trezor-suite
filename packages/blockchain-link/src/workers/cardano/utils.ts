@@ -44,22 +44,20 @@ export const parseAsset = (hex: string) => {
 export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
     const result: Utxo[] = [];
 
-    utxos.forEach(utxo => {
-        // TODO: utxos which include some token are excluded
-        const isMultiAsset = utxo.utxoData.amount.find(b => b.unit !== 'lovelace');
-        const lovelaceBalance = utxo.utxoData.amount.find(b => b.unit === 'lovelace');
-        if (!lovelaceBalance || isMultiAsset) return;
-
-        result.push({
-            address: utxo.address,
-            txid: utxo.utxoData.tx_hash,
-            confirmations: utxo.blockInfo.confirmations,
-            blockHeight: utxo.blockInfo.height || 0,
-            amount: lovelaceBalance?.quantity || '0',
-            vout: utxo.utxoData.output_index,
-            path: utxo.path,
-        });
-    });
+    utxos.forEach(utxo =>
+        utxo.utxoData.amount.forEach(u => {
+            result.push({
+                address: utxo.address,
+                txid: utxo.utxoData.tx_hash,
+                confirmations: utxo.blockInfo.confirmations,
+                blockHeight: utxo.blockInfo.height || 0,
+                amount: u.quantity,
+                vout: utxo.utxoData.output_index,
+                path: utxo.path,
+                cardanoUnit: u.unit,
+            });
+        })
+    );
 
     return result;
 };

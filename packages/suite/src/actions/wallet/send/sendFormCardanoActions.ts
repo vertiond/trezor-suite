@@ -5,6 +5,7 @@ import {
     getNetworkId,
     getProtocolMagic,
     getStakingPath,
+    transformUtxos,
 } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
@@ -24,6 +25,8 @@ export const composeTransaction = (
 ) => (): PrecomposedLevelsCardano | void => {
     const { account, feeInfo } = formState;
     if (!account.addresses || !account.utxo) return;
+
+    const utxos = transformUtxos(account.utxo);
     const fee = '170000';
     const utxosCopy = account.utxo.map(u => ({ ...u }));
     const sortedUtxos = utxosCopy.sort((utxo1, utxo2) =>
@@ -36,6 +39,8 @@ export const composeTransaction = (
             acc.plus(networkAmountToSatoshi(currentValues.amount, account.symbol)),
         new BigNumber('0'),
     );
+
+    console.log('utxos', utxos);
 
     const totalOutputWithFee = totalOutputAmount.plus(fee);
     let totalUsedUtxoAmount = new BigNumber(0);

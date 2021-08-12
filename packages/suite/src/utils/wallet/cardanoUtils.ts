@@ -14,3 +14,19 @@ export const getNetworkId = (accountSymbol: Account['symbol']) =>
 
 export const getAddressType = (accountType: Account['accountType']): 0 | 8 =>
     accountType === 'normal' ? CARDANO.ADDRESS_TYPE.Base : CARDANO.ADDRESS_TYPE.Byron;
+
+export const transformUtxos = (utxos: Account['utxos']) => {
+    const result = [];
+
+    utxos.forEach(utxo => {
+        const foundItem = result.find(res => res.txid === utxo.txid);
+
+        if (!foundItem) {
+            result.push({ ...utxo, amount: [{ quantity: utxo.amount, unit: utxo.cardanoUnit }] });
+        } else {
+            foundItem.amount.push({ quantity: utxo.amount, unit: utxo.cardanoUnit });
+        }
+    });
+
+    return result;
+};
