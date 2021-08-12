@@ -4175,6 +4175,10 @@ const definedMessages = defineMessages({
         id: 'TR_NO_DEVICE_CONNECTED',
         defaultMessage: 'No device connected',
     },
+    TR_REBOOT_INTO_BOOTLOADER: {
+        id: 'TR_REBOOT_INTO_BOOTLOADER',
+        defaultMessage: 'Reboot your Trezor into bootloader mode',
+    },
     TR_RECONNECT_IN_BOOTLOADER: {
         id: 'TR_RECONNECT_IN_BOOTLOADER',
         defaultMessage: 'Reconnect your device in bootloader mode',
@@ -5860,9 +5864,13 @@ const definedMessages = defineMessages({
         id: 'TR_SUITE_WEB_LANDING_WINDOWS_LABEL',
         defaultMessage: 'for Windows 8+',
     },
+    TR_SUITE_WEB_LANDING_MACOS_ARM64_LABEL: {
+        id: 'TR_SUITE_WEB_LANDING_MACOS_ARM64_LABEL',
+        defaultMessage: 'for macOS (Apple Silicon)',
+    },
     TR_SUITE_WEB_LANDING_MACOS_LABEL: {
         id: 'TR_SUITE_WEB_LANDING_MACOS_LABEL',
-        defaultMessage: 'for MacOS',
+        defaultMessage: 'for macOS (Intel)',
     },
     TR_SUITE_WEB_LANDING_SIGNING_KEY: {
         id: 'TR_SUITE_WEB_LANDING_SIGNING_KEY',
