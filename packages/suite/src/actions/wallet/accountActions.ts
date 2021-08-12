@@ -80,6 +80,7 @@ export const update = (account: Account, accountInfo: AccountInfo): AccountActio
             account.networkType === 'ripple' ? accountInfo.balance : accountInfo.availableBalance,
             account.symbol,
         ),
+        utxo: accountUtils.enhanceUtxo(accountInfo.utxo, account.networkType, account.index),
         tokens: accountUtils.enhanceTokens(accountInfo.tokens),
         ...accountUtils.getAccountSpecific(accountInfo, account.networkType),
     },
