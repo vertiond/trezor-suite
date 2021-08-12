@@ -1,6 +1,11 @@
 /* eslint-disable no-bitwise */
 import TrezorConnect from 'trezor-connect';
-import { getNetworkId, getProtocolMagic, getStakingPath } from '@wallet-utils/cardanoUtils';
+import {
+    getAddressType,
+    getNetworkId,
+    getProtocolMagic,
+    getStakingPath,
+} from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 import { networkAmountToSatoshi } from '@wallet-utils/accountUtils';
 import * as notificationActions from '@suite-actions/notificationActions';
@@ -43,14 +48,13 @@ export const composeTransaction = (
     });
 
     const changeAddress = account.addresses.unused[0];
-
     const changeOutput = {
         type: 'change',
         address: changeAddress.address,
         amount: totalUsedUtxoAmount.minus(totalOutputWithFee).toString(),
         addressParameters: {
             path: changeAddress.path,
-            addressType: 0, // shelley
+            addressType: getAddressType(account.accountType),
             stakingPath: getStakingPath(account.accountType, account.index),
         },
         token_bundle: [],
