@@ -70,6 +70,7 @@ const transformToTokenBundle = (assets: { unit: string; quantity: string }[]) =>
             .map(asset => {
                 const assetInfo = parseAsset(asset.unit);
 
+                // TODO: Looks like transaction is invalid if one of the asset doens't have proper assetName (we are sending assetNameInHex set to empty string)
                 return {
                     assetNameBytes: assetInfo.assetNameInHex,
                     amount: asset.quantity,
@@ -213,7 +214,7 @@ const largestFirst = (
 
             // Calculate change output
 
-            // change output amount should be lowered by the cost of the change output (fee + min utxoval)
+            // change output amount should be lowered by the cost of the change output (fee + minUtxoVal)
             // The cost will be subtracted once we calculate it.
             const placeholderChangeOutputAmount = utxosTotalAmount.clamped_sub(
                 totalFeesAmount.checked_add(totalOutputAmount),
@@ -260,12 +261,6 @@ const largestFirst = (
                 .checked_add(changeOutputCost.outputFee);
             let changeOutputAmount = utxosTotalAmount.clamped_sub(totalSpent);
 
-            console.log('totalSpent', totalSpent.to_str());
-            console.log('changeOutputAmount', changeOutputAmount.to_str());
-            console.log(
-                'changeOutputCost.minOutputAmount',
-                changeOutputCost.minOutputAmount.to_str(),
-            );
             // Sum of all tokens in utxos must be same as sum of the tokens in external + change outputs
             // If computed change output doesn't contain any tokens then it makes sense to add it only if the fee + minUtxoValue is less then the amount
             const isChangeOutputNeeded =
@@ -273,16 +268,17 @@ const largestFirst = (
                 changeOutputAmount.compare(changeOutputCost.minOutputAmount) > 0;
 
             let requiredAmount = totalFeesAmount.checked_add(totalOutputAmount); // fees + regulars outputs
-            let addAnotherUtxo = false;
+            // let addAnotherUtxo = false;
             if (isChangeOutputNeeded) {
                 if (changeOutputAmount.compare(changeOutputCost.minOutputAmount) < 0) {
                     // computed change amount would be below minUtxoValue
                     // but since we need to return assets let's try to add another utxo
+                    // and set change output amount to met minimum requirements for minUtxoValue
                     changeOutputAmount = changeOutputCost.minOutputAmount;
-                    addAnotherUtxo = true; // flag probably not necessary anymore
+                    // addAnotherUtxo = true; // flag probably not necessary anymore
                     if (!utxos.length) {
                         console.warn(
-                            'malo utxa na vytvorenie change outputu, ale change output je potrebny kvoli vrateniu tokenov.. fail',
+                            "We need to add change output because of utxos are containing some assets which we are not spending in regular output, but we don't have enough ADA to cover change output's minUtxoVal ",
                         );
                     }
                 }
@@ -292,11 +288,23 @@ const largestFirst = (
                     .checked_add(changeOutputCost.outputFee);
             }
 
-            console.log('----');
-            console.log('utxosTotalAmount', utxosTotalAmount.to_str());
-            console.log('requiredAmount', requiredAmount.to_str());
-            console.log('addAnotherUtxo', addAnotherUtxo);
-            if (utxosTotalAmount.compare(requiredAmount) >= 0 && !addAnotherUtxo) {
+            console.log('----CURRENT UTXO SELECTION ITERATION----');
+            console.log('usedUtxos', usedUtxos);
+            console.log(
+                'utxosTotalAmount (ADA amount that needs to be spent (sum of utxos = outputs - fee))',
+                utxosTotalAmount.to_str(),
+            );
+            console.log(
+                'requiredAmount to cover fees for all inputs, outputs (including additional change output if needed) and output amounts themselves',
+                requiredAmount.to_str(),
+            );
+            console.log(
+                `CHANGE OUTPUT (already included in requiredAmount above): amount: ${changeOutputAmount.to_str()} fe: ${changeOutputCost.outputFee.to_str()}`,
+            );
+
+            // console.log('addAnotherUtxo', addAnotherUtxo);
+            if (utxosTotalAmount.compare(requiredAmount) >= 0) {
+                // if (utxosTotalAmount.compare(requiredAmount) >= 0 && !addAnotherUtxo) {
                 // we have enough utxos to cover fees + minUtxoValue for each output
                 // TODO: we should check if we have enough utxos for each asset
 
@@ -314,8 +322,9 @@ const largestFirst = (
                     };
                 } else {
                     console.warn(
-                        `Change output would be inefficient. Burning ${placeholderChangeOutputAmount} as fee`,
+                        `Change output would be inefficient. Burning ${placeholderChangeOutputAmount.to_str()} as fee`,
                     );
+                    // Since we didn't add a change output we can burn its value + fee we would pay for it. That's equal to initial placeholderChangeOutputAmount
                     totalFeesAmount = totalFeesAmount.checked_add(placeholderChangeOutputAmount);
                 }
                 sufficientUtxos = true;
@@ -337,10 +346,12 @@ const largestFirst = (
     }
 
     const totalSpent = totalOutputAmount.checked_add(totalFeesAmount);
+    console.log('FINAL RESULT START');
     console.log('usedUtxos', usedUtxos);
     console.log('totalOutputAmount', totalOutputAmount.to_str());
     console.log('utxosTotalAmount', utxosTotalAmount.to_str());
     console.log('totalSpent', totalSpent.to_str());
+    console.log('FINAL RESULT END');
     return {
         inputs,
         outputs,
