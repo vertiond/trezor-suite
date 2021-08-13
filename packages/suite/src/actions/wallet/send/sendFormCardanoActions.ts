@@ -11,7 +11,7 @@ import {
     transformUtxos,
 } from '@wallet-utils/cardanoUtils';
 import { Account, CardanoMergedUtxo } from '@wallet-types';
-import { amountToSatoshi } from '@wallet-utils/accountUtils';
+import { amountToSatoshi, formatAmount } from '@wallet-utils/accountUtils';
 import * as notificationActions from '@suite-actions/notificationActions';
 import {
     FormState,
@@ -37,14 +37,26 @@ const txBuilder = CardanoWasm.TransactionBuilder.new(
     CardanoWasm.BigNum.from_str('2000000'),
 );
 
-const getAssetAmount = (utxo: CardanoMergedUtxo, asset = 'lovelace') =>
-    utxo.amount.find(a => a.unit === asset)?.quantity ?? '0';
+const getAssetAmount = (obj: Pick<CardanoMergedUtxo, 'amount'>, asset = 'lovelace') =>
+    obj.amount.find(a => a.unit === asset)?.quantity ?? '0';
 
 const getSumAssetAmount = (utxos: CardanoMergedUtxo[], asset = 'lovelace') =>
     utxos.reduce(
         (acc, utxo) => acc.checked_add(CardanoWasm.BigNum.from_str(getAssetAmount(utxo, asset))),
         CardanoWasm.BigNum.from_str('0'),
     );
+
+const getSumOutputAmount = (outputs: RequiredOutput[], asset = 'lovelace') =>
+    outputs.reduce(
+        (acc, output) =>
+            acc.checked_add(
+                CardanoWasm.BigNum.from_str(
+                    output.assets?.find(a => a.unit === asset)?.quantity ?? '0',
+                ),
+            ),
+        CardanoWasm.BigNum.from_str('0'),
+    );
+
 const sortUtxos = (utxos: CardanoMergedUtxo[], asset = 'lovelace') =>
     utxos.sort((u1, u2) =>
         new BigNumber(getAssetAmount(u2, asset)).comparedTo(getAssetAmount(u1, asset)),
@@ -84,13 +96,11 @@ const transformToCardanoInput = (utxo: CardanoMergedUtxo): CardanoInput => ({
     prev_hash: utxo.txid,
     prev_index: utxo.vout,
 });
-const transformToCardanoOutput = (output: Output): CardanoOutput => ({
+
+const transformToCardanoOutput = (output: RequiredOutput): CardanoOutput => ({
     address: output.address,
     amount: amountToSatoshi(output.amount, 6),
-    // TODO: To send tokens we need to add tokenBundle and set amount above to minUtxoValue which (can be retrieved from getOutputCost)
-    // tokenBundle: output.token
-    //     ? transformToTokenBundle([{ unit: output.token, quantity: output.amount }])
-    //     : undefined,
+    tokenBundle: output.assets ? transformToTokenBundle(output.assets) : [],
 });
 
 const getInputCost = (utxo: CardanoMergedUtxo) => {
@@ -117,24 +127,16 @@ const getInputCost = (utxo: CardanoMergedUtxo) => {
 };
 
 const getOutputCost = (
-    output: Pick<Output, 'amount' | 'token' | 'address'>,
+    output: Pick<RequiredOutput, 'amount' | 'assets' | 'address'>,
     assets: { unit: string; quantity: string }[] | null,
     minUtxoValue = protocolMinUtxoValue,
 ) => {
     let minOutputAmount = minUtxoValue;
     let outputValue = CardanoWasm.Value.new(minOutputAmount);
 
-    if (output.token || assets?.length) {
+    if (assets?.length) {
         const multiAsset = CardanoWasm.MultiAsset.new();
-        buildMultiAsset(
-            multiAsset,
-            assets ?? [
-                {
-                    unit: output.token!,
-                    quantity: output.amount,
-                },
-            ],
-        );
+        buildMultiAsset(multiAsset, assets);
 
         minOutputAmount = getMinAdaRequired(multiAsset, minUtxoValue);
         outputValue = CardanoWasm.Value.new(minOutputAmount);
@@ -155,9 +157,18 @@ const getOutputCost = (
 
 const ERROR_UTXO_BALANCE_INSUFFICIENT = 'UTxO Balance Insufficient';
 
+interface RequiredOutput extends Pick<Output, 'address' | 'amount'> {
+    assets:
+        | {
+              unit: string;
+              quantity: string;
+          }[]
+        | undefined;
+}
+
 const largestFirst = (
     utxos: CardanoMergedUtxo[],
-    formOutputs: Output[],
+    userOutputs: RequiredOutput[],
     changeAddress: Exclude<Account['addresses'], undefined>['change'][number],
     account: Account,
 ) => {
@@ -170,24 +181,35 @@ const largestFirst = (
     let utxosTotalAmount = CardanoWasm.BigNum.from_str('0');
     const sortedUtxos = sortUtxos(utxos);
 
-    const requiredOutputs = formOutputs.map(output => ({
-        ...output,
-        // tokenAmount: output.token ? output.amount : undefined,
-    }));
-    // Sum of all form outputs, ADA only for now
-    const totalOutputAmount = requiredOutputs.reduce(
-        (acc, output) =>
-            acc.checked_add(CardanoWasm.BigNum.from_str(amountToSatoshi(output.amount, 6))),
-        CardanoWasm.BigNum.from_str('0'),
-    );
+    const requiredOutputs = userOutputs.map(output => {
+        // TODO: user outputs have amounts in ADA, everything else works with lovelace
+        const { minOutputAmount } = getOutputCost(output, output.assets ?? null);
+        const outputAmount = CardanoWasm.BigNum.from_str(amountToSatoshi(output.amount, 6));
 
-    console.log('requiredOutputs', requiredOutputs);
+        return {
+            ...output,
+            // if output contains assets make sure that minUtxoValue is at least minOutputAmount
+            amount:
+                output.assets && outputAmount.compare(minOutputAmount) < 0
+                    ? formatAmount(minOutputAmount.to_str(), 6)
+                    : output.amount,
+        };
+    });
+
+    console.log('requiredOutputs after conversion', requiredOutputs);
 
     // Calculate fee and minUtxoValue for all external outputs
-    const outputsCost = requiredOutputs.map(output => getOutputCost(output, null));
+    const outputsCost = requiredOutputs.map(output => getOutputCost(output, output.assets ?? null));
 
     const totalOutputsFee = outputsCost.reduce(
         (acc, output) => (acc = acc.checked_add(output.outputFee)),
+        CardanoWasm.BigNum.from_str('0'),
+    );
+
+    // Sum of all form outputs (ADA only)
+    const totalOutputAmount = requiredOutputs.reduce(
+        (acc, output) =>
+            acc.checked_add(CardanoWasm.BigNum.from_str(amountToSatoshi(output.amount, 6))),
         CardanoWasm.BigNum.from_str('0'),
     );
 
@@ -232,14 +254,7 @@ const largestFirst = (
             const changeOutputAssets = uniqueAssets
                 .map(assetUnit => {
                     const assetInputAmount = getSumAssetAmount(usedUtxos, assetUnit);
-                    const assetSpentAmount = requiredOutputs.reduce(
-                        (acc, output) =>
-                            (acc =
-                                output.token === assetUnit
-                                    ? acc.checked_add(CardanoWasm.BigNum.from_str(output.amount))
-                                    : acc),
-                        CardanoWasm.BigNum.from_str('0'),
-                    );
+                    const assetSpentAmount = getSumOutputAmount(requiredOutputs, assetUnit);
                     return {
                         unit: assetUnit,
                         quantity: assetInputAmount.clamped_sub(assetSpentAmount).to_str(),
@@ -251,7 +266,7 @@ const largestFirst = (
                 {
                     address: changeAddress.address,
                     amount: placeholderChangeOutputAmount.to_str(),
-                    token: null,
+                    assets: undefined,
                 },
                 changeOutputAssets,
             );
@@ -302,8 +317,23 @@ const largestFirst = (
                 `CHANGE OUTPUT (already included in requiredAmount above): amount: ${changeOutputAmount.to_str()} fe: ${changeOutputCost.outputFee.to_str()}`,
             );
 
+            // Check if we have enough utxos to cover assets
+            // TODO: sort utxos by asset amount instead of lovelace
+            let assetsAmountSatisfied = true;
+            requiredOutputs.forEach(output => {
+                if (output.assets) {
+                    const asset = output.assets[0];
+                    const assetAmountInUtxos = getSumAssetAmount(usedUtxos, asset.unit);
+                    if (
+                        assetAmountInUtxos.compare(CardanoWasm.BigNum.from_str(asset.quantity)) < 0
+                    ) {
+                        assetsAmountSatisfied = false;
+                    }
+                }
+            });
+
             // console.log('addAnotherUtxo', addAnotherUtxo);
-            if (utxosTotalAmount.compare(requiredAmount) >= 0) {
+            if (utxosTotalAmount.compare(requiredAmount) >= 0 && assetsAmountSatisfied) {
                 // if (utxosTotalAmount.compare(requiredAmount) >= 0 && !addAnotherUtxo) {
                 // we have enough utxos to cover fees + minUtxoValue for each output
                 // TODO: we should check if we have enough utxos for each asset
@@ -377,7 +407,21 @@ export const composeTransaction = (
     );
 
     // try {
-    const res = largestFirst(utxos, formValues.outputs, changeAddress, account);
+    // TODO: conversion from ADA to lovelace here?
+    const preparedOutputs = formValues.outputs.map(output => ({
+        address: output.address,
+        amount: output.token ? '0' : output.amount,
+        assets: output.token
+            ? [
+                  {
+                      unit: output.token,
+                      quantity: output.amount,
+                  },
+              ]
+            : undefined,
+    }));
+
+    const res = largestFirst(utxos, preparedOutputs, changeAddress, account);
     console.log('tx fee', res.fee.to_str());
     console.log('tx totalSpent', res.totalSpent.to_str());
     console.log('tx inputs', res.inputs);

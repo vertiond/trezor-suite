@@ -71,7 +71,7 @@ export const transformTokenInfo = (
         return {
             type: 'CARDANO',
             name: fingerprint,
-            address: fingerprint,
+            address: t.unit,
             symbol: assetName,
             balance: t.quantity,
             decimals: t.decimals,
