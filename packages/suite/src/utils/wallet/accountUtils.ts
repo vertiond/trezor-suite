@@ -296,15 +296,15 @@ export const enhanceAddresses = (
 };
 
 export const enhanceUtxo = (
-    utxo: Account['utxo'],
+    utxos: Account['utxo'],
     networkType: Account['networkType'],
     accountIndex: Account['index'],
 ): Account['utxo'] => {
-    if (!utxo) return undefined;
-    if (networkType !== 'cardano') return utxo;
+    if (!utxos) return undefined;
+    if (networkType !== 'cardano') return utxos;
 
     const accountIndexStr = accountIndex.toString();
-    const enhancedUtxos = utxo.map(utxo => ({
+    const enhancedUtxos = utxos.map(utxo => ({
         ...utxo,
         path: utxo.path.replace('i', accountIndexStr),
     }));
