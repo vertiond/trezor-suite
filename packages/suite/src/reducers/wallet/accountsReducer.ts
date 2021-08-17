@@ -22,7 +22,14 @@ type AccountNetworkSpecific =
     | {
           networkType: 'cardano';
           marker: undefined;
-          misc: undefined;
+          misc: {
+              staking: {
+                  address: string;
+                  isActive: boolean;
+                  rewards: string;
+                  poolId: string | null;
+              };
+          };
           page: AccountInfo['page'];
       }
     | {

@@ -2438,7 +2438,7 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@emurgo/cardano-serialization-lib-browser@8.0.0":
+"@emurgo/cardano-serialization-lib-browser@8.0.0", "@emurgo/cardano-serialization-lib-browser@^8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-8.0.0.tgz#b938890b035222d8514030410aa2bfe52e6098a0"
   integrity sha512-JoYF8LfnELddD9oGVhrEZ6j1PPvXladT80XVGCGmwBARag/iNNUYZEZwklGPf5YBztX26Xzj2zAK0/4hK407Eg==
@@ -4214,6 +4214,13 @@
   integrity sha512-MZPUxrmFubI36XS1DI3qmI0YdN1gks62JtFZvxR67ljjSNCeK6U08Zx4msEWOXuofgqUt6zPHSi1H9fbjR/NRA==
   dependencies:
     "@sinonjs/commons" "^1.7.0"
+
+"@slowbackspace/coin-selection@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@slowbackspace/coin-selection/-/coin-selection-0.0.1.tgz#4206e3df40dc037afa732d80899b8a81306559e2"
+  integrity sha512-M/nQp1QWyHg0gp0IYYeONLV6srz3C8SjXtzK4Ztikk9nR/4oDIBSbjcX4GdPGhDaSCBAvw8LyIUwyoaGnMxnRQ==
+  dependencies:
+    "@emurgo/cardano-serialization-lib-browser" "^8.0.0"
 
 "@storybook/addon-actions@^6.1.14":
   version "6.1.14"

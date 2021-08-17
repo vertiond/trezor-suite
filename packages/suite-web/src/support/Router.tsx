@@ -15,6 +15,7 @@ const components: { [key: string]: React.LazyExoticComponent<any> } = {
     'wallet-details': lazy(() => import('@wallet-views/details')),
     'wallet-tokens': lazy(() => import('@wallet-views/tokens')),
     'wallet-send': lazy(() => import('@wallet-views/send')),
+    'wallet-staking': lazy(() => import('@wallet-views/staking')),
     'wallet-sign-verify': lazy(() => import('@wallet-views/sign-verify')),
 
     'wallet-coinmarket-buy': lazy(() => import('@wallet-views/coinmarket/buy')),

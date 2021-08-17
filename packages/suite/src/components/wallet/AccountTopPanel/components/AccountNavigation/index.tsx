@@ -57,6 +57,19 @@ const AccountNavigation = (props: Props) => {
             },
         },
         {
+            id: 'wallet-staking',
+            callback: () => {
+                goto('wallet-staking', undefined, true);
+            },
+            title: <Translation id="TR_NAV_STAKING" />,
+            position: 'primary',
+            isHidden: () => {
+                if (!account) return false;
+                const coinsWithStaking = ['cardano'];
+                return !coinsWithStaking.includes(account.networkType);
+            },
+        },
+        {
             id: 'wallet-send',
             callback: () => {
                 goto('wallet-send', undefined, true);

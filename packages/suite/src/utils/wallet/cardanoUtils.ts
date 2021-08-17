@@ -1,5 +1,5 @@
 import { CARDANO, CardanoCertificate, CardanoCertificateType } from 'trezor-connect';
-import { types } from '@fivebinaries/coin-selection';
+import { types } from '@slowbackspace/coin-selection';
 import { amountToSatoshi } from '@wallet-utils/accountUtils';
 import { Account } from '@wallet-types';
 import { Output } from '@wallet-types/sendForm';

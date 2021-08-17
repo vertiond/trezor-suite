@@ -233,7 +233,8 @@ const isSubsection = (routeName: Route['name']): boolean =>
         routeName.startsWith('settings') ||
         routeName === 'wallet-index' ||
         routeName === 'wallet-details' ||
-        routeName === 'wallet-tokens'
+        routeName === 'wallet-tokens' ||
+        routeName === 'wallet-staking'
     );
 
 const isSecondaryMenuOverflown = ({ primary, secondary, wrapper }: MenuWidths) =>

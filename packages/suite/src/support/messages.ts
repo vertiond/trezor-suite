@@ -2161,6 +2161,10 @@ const definedMessages = defineMessages({
         defaultMessage: 'Tokens',
         id: 'TR_NAV_TOKENS',
     },
+    TR_NAV_STAKING: {
+        defaultMessage: 'Staking',
+        id: 'TR_NAV_STAKING',
+    },
     TR_NAV_SIGN_AND_VERIFY: {
         defaultMessage: 'Sign & Verify',
         description:
@@ -6490,6 +6494,46 @@ const definedMessages = defineMessages({
     TR_DO_YOU_REALLY_WANT_TO_SKIP: {
         id: 'TR_DO_YOU_REALLY_WANT_TO_SKIP',
         defaultMessage: 'Do you really want to skip this step?',
+    },
+    TR_STAKING_REWARDS_TITLE: {
+        id: 'TR_STAKING_REWARDS_TITLE',
+        defaultMessage: 'Cardano Staking is Active',
+    },
+    TR_STAKING_STAKE_TITLE: {
+        id: 'TR_STAKING_STAKE_TITLE',
+        defaultMessage: 'Cardano Staking is NOT Active',
+    },
+    TR_STAKING_STAKE_ADDRESS: {
+        id: 'TR_STAKING_STAKE_ADDRESS',
+        defaultMessage: 'Your stake address',
+    },
+    TR_STAKING_DELEGATE: {
+        id: 'TR_STAKING_DELEGATE',
+        defaultMessage: 'Delegate',
+    },
+    TR_STAKING_WITHDRAW: {
+        id: 'TR_STAKING_WITHDRAW',
+        defaultMessage: 'Withdraw',
+    },
+    TR_STAKING_DEPOSIT: {
+        id: 'TR_STAKING_DEPOSIT',
+        defaultMessage: 'Refundable Deposit',
+    },
+    TR_STAKING_FEE: {
+        id: 'TR_STAKING_FEE',
+        defaultMessage: 'Fee',
+    },
+    TR_STAKING_REWARDS: {
+        id: 'TR_STAKING_REWARDS',
+        defaultMessage: 'Available Rewards',
+    },
+    TR_STAKING_REWARDS_DESCRIPTION: {
+        id: 'TR_STAKING_REWARDS',
+        defaultMessage: 'TR_STAKING_REWARDS_DESCRIPTION',
+    },
+    TR_STAKING_STAKE_DESCRIPTION: {
+        id: 'TR_STAKING_STAKE_DESCRIPTION',
+        defaultMessage: 'TR_STAKING_STAKE_DESCRIPTION',
     },
 } as const);
 

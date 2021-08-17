@@ -383,7 +383,12 @@ export const isAccountOutdated = (account: Account, freshInfo: AccountInfo) => {
     const changedEthereum =
         account.networkType === 'ethereum' && freshInfo.misc!.nonce !== account.misc.nonce;
 
-    return changedTxCount || changedRipple || changedEthereum;
+    const changedCardano =
+        account.networkType === 'cardano' &&
+        freshInfo.misc!.staking?.isActive !== account.misc.staking.isActive &&
+        freshInfo.misc!.staking?.poolId !== account.misc.staking.poolId;
+
+    return changedTxCount || changedRipple || changedEthereum || changedCardano;
 };
 
 // Used in accountActions and failed accounts
@@ -409,6 +414,22 @@ export const getAccountSpecific = (
             networkType,
             misc: {
                 nonce: misc && misc.nonce ? misc.nonce : '0',
+            },
+            marker: undefined,
+            page: accountInfo.page,
+        };
+    }
+
+    if (networkType === 'cardano') {
+        return {
+            networkType,
+            misc: {
+                staking: {
+                    rewards: misc && misc.staking ? misc.staking.rewards : '0',
+                    isActive: misc && misc.staking ? misc.staking.isActive : false,
+                    address: misc && misc.staking ? misc.staking.address : '',
+                    poolId: misc && misc.staking ? misc.staking.poolId : null,
+                },
             },
             marker: undefined,
             page: accountInfo.page,

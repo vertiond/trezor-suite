@@ -20,6 +20,7 @@
         "@trezor/components": "^1.0.0",
         "@trezor/suite-data": "21.9.0",
         "@trezor/suite-storage": "21.9.0",
+        "@slowbackspace/coin-selection": "0.0.1",
         "@emurgo/cardano-serialization-lib-browser": "8.0.0",
         "bignumber.js": "^9.0.1",
         "date-fns": "^2.16.1",

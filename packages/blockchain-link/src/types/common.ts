@@ -127,7 +127,7 @@ export interface AccountInfo {
         sequence?: number;
         reserve?: string;
         // cardano
-        cardanoUtxos?: [];
+        rewards?: string;
     };
     page?: {
         // blockbook and cardano
