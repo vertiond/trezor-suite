@@ -1,11 +1,8 @@
-import { Account, CardanoMergedUtxo } from '@wallet-types';
-import * as CardanoWasm from '@emurgo/cardano-serialization-lib-browser';
-import { CARDANO } from 'trezor-connect';
-
-export const getStakingPath = (
-    accountType: Account['accountType'],
-    accountIndex: Account['index'],
-) => `m/${accountType === 'normal' ? 1852 : 44}'/1815'/${accountIndex}'/2/0.`;
+import { CARDANO, CardanoCertificate, CardanoCertificateType } from 'trezor-connect';
+import { types } from '@fivebinaries/coin-selection';
+import { amountToSatoshi } from '@wallet-utils/accountUtils';
+import { Account } from '@wallet-types';
+import { Output } from '@wallet-types/sendForm';
 
 export const getProtocolMagic = (accountSymbol: Account['symbol']) =>
     accountSymbol === 'ada' ? CARDANO.PROTOCOL_MAGICS.mainnet : 1097911063;
@@ -16,19 +13,77 @@ export const getNetworkId = (accountSymbol: Account['symbol']) =>
 export const getAddressType = (accountType: Account['accountType']): 0 | 8 =>
     accountType === 'normal' ? CARDANO.ADDRESS_TYPE.Base : CARDANO.ADDRESS_TYPE.Byron;
 
-export const transformUtxos = (utxos: Account['utxo']): CardanoMergedUtxo[] => {
-    const result: CardanoMergedUtxo[] = [];
+export const getStakingPath = (
+    accountType: Account['accountType'],
+    accountIndex: Account['index'],
+) => `m/${accountType === 'normal' ? 1852 : 44}'/1815'/${accountIndex}'/2/0.`;
+
+export const transformUserOutputs = (outputs: Output[]) =>
+    outputs.map(output => ({
+        address: output.address,
+        amount: output.token ? '0' : amountToSatoshi(output.amount, 6),
+        assets: output.token
+            ? [
+                  {
+                      unit: output.token,
+                      quantity: output.amount,
+                  },
+              ]
+            : undefined,
+    }));
+
+export const transformUtxos = (utxos: Account['utxo']): types.Utxo[] => {
+    const result: types.Utxo[] = [];
     utxos?.forEach(utxo => {
-        const foundItem = result.find(res => res.txid === utxo.txid && res.vout === utxo.vout);
+        const foundItem = result.find(
+            res => res.txHash === utxo.txid && res.outputIndex === utxo.vout,
+        );
 
         if (!foundItem) {
-            result.push({ ...utxo, amount: [{ quantity: utxo.amount, unit: utxo.cardanoUnit }] });
+            // path: utxo.path,
+            result.push({
+                // path: utxo.path,
+                address: utxo.address,
+                txHash: utxo.txid,
+                outputIndex: utxo.vout,
+                amount: [{ quantity: utxo.amount, unit: utxo.cardanoUnit }],
+            });
         } else {
             foundItem.amount.push({ quantity: utxo.amount, unit: utxo.cardanoUnit });
         }
     });
 
     return result;
+};
+
+export const prepareCertificates = (certs: CardanoCertificate[]) => {
+    // convert trezor-connect certificate format to cardano coin-selection lib format
+    const convertedCerts: types.Certificate[] = [];
+    certs.forEach(cert => {
+        switch (cert.type) {
+            case CardanoCertificateType.STAKE_DELEGATION:
+                convertedCerts.push({
+                    type: cert.type,
+                    pool: cert.pool!,
+                });
+                break;
+            case CardanoCertificateType.STAKE_REGISTRATION:
+            case CardanoCertificateType.STAKE_DEREGISTRATION:
+                convertedCerts.push({
+                    type: cert.type,
+                });
+                break;
+
+            case CardanoCertificateType.STAKE_POOL_REGISTRATION:
+                convertedCerts.push({
+                    type: cert.type,
+                    pool_parameters: cert.poolParameters!,
+                });
+                break;
+            // no default
+        }
+    });
+    return convertedCerts;
 };
 
 export const parseAsset = (
@@ -44,34 +99,4 @@ export const parseAsset = (
         policyId,
         assetNameInHex,
     };
-};
-
-export const buildMultiAsset = (
-    multiAsset: CardanoWasm.MultiAsset,
-    assets: {
-        unit: string;
-        quantity: string;
-    }[],
-): CardanoWasm.MultiAsset => {
-    assets.forEach(assetEntry => {
-        const asset = CardanoWasm.Assets.new();
-        const { policyId, assetNameInHex } = parseAsset(assetEntry.unit);
-        asset.insert(
-            CardanoWasm.AssetName.new(Buffer.from(assetNameInHex, 'hex')),
-            CardanoWasm.BigNum.from_str(assetEntry.quantity),
-        );
-        const scriptHash = CardanoWasm.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'));
-        multiAsset.insert(scriptHash, asset);
-    });
-    return multiAsset;
-};
-
-export const getMinAdaRequired = (
-    multiAsset: CardanoWasm.MultiAsset | null,
-    minUtxoValue = CardanoWasm.BigNum.from_str('1000000'),
-): CardanoWasm.BigNum => {
-    if (!multiAsset) return minUtxoValue;
-    const Value = CardanoWasm.Value.new(minUtxoValue);
-    Value.set_multiasset(multiAsset);
-    return CardanoWasm.min_ada_required(Value, minUtxoValue);
 };

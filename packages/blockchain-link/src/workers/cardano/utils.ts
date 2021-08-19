@@ -72,7 +72,7 @@ export const transformTokenInfo = (
             type: 'CARDANO',
             name: fingerprint,
             address: t.unit,
-            symbol: assetName,
+            symbol: assetName || fingerprint, // fallback to fingerprint if assetName is empty string
             balance: t.quantity,
             decimals: t.decimals,
         };
