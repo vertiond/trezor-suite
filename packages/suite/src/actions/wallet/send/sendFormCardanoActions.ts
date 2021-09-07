@@ -1,14 +1,9 @@
-/* eslint-disable no-bitwise */
-import TrezorConnect, {
-    CardanoCertificate,
-    CardanoCertificateType,
-    CardanoWithdrawal,
-} from 'trezor-connect';
+import TrezorConnect from 'trezor-connect';
 import {
+    findUtxo,
     getNetworkId,
     getProtocolMagic,
     getStakingPath,
-    prepareCertificates,
     transformUserOutputs,
     transformUtxos,
 } from '@wallet-utils/cardanoUtils';
@@ -21,68 +16,85 @@ import {
 } from '@wallet-types/sendForm';
 import { Dispatch, GetState } from '@suite-types';
 import { coinSelection, trezorUtils } from '@fivebinaries/coin-selection';
+import { formatNetworkAmount } from '@suite/utils/wallet/accountUtils';
 
-export const composeTransaction = (
-    formValues: FormState,
-    formState: UseSendFormState,
-) => (): PrecomposedLevelsCardano | void => {
+export const composeTransaction = (formValues: FormState, formState: UseSendFormState) => (
+    dispatch: Dispatch,
+): PrecomposedLevelsCardano | void => {
     const { account, feeInfo } = formState;
     if (!account.addresses || !account.utxo) return;
-    const stakingPath = getStakingPath(account.accountType, account.index);
 
+    const stakingPath = getStakingPath(account.accountType, account.index);
     const changeAddress = {
         ...account.addresses.change[0],
         stakingPath,
     };
+
+    const predefinedLevels = feeInfo.levels.filter(l => l.label !== 'custom');
+    if (formValues.selectedFee === 'custom') {
+        predefinedLevels.push({
+            label: 'custom',
+            feePerUnit: formValues.feePerUnit,
+            blocks: -1,
+        });
+    }
+
     const utxos = transformUtxos(account.utxo);
-    const outputs = transformUserOutputs(formValues.outputs);
+    const outputs = transformUserOutputs(formValues.outputs, formValues.setMaxOutputId);
 
-    console.log('=======COMPOSE=======');
-    console.log(
-        'account utxos',
-        utxos.map(u => ({ ...u })),
-    );
+    const wrappedResponse: PrecomposedLevelsCardano = {};
+    predefinedLevels.forEach(level => {
+        const options = {
+            byron: account.accountType !== 'normal',
+            ...(level.label === 'custom' ? { feeParams: { a: formValues.feePerUnit } } : {}),
+        };
 
-    // try {
-    const res = coinSelection(
-        utxos,
-        outputs,
-        changeAddress,
-        [],
-        [],
-        false,
-        account.accountType !== 'normal',
-    );
-    console.log('tx fee', res.fee);
-    console.log('tx totalSpent', res.totalSpent);
-    console.log('tx inputs', res.inputs);
-    console.log('tx outputs', res.outputs);
-    console.log('withdrawal', res.withdrawal);
-    console.log('deposit', res.deposit);
-    return {
-        normal: {
-            type: 'final',
-            fee: res.fee,
-            feePerByte: feeInfo.levels[0].feePerUnit,
-            bytes: 300,
-            totalSpent: res.totalSpent,
-            max: undefined,
-            transaction: {
-                inputs: res.inputs.map(i =>
-                    trezorUtils.transformToTrezorInput(
-                        i,
-                        account.utxo!.find(u => u.txid === i.txHash && u.vout === i.outputIndex)!
-                            .path,
-                    ),
-                ),
-                outputs: res.outputs.map(o => trezorUtils.transformToTrezorOutput(o)),
-            },
-        },
-    };
-    // } catch (err) {
-    //     console.warn('logged error');
-    //     console.error(err);
-    // }
+        try {
+            const res = coinSelection(utxos, outputs, changeAddress, [], [], options);
+
+            const tx = {
+                type: res.type,
+                fee: res.fee,
+                feePerByte: level.feePerUnit,
+                bytes: 0,
+                totalSpent: res.totalSpent,
+                max:
+                    res.max && outputs.find(o => o.setMax && o.assets.length === 0)
+                        ? formatNetworkAmount(res.max, account.symbol)
+                        : res.max, // convert lovelace to ADA (for ADA outputs only)
+
+                transaction:
+                    res.type === 'final'
+                        ? {
+                              inputs: res.inputs.map(input =>
+                                  trezorUtils.transformToTrezorInput(
+                                      input,
+                                      findUtxo(account.utxo, input)!,
+                                  ),
+                              ),
+                              outputs: res.outputs.map(o => trezorUtils.transformToTrezorOutput(o)),
+                          }
+                        : undefined,
+            };
+            wrappedResponse[level.label] = tx;
+        } catch (error) {
+            if (error.message === 'UTXO_BALANCE_INSUFFICIENT') {
+                wrappedResponse[level.label] = {
+                    type: 'error',
+                    errorMessage: { id: 'AMOUNT_IS_NOT_ENOUGH' },
+                };
+            } else {
+                dispatch(
+                    notificationActions.addToast({
+                        type: 'sign-tx-error',
+                        error: error.message,
+                    }),
+                );
+            }
+        }
+    });
+
+    return wrappedResponse;
 };
 
 export const signTransaction = (

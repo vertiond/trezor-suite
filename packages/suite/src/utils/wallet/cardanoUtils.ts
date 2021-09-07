@@ -18,19 +18,30 @@ export const getStakingPath = (
     accountIndex: Account['index'],
 ) => `m/${accountType === 'normal' ? 1852 : 44}'/1815'/${accountIndex}'/2/0.`;
 
-export const transformUserOutputs = (outputs: Output[]) =>
-    outputs.map(output => ({
-        address: output.address,
-        amount: output.token ? '0' : amountToSatoshi(output.amount, 6),
-        assets: output.token
-            ? [
-                  {
-                      unit: output.token,
-                      quantity: output.amount,
-                  },
-              ]
-            : undefined,
-    }));
+export const findUtxo = (utxos: Account['utxo'], utxo: types.Utxo) =>
+    utxos?.find(u => u.txid === utxo.txHash && u.vout === utxo.outputIndex)!.path;
+
+export const transformUserOutputs = (
+    outputs: Output[],
+    maxOutputIndex?: number,
+): types.UserOutput[] =>
+    outputs.map((output, i) => {
+        const setMax = i === maxOutputIndex;
+        const amount = output.amount === '' ? undefined : amountToSatoshi(output.amount, 6);
+        return {
+            address: output.address === '' ? undefined : output.address,
+            amount: output.token ? undefined : amount,
+            assets: output.token
+                ? [
+                      {
+                          unit: output.token,
+                          quantity: output.amount || '0',
+                      },
+                  ]
+                : [],
+            setMax,
+        };
+    });
 
 export const transformUtxos = (utxos: Account['utxo']): types.Utxo[] => {
     const result: types.Utxo[] = [];
