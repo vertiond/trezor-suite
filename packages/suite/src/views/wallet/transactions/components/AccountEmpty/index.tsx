@@ -99,6 +99,7 @@ const AccountEmpty = (props: Props) => {
                 <Divider />
                 <Actions>
                     <ActionButton
+                        data-test="@accounts/empty-account/receive"
                         variant="secondary"
                         onClick={() => {
                             goto('wallet-receive', undefined, true);
@@ -113,6 +114,7 @@ const AccountEmpty = (props: Props) => {
                         <Translation id="TR_RECEIVE_NETWORK" values={{ network: networkSymbol }} />
                     </ActionButton>
                     <ActionButton
+                        data-test="@accounts/empty-account/buy"
                         variant="primary"
                         onClick={() => {
                             goto('wallet-coinmarket-buy', undefined, true);

@@ -323,7 +323,10 @@ export const pushRawTransaction = (tx: string, coin: Account['symbol']) => async
         }
     } else {
         dispatch(
-            notificationActions.addToast({ type: 'sign-tx-error', error: sentTx.payload.error }),
+            notificationActions.addToast({
+                type: 'sign-tx-error',
+                error: sentTx.payload.error,
+            }),
         );
     }
 

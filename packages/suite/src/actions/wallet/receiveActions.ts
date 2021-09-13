@@ -72,6 +72,13 @@ export const showAddress = (path: string, address: string) => async (
         return;
     }
 
+    const params = {
+        device,
+        path,
+        useEmptyPassphrase: device.useEmptyPassphrase,
+        coin: account.symbol,
+    };
+
     // catch button request and open modal
     const buttonRequestHandler = (event: ButtonRequestMessage['payload']) => {
         if (!event || event.code !== 'ButtonRequest_Address') return;
@@ -90,46 +97,27 @@ export const showAddress = (path: string, address: string) => async (
         );
     };
 
-    let response;
-    const params = {
-        device,
-        path,
-        useEmptyPassphrase: device.useEmptyPassphrase,
-        coin: account.symbol,
-    };
-
-    TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
-
+    let fn;
     switch (account.networkType) {
         case 'ethereum':
-            response = await TrezorConnect.ethereumGetAddress(params);
-            break;
-        case 'cardano':
-            response = await TrezorConnect.cardanoGetAddress({
-                useEmptyPassphrase: device.useEmptyPassphrase,
-                addressParameters: {
-                    stakingPath: getStakingPath(account.accountType, account.index),
-                    addressType: getAddressType(account.accountType),
-                    path,
-                },
-                protocolMagic: getProtocolMagic(account.symbol),
-                networkId: getNetworkId(account.symbol),
-            });
+            fn = TrezorConnect.ethereumGetAddress;
             break;
         case 'ripple':
-            response = await TrezorConnect.rippleGetAddress(params);
+            fn = TrezorConnect.rippleGetAddress;
             break;
         case 'bitcoin':
-            response = await TrezorConnect.getAddress(params);
+            fn = TrezorConnect.getAddress;
             break;
         default:
-            response = {
+            fn = () => ({
                 success: false,
                 payload: { error: 'Method for getAddress not defined', code: undefined },
-            };
+            });
             break;
     }
 
+    TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
+    const response = await fn(params);
     TrezorConnect.off(UI.REQUEST_BUTTON, buttonRequestHandler);
 
     if (response.success) {

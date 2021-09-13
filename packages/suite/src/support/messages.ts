@@ -1643,13 +1643,8 @@ const definedMessages = defineMessages({
     },
     TR_DEVICE_SETTINGS_PASSPHRASE_DESC: {
         defaultMessage:
-            'Passphrase encryption adds an extra custom word to your recovery seed. This allows you to access new wallets, each hidden behind a particular passphrase. Your old accounts will be accessible with an empty passphrase.',
+            'Passphrase encryption adds an extra custom word to your recovery seed. This allows you to access new wallets, each hidden behind a particular passphrase. Your old accounts will be accessible with an empty passphrase. If you forget your passphrase, your wallet is lost for good. There is no way to recover your funds.',
         id: 'TR_DEVICE_SETTINGS_PASSPHRASE_DESC',
-    },
-    TR_DEVICE_SETTINGS_PASSPHRASE_DESC_MORE: {
-        defaultMessage:
-            'If you forget your passphrase, your wallet is lost for good. There is no way to recover your funds.',
-        id: 'TR_DEVICE_SETTINGS_PASSPHRASE_DESC_MORE',
     },
     TR_DEVICE_SETTINGS_SAFETY_CHECKS_TITLE: {
         defaultMessage: 'Safety checks',
@@ -2382,7 +2377,7 @@ const definedMessages = defineMessages({
         id: 'TR_PASSPHRASE_WALLET',
     },
     TR_PENDING_TX_HEADING: {
-        defaultMessage: 'Pending {count, plural, one {transaction} other {transactions}}',
+        defaultMessage: '{count, plural, one {Pending transaction} other {Pending transactions}}',
         description: 'Heading for the list of pending transactions',
         id: 'TR_PENDING_TX_HEADING',
     },
@@ -5569,7 +5564,7 @@ const definedMessages = defineMessages({
     FIRMWARE_CONNECT_IN_NORMAL_MODEL_2: {
         id: 'FIRMWARE_CONNECT_IN_NORMAL_MODEL_2',
         defaultMessage:
-            'Please make sure you are not holding any buttons while connecting your device.',
+            'Please make sure you are not touching the touchscreen while connecting your device.',
     },
     FIRMWARE_UPDATE_TO_VERSION: {
         id: 'FIRMWARE_UPDATE_TO_VERSION',
@@ -5786,8 +5781,7 @@ const definedMessages = defineMessages({
     },
     TR_SUITE_WEB_LANDING_BOTTOM_HEADLINE: {
         id: 'TR_SUITE_WEB_LANDING_BOTTOM_HEADLINE',
-        defaultMessage:
-            'Dozens of <em>brand-new features</em> to discover.{lineBreak}Try Suite now.',
+        defaultMessage: 'Dozens of features to discover.{lineBreak}Try Suite now.',
     },
 
     TR_SUITE_WEB_LANDING_FEATURES_1_HEADLINE: {
@@ -5928,8 +5922,7 @@ const definedMessages = defineMessages({
     },
     TR_SUITE_WEB_LANDING_START_BOTTOM_HEADLINE: {
         id: 'TR_SUITE_WEB_LANDING_START_BOTTOM_HEADLINE',
-        defaultMessage:
-            'Dozens of <em>brand-new features</em> to discover.{lineBreak}Try Suite now.',
+        defaultMessage: 'Dozens of features to discover.{lineBreak}Try Suite now.',
     },
     TR_DARK_MODE: {
         id: 'TR_DARK_MODE',

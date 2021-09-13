@@ -141,9 +141,6 @@ export const fetchAndUpdateAccount = (account: Account) => async (
         getState().wallet.transactions.transactions,
         account,
     );
-
-    console.log('accountOutdated', accountOutdated);
-
     // stop here if account is not outdated and there are no pending transactions
     if (!accountOutdated && !accountTxs.find(isPending)) return;
 

@@ -50,9 +50,8 @@ workers.forEach(instance => {
                         subscribed: f.method === 'subscribe',
                     });
 
-                    const data = (!Array.isArray(f.notifications)
-                        ? [f.notifications]
-                        : f.notifications
+                    const data = (
+                        !Array.isArray(f.notifications) ? [f.notifications] : f.notifications
                     ).map((n: any) => ({
                         ...n,
                         id: id.toString(),
