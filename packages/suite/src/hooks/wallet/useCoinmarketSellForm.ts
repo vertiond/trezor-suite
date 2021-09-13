@@ -71,7 +71,9 @@ export const useCoinmarketSellForm = (props: Props): SellFormContextValues => {
         loadInvityData: coinmarketCommonActions.loadInvityData,
     });
 
-    loadInvityData();
+    useEffect(() => {
+        loadInvityData();
+    }, [loadInvityData]);
 
     const { selectedAccount, quotesRequest, fees, fiat, localCurrency, exchangeCoinInfo, device } =
         props;
@@ -86,7 +88,9 @@ export const useCoinmarketSellForm = (props: Props): SellFormContextValues => {
     const localCurrencyOption = { value: localCurrency, label: localCurrency.toUpperCase() };
 
     const [state, setState] = useState<ReturnType<typeof useSellState>>(undefined);
-
+    const [activeInput, setActiveInput] = useState<typeof FIAT_INPUT | typeof CRYPTO_INPUT>(
+        FIAT_INPUT,
+    );
     const { accounts, sellInfo } = useSelector(state => ({
         accounts: state.wallet.accounts,
         sellInfo: state.wallet.coinmarket.sell.sellInfo,
@@ -238,13 +242,11 @@ export const useCoinmarketSellForm = (props: Props): SellFormContextValues => {
         const composed = composedLevels[selectedFeeLevel];
         if (!composed) return;
 
-        if (composed.type === 'error') {
-            if (composed.errorMessage) {
-                setError(CRYPTO_INPUT, {
-                    type: 'compose',
-                    message: composed.errorMessage as any,
-                });
-            }
+        if (composed.type === 'error' && composed.errorMessage && activeInput === CRYPTO_INPUT) {
+            setError(CRYPTO_INPUT, {
+                type: 'compose',
+                message: composed.errorMessage as any,
+            });
         }
         // set calculated and formatted "max" value to `Amount` input
         else if (composed.type === 'final') {
@@ -263,6 +265,7 @@ export const useCoinmarketSellForm = (props: Props): SellFormContextValues => {
         setError,
         setValue,
         selectedFee,
+        activeInput,
     ]);
 
     const onSubmit = async () => {
@@ -333,6 +336,8 @@ export const useCoinmarketSellForm = (props: Props): SellFormContextValues => {
         handleClearFormButtonClick,
         formState,
         isDraft,
+        activeInput,
+        setActiveInput,
     };
 };
 

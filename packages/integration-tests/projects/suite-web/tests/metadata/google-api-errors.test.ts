@@ -8,7 +8,7 @@ const provider = 'google';
 describe('Google api errors', () => {
     beforeEach(() => {
         cy.viewport(1024, 768).resetDb();
-        cy.task('startEmu', { wipe: true });
+        cy.task('startEmu', { version: Cypress.env('emuVersionT2'), wipe: true });
         cy.task('setupEmu', {
             mnemonic: 'all all all all all all all all all all all all',
         });
@@ -23,7 +23,6 @@ describe('Google api errors', () => {
         cy.passThroughInitialRun();
         cy.discoveryShouldFinish();
         cy.getTestElement('@suite/menu/wallet-index').click();
-
     });
 
     it('Malformed token', () => {

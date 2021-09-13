@@ -10,7 +10,7 @@ const timestamp = new RegExp(/^[0-9]{13,16}$/);
 
 describe('Analytics', () => {
     beforeEach(() => {
-        cy.task('startEmu', { wipe: true });
+        cy.task('startEmu', { version: Cypress.env('emuVersionT2'), wipe: true });
         cy.task('setupEmu');
         cy.task('startBridge');
         cy.viewport(1024, 768).resetDb();
@@ -23,9 +23,7 @@ describe('Analytics', () => {
          */
         cy.skipOn('localhost');
 
-        // cy.request('https://data.trezor.io/suite/log/web/develop.log').as('log');
-
-        cy.intercept('GET', 'https://data.trezor.io/suite/log/', req => {
+        cy.intercept({ hostname: 'data.trezor.io', url: '/suite/log/**' }, req => {
             const params = urlSearchParams(req.url);
             requests.push(params);
         }).as('data-fetch');

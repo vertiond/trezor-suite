@@ -15,7 +15,7 @@ import {
     getProtocolMagic,
     getNetworkId,
 } from '@wallet-utils/cardanoUtils';
-import { coinSelection, trezorUtils } from '@slowbackspace/coin-selection';
+import { coinSelection, trezorUtils } from '@fivebinaries/coin-selection';
 
 export const useCardanoStaking = (props: Props): ContextValues => {
     const URL_MAINNET = 'https://trezor-cardano-mainnet.blockfrost.io/api/v0/pools/';

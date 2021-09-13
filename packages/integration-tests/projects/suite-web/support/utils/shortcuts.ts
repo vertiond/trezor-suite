@@ -1,9 +1,7 @@
 /**
  * Shortcut to click device menu
  */
-export const toggleDeviceMenu = () => {
-    return cy.getTestElement('@menu/switch-device').click();
-};
+export const toggleDeviceMenu = () => cy.getTestElement('@menu/switch-device').click();
 
 export const goToOnboarding = () => {
     // return cy
@@ -13,21 +11,19 @@ export const goToOnboarding = () => {
     //     .click();
 
     // todo: no no no
-    cy.task('startEmu', { version: '2.1.4', wipe: true });
+    cy.task('startEmu', { version: Cypress.env('emuVersionT2'), wipe: true });
     cy.getTestElement('@onboarding/continue-button').click();
     cy.getTestElement('@onboarding/continue-button').click();
-
 };
 
-export const passThroughInitialRun = () => {
-    return cy
+export const passThroughInitialRun = () =>
+    cy
         .getTestElement('@onboarding/continue-button')
         .click()
         .getTestElement('@onboarding/exit-app-button')
         .click()
         .getTestElement('@suite/loading')
         .should('not.exist');
-};
 
 export const passThroughBackup = () => {
     // todo: much of commented out code probably stays in standalone backup?
@@ -88,5 +84,4 @@ export const passThroughSetPin = () => {
     cy.task('inputEmu', '1');
     cy.task('pressYes');
     cy.getTestElement('@onboarding/pin/continue-button').click();
-
 };

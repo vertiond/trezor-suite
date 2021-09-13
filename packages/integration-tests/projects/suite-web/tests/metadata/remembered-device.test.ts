@@ -24,7 +24,7 @@ On disable, it throws away all metadata related records from memory.`, () => {
         it(f.provider, () => {
             // prepare test
             cy.task('stopBridge');
-            cy.task('startEmu', { wipe: true });
+            cy.task('startEmu', { version: Cypress.env('emuVersionT2'), wipe: true });
             cy.task('setupEmu', {
                 mnemonic: 'all all all all all all all all all all all all',
             });
@@ -63,7 +63,6 @@ On disable, it throws away all metadata related records from memory.`, () => {
             cy.getTestElement('@suite/menu/settings-index').click();
             cy.getTestElement('@settings/metadata-switch').click({ force: true });
             cy.passThroughInitMetadata(f.provider);
-
 
             cy.log(
                 'Now metadata is enabled, go to accounts and see what we got loaded from provider',

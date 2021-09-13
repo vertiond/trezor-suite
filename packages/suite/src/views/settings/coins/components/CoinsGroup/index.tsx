@@ -3,11 +3,10 @@ import styled from 'styled-components';
 import { P, Switch, Icon, variables, Button, useTheme } from '@trezor/components';
 import { Translation } from '@suite-components';
 import { NETWORKS } from '@wallet-config';
-import { UnavailableCapability } from 'trezor-connect';
 import { Network } from '@wallet-types';
 import { Section, ActionColumn, Row } from '@suite-components/Settings';
 import { useDevice, useActions } from '@suite-hooks';
-import { isBitcoinOnly } from '@suite-utils/device';
+import { getUnavailabilityMessage } from '@suite-utils/device';
 import * as modalActions from '@suite-actions/modalActions';
 import Coin from '../Coin';
 
@@ -100,32 +99,7 @@ interface Props {
     filterFn: (n: Network) => boolean;
     enabledNetworks: Network['symbol'][];
     type: 'mainnet' | 'testnet'; // used in tests
-    unavailableCapabilities: { [key: string]: UnavailableCapability };
 }
-
-interface UnavailableMessageProps {
-    type: UnavailableCapability;
-    deviceVersion: number;
-    isBtcOnly: boolean;
-}
-const UnavailableMessage = ({ type, deviceVersion, isBtcOnly }: UnavailableMessageProps) => {
-    switch (type) {
-        case 'no-capability':
-            return deviceVersion === 1 && !isBtcOnly ? (
-                // right know it serves only one purpose - in case of XRP on T1 inform user that the capability is available on TT
-                <Translation id="FW_CAPABILITY_SUPPORTED_IN_T2" />
-            ) : (
-                <Translation id="FW_CAPABILITY_NO_CAPABILITY" />
-            );
-        case 'no-support':
-            return <Translation id="FW_CAPABILITY_NO_SUPPORT" />;
-        case 'update-required':
-            return <Translation id="FW_CAPABILITY_UPDATE_REQUIRED" />;
-        // case 'trezor-connect-outdated':
-        default:
-            return <Translation id="FW_CAPABILITY_CONNECT_OUTDATED" />;
-    }
-};
 
 const CoinsGroup = ({
     label,
@@ -135,7 +109,6 @@ const CoinsGroup = ({
     onToggleOneFn,
     filterFn,
     enabledNetworks,
-    unavailableCapabilities,
     ...props
 }: Props) => {
     const { openModal } = useActions({
@@ -146,10 +119,9 @@ const CoinsGroup = ({
     if (!device) return null;
 
     const isDeviceLocked = isLocked();
-    const deviceVersion = device.features?.major_version === 1 ? 1 : 2;
-    const isBtcOnly = isBitcoinOnly(device);
+    const unavailableCapabilities = device?.unavailableCapabilities ?? {};
     return (
-        <Wrapper data-test="@settings/wallet/coins-group">
+        <Wrapper data-test={`@settings/wallet/coins-group/${props.type}`}>
             <Section
                 customHeader={
                     <Header>
@@ -189,7 +161,7 @@ const CoinsGroup = ({
                     <CoinRow key={network.symbol}>
                         <Coin symbol={network.symbol} name={network.name} />
                         <ActionColumn>
-                            {!unavailableCapabilities[network.symbol] && (
+                            {!unavailableCapabilities[network.symbol] ? (
                                 <>
                                     <AdvancedSettings
                                         onClick={() =>
@@ -219,13 +191,13 @@ const CoinsGroup = ({
                                         isDisabled={isDeviceLocked}
                                     />
                                 </>
-                            )}
-                            {unavailableCapabilities[network.symbol] && (
+                            ) : (
                                 <UnavailableLabel>
-                                    <UnavailableMessage
-                                        deviceVersion={deviceVersion}
-                                        isBtcOnly={isBtcOnly}
-                                        type={unavailableCapabilities[network.symbol]}
+                                    <Translation
+                                        id={getUnavailabilityMessage(
+                                            unavailableCapabilities[network.symbol],
+                                            device.features?.major_version,
+                                        )}
                                     />
                                 </UnavailableLabel>
                             )}

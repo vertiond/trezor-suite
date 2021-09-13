@@ -7,16 +7,17 @@ import * as storageActions from '@suite-actions/storageActions';
 import { getOsTheme } from '@suite-utils/env';
 import { SUITE, METADATA } from './constants';
 import type { Locale } from '@suite-config/languages';
-import {
+import type {
     Action,
     Dispatch,
     GetState,
     TrezorDevice,
+    ButtonRequest,
     AppState,
     SuiteThemeVariant,
     SuiteThemeColors,
 } from '@suite-types';
-import { DebugModeOptions } from '@suite-reducers/suiteReducer';
+import type { DebugModeOptions } from '@suite-reducers/suiteReducer';
 
 export type SuiteAction =
     | { type: typeof SUITE.INIT }
@@ -65,7 +66,7 @@ export type SuiteAction =
     | {
           type: typeof SUITE.ADD_BUTTON_REQUEST;
           device: TrezorDevice | undefined;
-          payload?: string;
+          payload?: ButtonRequest;
       }
     | {
           type: typeof SUITE.SET_PROCESS_MODE;
@@ -83,7 +84,7 @@ export const removeButtonRequests = (device: TrezorDevice | undefined) => ({
     device,
 });
 
-export const addButtonRequest = (device: TrezorDevice | undefined, payload: string) => ({
+export const addButtonRequest = (device: TrezorDevice | undefined, payload: ButtonRequest) => ({
     type: SUITE.ADD_BUTTON_REQUEST,
     device,
     payload,
@@ -236,7 +237,7 @@ export const selectDevice =
 /**
  * Toggles remembering the given device. I.e. if given device is not remembered it will become remembered
  * and if it is remembered it will be forgotten.
- * @param forceRemember can be set to `true` to remember given device regardless if its current state.
+ * @param forceRemember can be set to `true` to remember given device regardless of its current state.
  *
  * Use `forgetDevice` to forget a device regardless if its current state.
  */
@@ -320,14 +321,13 @@ export const handleDeviceDisconnect =
         if (!selectedDevice) return;
         if (selectedDevice.path !== device.path) return;
 
-        const { devices, firmware, router } = getState();
+        const { devices, router } = getState();
 
-        if (
-            ['wait-for-reboot', 'unplug'].includes(firmware.status) ||
-            router.app === 'onboarding'
-        ) {
-            // Suite tried to switch selected device to a remembered (and disconnected) device or another connected device while being in Onboarding process.
-            // We never want to switch to some different remembered device when currently used device disconnects because of loose cable or in order to complete firmware installation
+        /**
+         * Under normal circumstances, after device is disconnected we want suite to select another existing device (either remembered or physically connected)
+         * This is not the case in firmware update and onboarding; In this case we simply wan't suite.device to be empty until user reconnects a device again
+         */
+        if (['onboarding', 'firmware'].includes(router.app)) {
             dispatch({ type: SUITE.SELECT_DEVICE, payload: undefined });
             return;
         }

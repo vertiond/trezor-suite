@@ -76,6 +76,7 @@ const FirmwareCustom = () => {
         <Modal
             cancelable={isCancelable}
             onCancel={onClose}
+            noSidePadding={status !== 'initial'} // TODO: redesign custom fw modal to match fw update modal
             heading={<Translation id="TR_DEVICE_SETTINGS_CUSTOM_FIRMWARE_TITLE" />}
             header={
                 status === 'waiting-for-confirmation' && (
@@ -113,7 +114,10 @@ const FirmwareCustom = () => {
                             return shouldDisplayConnectPrompt(liveDevice) ? (
                                 <ConnectDevicePromptManager device={liveDevice} />
                             ) : (
-                                <SelectCustomFirmware onSuccess={onFirmwareSelected} />
+                                <SelectCustomFirmware
+                                    device={liveDevice}
+                                    onSuccess={onFirmwareSelected}
+                                />
                             );
                         case 'check-seed':
                             return <CheckSeedStep onSuccess={onSeedChecked} />;
