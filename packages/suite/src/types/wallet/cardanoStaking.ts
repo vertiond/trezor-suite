@@ -21,5 +21,5 @@ export type ContextValues = {
     rewards: string;
     delegate(): void;
     withdraw(): void;
-    composeTx(): void;
+    calculateFeeAndDeposit(action: 'delegate' | 'withdrawal'): void;
 };

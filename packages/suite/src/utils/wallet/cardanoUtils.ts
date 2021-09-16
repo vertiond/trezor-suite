@@ -16,7 +16,21 @@ export const getAddressType = (accountType: Account['accountType']): 0 | 8 =>
 export const getStakingPath = (
     accountType: Account['accountType'],
     accountIndex: Account['index'],
-) => `m/${accountType === 'normal' ? 1852 : 44}'/1815'/${accountIndex}'/2/0.`;
+) => `m/${accountType === 'normal' ? 1852 : 44}'/1815'/${accountIndex}'/2/0`;
+
+export const getChangeAddressParameters = (account: Account) => {
+    if (!account.addresses || account.networkType !== 'cardano') return;
+    const stakingPath = getStakingPath(account.accountType, account.index);
+
+    return {
+        address: account.addresses.change[0].address,
+        addressParameters: {
+            path: account.addresses.change[0].path,
+            addressType: getAddressType(account.accountType),
+            stakingPath,
+        },
+    };
+};
 
 export const findUtxo = (utxos: Account['utxo'], utxo: types.Utxo) =>
     utxos?.find(u => u.txid === utxo.txHash && u.vout === utxo.outputIndex)!.path;

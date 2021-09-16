@@ -90,16 +90,16 @@ const Delegate = () => {
         delegate,
         account,
         deposit,
-        composeTx,
+        calculateFeeAndDeposit,
         fee,
         loading,
+        trezorPoolId,
     } = useCardanoStakingContext();
 
     useEffect(() => {
-        if (!fee) {
-            composeTx();
-        }
-    }, [fee, composeTx]);
+        if (!trezorPoolId) return;
+        calculateFeeAndDeposit('delegate');
+    }, [calculateFeeAndDeposit, trezorPoolId]);
 
     return (
         <StyledCard>
