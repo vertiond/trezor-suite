@@ -14,7 +14,6 @@ import {
     transformUtxos,
     getProtocolMagic,
     getNetworkId,
-    findUtxo,
     getChangeAddressParameters,
 } from '@wallet-utils/cardanoUtils';
 import { coinSelection, trezorUtils } from '@fivebinaries/coin-selection';
@@ -112,18 +111,17 @@ export const useCardanoStaking = (props: Props): ContextValues => {
 
     const signAndPushTransaction = async (action: 'delegate' | 'withdrawal') => {
         const composeRes = composeTxPlan(action);
-        if (!composeRes) return;
+        if (!composeRes || !account.utxo) return;
 
         const { txPlan, certificates, withdrawals, changeAddress } = composeRes;
         if (!txPlan || txPlan.type !== 'final') return;
 
         const res = await trezorConnect.cardanoSignTransaction({
             signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
-            inputs: txPlan.inputs.map(input =>
-                trezorUtils.transformToTrezorInput(input, findUtxo(account.utxo, input)!),
-            ),
-            outputs: txPlan.outputs.map(o =>
-                trezorUtils.transformToTrezorOutput(o, changeAddress.addressParameters),
+            inputs: trezorUtils.transformToTrezorInputs(txPlan.inputs, account.utxo),
+            outputs: trezorUtils.transformToTrezorOutputs(
+                txPlan.outputs,
+                changeAddress.addressParameters,
             ),
             fee: txPlan.fee,
             protocolMagic: getProtocolMagic(network.symbol),

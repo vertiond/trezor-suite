@@ -1,6 +1,5 @@
 import TrezorConnect, { CardanoTxSigningMode } from 'trezor-connect';
 import {
-    findUtxo,
     getChangeAddressParameters,
     getNetworkId,
     getProtocolMagic,
@@ -69,17 +68,13 @@ export const composeTransaction =
                     transaction:
                         txPlan.type === 'final'
                             ? {
-                                  inputs: txPlan.inputs.map(input =>
-                                      trezorUtils.transformToTrezorInput(
-                                          input,
-                                          findUtxo(account.utxo, input)!,
-                                      ),
+                                  inputs: trezorUtils.transformToTrezorInputs(
+                                      txPlan.inputs,
+                                      account.utxo!, // for some reason TS still considers 'undefined' as possible value
                                   ),
-                                  outputs: txPlan.outputs.map(o =>
-                                      trezorUtils.transformToTrezorOutput(
-                                          o,
-                                          changeAddress.addressParameters,
-                                      ),
+                                  outputs: trezorUtils.transformToTrezorOutputs(
+                                      txPlan.outputs,
+                                      changeAddress.addressParameters,
                                   ),
                                   unsignedTx: txPlan.tx,
                               }

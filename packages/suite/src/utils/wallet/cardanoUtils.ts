@@ -32,9 +32,6 @@ export const getChangeAddressParameters = (account: Account) => {
     };
 };
 
-export const findUtxo = (utxos: Account['utxo'], utxo: types.Utxo) =>
-    utxos?.find(u => u.txid === utxo.txHash && u.vout === utxo.outputIndex)!.path;
-
 export const transformUserOutputs = (
     outputs: Output[],
     maxOutputIndex?: number,

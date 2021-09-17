@@ -3114,10 +3114,10 @@
     unique-filename "^1.1.1"
     which "^1.3.1"
 
-"@fivebinaries/coin-selection@0.0.1-beta.1":
-  version "0.0.1-beta.1"
-  resolved "https://registry.yarnpkg.com/@fivebinaries/coin-selection/-/coin-selection-0.0.1-beta.1.tgz#1b4873e794e681cdd1762af78a907936dd90d191"
-  integrity sha512-/myJvjTduoXZLjz2FaZT+goXNEiTPEYcfuIOupAPf5Zp4iE+VDuKk67v8NOreQbt+zQF7WJZ9PKh21/plUEqcg==
+"@fivebinaries/coin-selection@0.0.1-beta.2":
+  version "0.0.1-beta.2"
+  resolved "https://registry.yarnpkg.com/@fivebinaries/coin-selection/-/coin-selection-0.0.1-beta.2.tgz#1464e76cebd719a189acac9242473083153aa8fe"
+  integrity sha512-gdmzkHIpZi8D2zHV9OyfyBVZLuc2y0GIP0aoHO21IA8oUXm4u0KEWpKg5Wx19qFNfIelVR6leJUuXmt3vk+dyA==
   dependencies:
     "@emurgo/cardano-serialization-lib-browser" "^8.1.0"
 
