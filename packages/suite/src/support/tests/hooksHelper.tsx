@@ -20,7 +20,7 @@ export const renderWithProviders = (store: any, children: React.ReactNode) => {
 export const waitForLoader = (text = /Loading/i) => {
     const loading = screen.queryByText(text);
     if (loading) {
-        return waitForElementToBeRemoved(() => screen.getByText(text));
+        return waitForElementToBeRemoved(() => screen.queryByText(text));
     }
 };
 
@@ -73,11 +73,7 @@ export const actionSequence = async <A extends UserAction[]>(
                 // eslint-disable-next-line no-await-in-loop
                 await act(() =>
                     // @ts-ignore: act => Promise
-                    userEvent.type(
-                        element,
-                        value,
-                        action.delay ? { delay: action.delay } : undefined,
-                    ),
+                    userEvent.type(element, value, { delay: action.delay && action.delay }),
                 );
             }
         }
