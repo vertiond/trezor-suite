@@ -4,10 +4,21 @@ import { Translation } from '@suite-components/Translation';
 import { SectionItem, ActionColumn, ActionSelect, TextColumn } from '@suite-components/Settings';
 import { useActions, useSelector } from '@suite-hooks';
 import type { SuiteThemeVariant } from '@suite-types';
+import { getOsTheme } from '@suite/utils/suite/env';
+
+const AutoLabel = () => {
+    const system =
+        getOsTheme() === 'dark' ? (
+            <Translation id="TR_COLOR_SCHEME_DARK" />
+        ) : (
+            <Translation id="TR_COLOR_SCHEME_LIGHT" />
+        );
+    return <Translation id="TR_SETTINGS_SAME_AS_SYSTEM" values={{ value: system }} />;
+};
 
 const THEME_OPTIONS = [
     {
-        options: [{ value: 'auto', label: <Translation id="TR_SETTINGS_SAME_AS_SYSTEM" /> }],
+        options: [{ value: 'auto', label: <AutoLabel /> }],
     },
     {
         options: [

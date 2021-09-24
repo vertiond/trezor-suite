@@ -1,15 +1,22 @@
 import React from 'react';
 import { Translation } from '@suite-components';
-import { isTranslationMode } from '@suite-utils/l10n';
+import { getOsLocale, isTranslationMode } from '@suite-utils/l10n';
 import { useActions, useAnalytics, useSelector } from '@suite-hooks';
 import LANGUAGES, { Locale, LocaleInfo } from '@suite-config/languages';
 import { setAutodetect as setAutodetectAction } from '@suite-actions/suiteActions';
 import { fetchLocale as fetchLocaleAction } from '@settings-actions/languageActions';
 import { ActionColumn, ActionSelect, SectionItem, TextColumn } from '@suite-components/Settings';
 
+const AutoLabel = () => (
+    <Translation
+        id="TR_SETTINGS_SAME_AS_SYSTEM"
+        values={{ value: LANGUAGES[getOsLocale()].name }}
+    />
+);
+
 const SYSTEM_OPTION = {
     value: 'auto',
-    label: <Translation id="TR_SETTINGS_SAME_AS_SYSTEM" />,
+    label: <AutoLabel />,
 } as const;
 
 const onlyComplete = (locale: [string, LocaleInfo]): locale is [Locale, LocaleInfo] =>

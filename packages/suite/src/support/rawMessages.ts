@@ -2669,7 +2669,7 @@ const messages = {
         id: 'TR_SETTINGS',
     },
     TR_SETTINGS_SAME_AS_SYSTEM: {
-        defaultMessage: 'System',
+        defaultMessage: 'System ({value})',
         id: 'TR_SETTINGS_SAME_AS_SYSTEM',
     },
     TR_SHOW_ADDRESS_ANYWAY: {
