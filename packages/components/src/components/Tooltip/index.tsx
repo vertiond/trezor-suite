@@ -154,7 +154,7 @@ const Tooltip = ({
     };
 
     return content && children ? (
-        <Wrapper className={className}>
+        <Wrapper className={className} data-test="@tooltip">
             <Tippy
                 zIndex={10070}
                 placement={placement}
