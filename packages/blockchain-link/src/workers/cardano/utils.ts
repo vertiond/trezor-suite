@@ -10,7 +10,7 @@ import {
     TokenInfo,
     TokenTransfer,
 } from '../../types/common';
-import { filterTargets, sumVinVout } from '../utils';
+import { filterTargets, sumVinVout, transformTarget } from '../utils';
 
 export const hexToString = (input: string) => {
     const hex = input.toString();
@@ -225,7 +225,7 @@ export const transformTransaction = (
         amount,
         fee,
         totalSpent,
-        targets,
+        targets: targets.filter(t => typeof t === 'object').map(t => transformTarget(t, incoming)),
         tokens,
         details: {
             vin: inputs,
