@@ -6551,6 +6551,32 @@ const messages = {
         id: 'TR_STAKING_STAKE_DESCRIPTION',
         defaultMessage: 'TR_STAKING_STAKE_DESCRIPTION',
     },
+    TR_RECEIVING_SYMBOL: {
+        id: 'TR_RECEIVING_SYMBOL',
+        defaultMessage: 'Receiving {symbol}',
+    },
+    TR_RECEIVED_SYMBOL: {
+        id: 'TR_RECEIVING_SYMBOL',
+        defaultMessage: 'Received {multiple, select, true {multiple tokens} false {{symbol}}}',
+    },
+    TR_SENDING_SYMBOL: {
+        id: 'TR_SENDING_SYMBOL',
+        defaultMessage: 'Sending {multiple, select, true {multiple tokens} false {{symbol}}}',
+    },
+    TR_SENT_SYMBOL: {
+        id: 'TR_SENT_SYMBOL',
+        defaultMessage: 'Sent {multiple, select, true {multiple tokens} false {{symbol}}}',
+    },
+    TR_SENDING_SYMBOL_TO_SELF: {
+        id: 'TR_SENDING_SYMBOL_TO_SELF',
+        defaultMessage:
+            'Sending {multiple, select, true {multiple tokens} false {{symbol} to myself}}',
+    },
+    TR_SENT_SYMBOL_TO_SELF: {
+        id: 'TR_SENT_SYMBOL_TO_SELF',
+        defaultMessage:
+            'Sent {multiple, select, true {multiple tokens} false {{symbol}}} to myself',
+    },
 };
 
 export default messages;

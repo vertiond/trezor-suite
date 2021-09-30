@@ -14,7 +14,10 @@ const Wrapper = styled.span`
     cursor: pointer;
 `;
 
-const HeadingWrapper = styled.div``;
+const HeadingWrapper = styled.div`
+    text-overflow: ellipsis;
+    overflow: hidden;
+`;
 
 const ChevronIconWrapper = styled.div<{ show: boolean; animate: boolean }>`
     display: flex;
@@ -65,27 +68,33 @@ const TransactionHeading = ({
     onClick,
 }: Props) => {
     const theme = useTheme();
-    const isTokenTransaction = transaction.tokens.length > 0;
+    const nTokens = transaction.tokens.length;
+    const isSingleTokenTransaction = nTokens === 1;
+    const isMultiTokenTransaction = nTokens > 1;
     const target = transaction.targets[0];
     const transfer = transaction.tokens[0];
-    const symbol = !isTokenTransaction
+    const symbol = !isSingleTokenTransaction
         ? transaction.symbol.toUpperCase()
         : transfer.symbol.toUpperCase();
+    const feeSymbol = transaction.type === 'self' ? transaction.symbol.toUpperCase() : symbol;
     let amount = null;
 
     const [headingIsHovered, setHeadingIsHovered] = useState(false);
 
     if (useSingleRowLayout) {
-        const targetAmount = !isTokenTransaction
-            ? getTargetAmount(target, transaction)
-            : transfer.amount;
+        // For single token transaction instead of showing coin amount we rather show the token amount
+        // In case of sent-to-self transaction we rely on getTargetAmount returning transaction.amount which will be equal to a fee
+        const targetAmount =
+            !isSingleTokenTransaction || transaction.type === 'self'
+                ? getTargetAmount(target, transaction)
+                : transfer.amount;
         const operation = getTxOperation(transaction);
         amount = (
             <CryptoAmount>
                 {targetAmount && (
                     <StyledHiddenPlaceholder>
                         {operation && <Sign value={operation} />}
-                        {targetAmount} {symbol}
+                        {targetAmount} {feeSymbol}
                     </StyledHiddenPlaceholder>
                 )}
             </CryptoAmount>
@@ -97,24 +106,36 @@ const TransactionHeading = ({
             <CryptoAmount>
                 <StyledHiddenPlaceholder>
                     <Sign value="neg" />
-                    {transaction.fee} {symbol}
+                    {transaction.fee} {feeSymbol}
                 </StyledHiddenPlaceholder>
             </CryptoAmount>
         );
     }
 
-    // TODO: intl once the structure and all combinations are decided
     let heading = null;
-    // const symbol = transaction.symbol.toUpperCase();
-
     if (isTxUnknown(transaction)) {
         heading = <Translation id="TR_UNKNOWN_TRANSACTION" />;
     } else if (transaction.type === 'sent') {
-        heading = isPending ? `Sending ${symbol}` : `Sent ${symbol}`;
+        heading = (
+            <Translation
+                id={isPending ? 'TR_SENDING_SYMBOL' : 'TR_SENT_SYMBOL'}
+                values={{ symbol, multiple: isMultiTokenTransaction }}
+            />
+        );
     } else if (transaction.type === 'recv') {
-        heading = isPending ? `Receiving ${symbol}` : `Received ${symbol}`;
+        heading = (
+            <Translation
+                id={isPending ? 'TR_RECEIVING_SYMBOL' : 'TR_RECEIVED_SYMBOL'}
+                values={{ symbol, multiple: isMultiTokenTransaction }}
+            />
+        );
     } else if (transaction.type === 'self') {
-        heading = isPending ? `Sending ${symbol} to myself` : `Sent ${symbol} to myself`;
+        heading = (
+            <Translation
+                id={isPending ? 'TR_SENDING_SYMBOL_TO_SELF' : 'TR_SENT_SYMBOL_TO_SELF'}
+                values={{ symbol, multiple: isMultiTokenTransaction }}
+            />
+        );
     } else if (transaction.type === 'failed') {
         heading = <Translation id="TR_FAILED_TRANSACTION" />;
     } else {

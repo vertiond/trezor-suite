@@ -179,30 +179,63 @@ const AmountDetails = ({ tx, isTestnet }: Props) => {
                     </>
                 )}
                 {/* AMOUNT */}
-                <AmountRow
-                    firstColumn={<Translation id="AMOUNT" />}
-                    secondColumn={<FormattedCryptoAmount value={amount} symbol={assetSymbol} />}
-                    thirdColumn={
-                        showHistoricalRates && (
-                            <FiatValue
-                                amount={amount}
-                                symbol={assetSymbol}
-                                source={tx.rates}
-                                useCustomSource
-                            />
-                        )
-                    }
-                    fourthColumn={
-                        showFiat && (
-                            <FiatValue
-                                amount={amount}
-                                symbol={assetSymbol}
-                                tokenAddress={tokenTransfer?.address}
-                            />
-                        )
-                    }
-                    color="light"
-                />
+                {tx.targets.length > 0 && (
+                    <AmountRow
+                        firstColumn={<Translation id="AMOUNT" />}
+                        secondColumn={
+                            <FormattedCryptoAmount value={tx.amount} symbol={tx.symbol} />
+                        }
+                        thirdColumn={
+                            showHistoricalRates && (
+                                <FiatValue
+                                    amount={amount}
+                                    symbol={assetSymbol}
+                                    source={tx.rates}
+                                    useCustomSource
+                                />
+                            )
+                        }
+                        fourthColumn={
+                            showFiat && (
+                                <FiatValue
+                                    amount={amount}
+                                    symbol={assetSymbol}
+                                    tokenAddress={tokenTransfer?.address}
+                                />
+                            )
+                        }
+                        color="light"
+                    />
+                )}
+                {tx.tokens.map(t => (
+                    <AmountRow
+                        firstColumn={
+                            tx.targets.length === 0 ? <Translation id="AMOUNT" /> : undefined
+                        }
+                        secondColumn={<FormattedCryptoAmount value={t.amount} symbol={t.symbol} />}
+                        thirdColumn={
+                            showHistoricalRates && (
+                                <FiatValue
+                                    amount={amount}
+                                    symbol={assetSymbol}
+                                    source={tx.rates}
+                                    useCustomSource
+                                />
+                            )
+                        }
+                        fourthColumn={
+                            showFiat && (
+                                <FiatValue
+                                    amount={amount}
+                                    symbol={assetSymbol}
+                                    tokenAddress={tokenTransfer?.address}
+                                />
+                            )
+                        }
+                        color="light"
+                    />
+                ))}
+
                 {/* TX FEE */}
                 <AmountRow
                     firstColumn={<Translation id="TR_TX_FEE" />}
