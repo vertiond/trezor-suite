@@ -120,6 +120,7 @@ const NestedIconWrapper = styled(IconWrapper)`
 
 const TxStatus = styled.div`
     text-align: left;
+    overflow: hidden;
 `;
 
 const ConfirmationStatusWrapper = styled.div`
@@ -132,6 +133,8 @@ const TxSentStatus = styled.div`
     color: ${props => props.theme.TYPE_DARK_GREY};
     font-size: ${variables.NEUE_FONT_SIZE.H2};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 const ConfirmationStatus = styled.div<{ confirmed: boolean; tiny?: boolean }>`
