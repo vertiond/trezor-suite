@@ -207,8 +207,10 @@ const AmountDetails = ({ tx, isTestnet }: Props) => {
                         color="light"
                     />
                 )}
-                {tx.tokens.map(t => (
+                {tx.tokens.map((t, i) => (
                     <AmountRow
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={i}
                         firstColumn={
                             tx.targets.length === 0 ? <Translation id="AMOUNT" /> : undefined
                         }
