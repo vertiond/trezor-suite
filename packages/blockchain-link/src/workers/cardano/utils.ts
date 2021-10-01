@@ -97,53 +97,54 @@ export const filterTokenTransfers = (
     tx: BlockfrostTransaction,
     type: Transaction['type']
 ): TokenTransfer[] => {
-    const myAddresses = accountAddress.change.concat(accountAddress.used, accountAddress.unused);
-    const tokens = Array.from(
-        new Set(
-            tx.txData.output_amount
-                .filter(asset => asset.unit !== 'lovelace')
-                .map(asset => asset.unit)
-        )
-    );
+    const transfers: TokenTransfer[] = [];
+    const myNonChangeAddresses = accountAddress.used.concat(accountAddress.unused);
+    const myAddresses = accountAddress.change.concat(myNonChangeAddresses);
+    tx.txUtxos.outputs.forEach(output => {
+        output.amount
+            .filter(a => a.unit !== 'lovelace')
+            .forEach(asset => {
+                const token = asset.unit;
+                const inputs = transformInputOutput(tx.txUtxos.inputs, token);
+                const outputs = transformInputOutput(tx.txUtxos.outputs, token);
+                const outgoing = filterTargets(myAddresses, inputs); // inputs going from account address
+                const incoming = filterTargets(myAddresses, outputs); // outputs to account address
+                const isChange = accountAddress.change.find(a => a.address === output.address);
 
-    const transfers = tokens.map(token => {
-        const inputs = transformInputOutput(tx.txUtxos.inputs, token);
-        const outputs = transformInputOutput(tx.txUtxos.outputs, token);
-        const outgoing = filterTargets(myAddresses, inputs);
-        const incoming = filterTargets(myAddresses, outputs);
-        if (incoming.length === 0 && outgoing.length === 0) return null;
+                if (incoming.length === 0 && outgoing.length === 0) return null;
 
-        let amount = '0';
-        // const internal = accountAddress ? filterTargets(accountAddress.change, outputs) : [];
-        if (type === 'sent') {
-            const myInputsSum = sumVinVout(outgoing, '0');
-            // reduce sum by my outputs values
-            amount = sumVinVout(incoming, myInputsSum, 'reduce');
-        } else if (type === 'recv') {
-            if (incoming.length > 0) {
-                amount = sumVinVout(incoming, '0');
-            }
-        }
+                const incomingForOutput = filterTargets(
+                    myNonChangeAddresses,
+                    transformInputOutput([output], token)
+                );
 
-        if (amount === '0') return null;
+                let amount = '0';
+                if (type === 'sent') {
+                    amount = isChange ? '0' : asset.quantity;
+                } else if (type === 'recv') {
+                    amount = sumVinVout(incomingForOutput, '0');
+                } else if (type === 'self' && !isChange) {
+                    amount = sumVinVout(incomingForOutput, '0');
+                }
 
-        const { fingerprint, assetName } = parseAsset(token);
-        return {
-            type,
-            name: assetName,
-            symbol: assetName,
-            address: fingerprint,
-            decimals: 0,
-            amount: amount.toString(),
-            from:
-                type === 'sent' || type === 'self'
-                    ? tx.address
-                    : tx.txUtxos.inputs.find(i => i.amount.find(a => a.unit === token))?.address,
-            to:
-                type === 'recv'
-                    ? tx.address
-                    : tx.txUtxos.outputs.find(i => i.amount.find(a => a.unit === token))?.address,
-        };
+                if (amount === '0') return null;
+
+                const { fingerprint, assetName } = parseAsset(token);
+                transfers.push({
+                    type,
+                    name: fingerprint,
+                    symbol: assetName || fingerprint,
+                    address: token,
+                    decimals: 0,
+                    amount: amount.toString(),
+                    from:
+                        type === 'sent' || type === 'self'
+                            ? tx.address
+                            : tx.txUtxos.inputs.find(i => i.amount.find(a => a.unit === token))
+                                  ?.address,
+                    to: type === 'recv' ? tx.address : output.address,
+                });
+            });
     });
 
     return transfers.filter(t => !!t) as TokenTransfer[];
