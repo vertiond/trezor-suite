@@ -18,7 +18,7 @@
         "test-health": "jest -c jest.config.health.js"
     },
     "dependencies": {
-        "@fivebinaries/coin-selection": "0.0.1-beta.2",
+        "@fivebinaries/coin-selection": "0.0.1-beta.4",
         "@trezor/components": "1.0.0",
         "@trezor/suite-data": "1.0.0",
         "@trezor/suite-storage": "1.0.0",
