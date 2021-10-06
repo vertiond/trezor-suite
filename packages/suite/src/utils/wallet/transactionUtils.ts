@@ -318,7 +318,9 @@ export const isTxUnknown = (transaction: WalletAccountTransaction) => {
     // eg. tx with eth smart contract that creates a new token has no valid target
     const isTokenTransaction = transaction.tokens.length > 0;
     return (
-        (!isTokenTransaction && !transaction.targets.find(t => t.addresses)) ||
+        (!isTokenTransaction &&
+            !transaction.cardanoSpecific && // cardano staking txs (de/registration of staking key, stake delegation) don't need to have any target
+            !transaction.targets.find(t => t.addresses)) ||
         transaction.type === 'unknown'
     );
 };
@@ -807,3 +809,14 @@ export const advancedSearchTransactions = (
 export const isTxFinal = (tx: WalletAccountTransaction, confirmations: number) =>
     // checks RBF status
     !tx.rbf || confirmations > 0;
+
+export const getTxHeaderSymbol = (transaction: WalletAccountTransaction) => {
+    const isSingleTokenTransaction = transaction.tokens.length === 1;
+    const transfer = transaction.tokens[0];
+    // In case of single token transactions show the token symbol instead of symbol of a main network
+    const symbol =
+        !isSingleTokenTransaction || !transfer
+            ? transaction.symbol.toUpperCase()
+            : transfer.symbol.toUpperCase();
+    return symbol;
+};

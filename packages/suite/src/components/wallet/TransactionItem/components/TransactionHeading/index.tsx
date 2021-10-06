@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { variables, Icon, useTheme } from '@trezor/components';
-import { Translation, HiddenPlaceholder, Sign } from '@suite-components';
-import { isTxUnknown, getTargetAmount, getTxOperation } from '@wallet-utils/transactionUtils';
+import { HiddenPlaceholder, Sign } from '@suite-components';
+import { getTargetAmount, getTxHeaderSymbol, getTxOperation } from '@wallet-utils/transactionUtils';
+import TransactionHeader from '../TransactionHeader';
 import { WalletAccountTransaction } from '@wallet-types';
 
 const Wrapper = styled.span`
@@ -68,15 +69,12 @@ const TransactionHeading = ({
     onClick,
 }: Props) => {
     const theme = useTheme();
+    const symbol = getTxHeaderSymbol(transaction);
     const nTokens = transaction.tokens.length;
     const isSingleTokenTransaction = nTokens === 1;
-    const isMultiTokenTransaction = nTokens > 1;
     const target = transaction.targets[0];
     const transfer = transaction.tokens[0];
-    const symbol = !isSingleTokenTransaction
-        ? transaction.symbol.toUpperCase()
-        : transfer.symbol.toUpperCase();
-    const feeSymbol = transaction.type === 'self' ? transaction.symbol.toUpperCase() : symbol;
+    const targetSymbol = transaction.type === 'self' ? transaction.symbol.toUpperCase() : symbol;
     let amount = null;
 
     const [headingIsHovered, setHeadingIsHovered] = useState(false);
@@ -94,7 +92,7 @@ const TransactionHeading = ({
                 {targetAmount && (
                     <StyledHiddenPlaceholder>
                         {operation && <Sign value={operation} />}
-                        {targetAmount} {feeSymbol}
+                        {targetAmount} {targetSymbol}
                     </StyledHiddenPlaceholder>
                 )}
             </CryptoAmount>
@@ -106,40 +104,10 @@ const TransactionHeading = ({
             <CryptoAmount>
                 <StyledHiddenPlaceholder>
                     <Sign value="neg" />
-                    {transaction.fee} {feeSymbol}
+                    {transaction.fee} {transaction.symbol.toUpperCase()}
                 </StyledHiddenPlaceholder>
             </CryptoAmount>
         );
-    }
-
-    let heading = null;
-    if (isTxUnknown(transaction)) {
-        heading = <Translation id="TR_UNKNOWN_TRANSACTION" />;
-    } else if (transaction.type === 'sent') {
-        heading = (
-            <Translation
-                id={isPending ? 'TR_SENDING_SYMBOL' : 'TR_SENT_SYMBOL'}
-                values={{ symbol, multiple: isMultiTokenTransaction }}
-            />
-        );
-    } else if (transaction.type === 'recv') {
-        heading = (
-            <Translation
-                id={isPending ? 'TR_RECEIVING_SYMBOL' : 'TR_RECEIVED_SYMBOL'}
-                values={{ symbol, multiple: isMultiTokenTransaction }}
-            />
-        );
-    } else if (transaction.type === 'self') {
-        heading = (
-            <Translation
-                id={isPending ? 'TR_SENDING_SYMBOL_TO_SELF' : 'TR_SENT_SYMBOL_TO_SELF'}
-                values={{ symbol, multiple: isMultiTokenTransaction }}
-            />
-        );
-    } else if (transaction.type === 'failed') {
-        heading = <Translation id="TR_FAILED_TRANSACTION" />;
-    } else {
-        heading = <Translation id="TR_UNKNOWN_TRANSACTION" />;
     }
 
     return (
@@ -149,7 +117,9 @@ const TransactionHeading = ({
                 onMouseLeave={() => setHeadingIsHovered(false)}
                 onClick={onClick}
             >
-                <HeadingWrapper>{heading}</HeadingWrapper>
+                <HeadingWrapper>
+                    <TransactionHeader transaction={transaction} isPending={isPending} />
+                </HeadingWrapper>
                 <ChevronIconWrapper
                     show={txItemIsHovered}
                     animate={nestedItemIsHovered || headingIsHovered}

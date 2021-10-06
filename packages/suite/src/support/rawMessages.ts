@@ -6577,6 +6577,22 @@ const messages = {
         defaultMessage:
             'Sent {multiple, select, true {multiple tokens} false {{symbol}}} to myself',
     },
+    TR_REWARDS_WITHDRAWAL: {
+        id: 'TR_REWARDS_WITHDRAWAL',
+        defaultMessage: 'Rewards withdrawal',
+    },
+    TR_STAKE_DELEGATED: {
+        id: 'TR_STAKE_DELEGATED',
+        defaultMessage: 'Stake delegation',
+    },
+    TR_STAKE_REGISTERED: {
+        id: 'TR_STAKE_REGISTERED',
+        defaultMessage: 'Registration of a stake address',
+    },
+    TR_STAKE_DEREGISTERED: {
+        id: 'TR_STAKE_DEREGISTERED',
+        defaultMessage: 'Deregistration of a stake address',
+    },
 };
 
 export default messages;
