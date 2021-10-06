@@ -74,6 +74,14 @@ export interface Transaction {
     tokens: TokenTransfer[];
     rbf?: boolean;
     ethereumSpecific?: BlockbookTransaction['ethereumSpecific'];
+    cardanoSpecific?: {
+        subtype:
+            | 'withdrawal'
+            | 'stake_delegation'
+            | 'stake_registration'
+            | 'stake_deregistration'
+            | null;
+    };
     details: TransactionDetail;
 }
 
