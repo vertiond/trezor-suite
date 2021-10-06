@@ -5,6 +5,8 @@ import { GUIDE } from '@suite-actions/constants';
 
 import type { ActiveView, Category, Node } from '@suite-types/guide';
 
+const indexNode = require('@trezor/suite-data/files/guide/index.json') as Category;
+
 export interface State {
     open: boolean;
     view: ActiveView;
@@ -15,7 +17,7 @@ export interface State {
 export const initialState: State = {
     open: false,
     view: 'GUIDE_DEFAULT',
-    indexNode: null,
+    indexNode: indexNode,
     currentNode: null,
 };
 

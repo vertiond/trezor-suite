@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import { variables } from '@trezor/components';
 import { resolveStaticPath } from '@suite-utils/build';
-
 const Wrapper = styled.button`
     display: flex;
     justify-content: center;

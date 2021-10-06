@@ -13,18 +13,18 @@ describe('Test Guide', () => {
         cy.passThroughInitialRun();
     });
 
-    it('Test open / close guide panel', () => {
-        // Test open
+    it('Testing guide open / close, navigation, feedback form', () => {
+        // Test open guide panel through guide button
         cy.getTestElement('@guide/button-open').click();
         cy.getTestElement('@guide/panel').should('be.visible');
         cy.getTestElement('@guide/button-open').should('not.be.visible');
-        // Test close
+
+        // Test close guide panel through close guide button
         cy.getTestElement('@guide/button-close').click();
         cy.getTestElement('@guide/panel').should('not.exist');
         cy.getTestElement('@guide/button-open').should('be.visible');
 
         // Test guide panel navigation
-        // Test open
         cy.getTestElement('@guide/button-open').click();
         cy.getTestElement('@guide/category/privacy').click();
         cy.getTestElement('@guide/button-back').click();
@@ -36,6 +36,7 @@ describe('Test Guide', () => {
         cy.getTestElement('@guide/button-close').click();
         cy.getTestElement('@guide/button-open').click();
         cy.getTestElement('@guide/category/privacy').should('be.visible');
+        cy.getTestElement('@guide/button-close').click(); // close guide panel before next steps
 
         // Test guide feedback form
         cy.getTestElement('@guide/button-open').click();
