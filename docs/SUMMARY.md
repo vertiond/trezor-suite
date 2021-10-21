@@ -1,6 +1,10 @@
 # Summary
 
 -   [Introduction](index.md)
+-   [Analytics](analytics/index.md)
+    -   [AWS](analytics/aws.md)
+    -   [AWS (technical)](analytics/aws-technical.md)
+    -   [Sentry](analytics/sentry.md)
 -   [Releases](releases/index.md)
     -   [Adding New Firmwares](releases/adding-new-firmwares.md)
     -   [Desktop Updates](releases/desktop_updates.md)
