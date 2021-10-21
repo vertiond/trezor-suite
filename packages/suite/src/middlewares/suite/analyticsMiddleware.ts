@@ -33,8 +33,6 @@ const reportSuiteReadyAction = (state: AppState) =>
             discreetMode: state.wallet.settings.discreetMode,
             screenWidth: getScreenWidth(),
             screenHeight: getScreenHeight(),
-            platform: getPlatform(),
-            platformLanguage: getPlatformLanguage(),
             platformLanguages: getPlatformLanguages().join(','),
             tor: state.suite.tor,
             rememberedStandardWallets: state.devices.filter(d => d.remember && d.useEmptyPassphrase)

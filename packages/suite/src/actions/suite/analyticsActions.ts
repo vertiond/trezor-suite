@@ -37,7 +37,6 @@ export type AnalyticsEvent =
          suite-ready
          Triggers on application start. Logs part of suite setup that might have been loaded from storage
          but it might also be suite default setup that is loaded when suite starts for the first time.
-         IMPORTANT: skipped if user opens suite for the first time. In such case, the first log will be 'initial-run-completed'
          */
           type: 'suite-ready';
           payload: {
@@ -47,9 +46,6 @@ export type AnalyticsEvent =
               discreetMode: AppState['wallet']['settings']['discreetMode'];
               screenWidth: number;
               screenHeight: number;
-              // added in 1.1
-              platform: string;
-              platformLanguage: string;
               // added in 1.2
               tor: boolean;
               // added in 1.4
