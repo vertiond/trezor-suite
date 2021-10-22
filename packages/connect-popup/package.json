@@ -1,0 +1,38 @@
+{
+    "name": "@trezor/connect-popup",
+    "version": "1.0.0",
+    "private": true,
+    "author": "Trezor <info@trezor.io>",
+    "homepage": "https://github.com/trezor/trezor-suite/packages/connect-iframe",
+    "keywords": [
+        "Trezor",
+        "trezor-connect"
+    ],
+    "license": "SEE LICENSE IN LICENSE.md",
+    "description": "Bundle and build of trezor-connect iframe",
+    "scripts": {
+        "lint": "eslint '**/*.ts'",
+        "build:lib": "rimraf build && webpack --config ./webpack/prod.webpack.config.js",
+        "type-check": "tsc --project tsconfig.json",
+        "dev": "webpack serve --config ./webpack/dev.babel.js"
+    },
+    "dependencies": {
+        "react": "17.0.1",
+        "react-dom": "17.0.1"
+    },
+    "devDependencies": {
+
+        "@babel/register": "^7.13.14",
+        "@babel/runtime": "^7.13.10",
+        "babel-eslint": "^10.1.0",
+        "babel-loader": "^8.2.1",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-loader": "^4.0.2",
+        "eslint-plugin-jest": "^24.4.0",
+        "html-webpack-plugin": "^5.3.2",
+        "ts-loader": "^9.2.5",
+        "webpack": "^5.55.1",
+        "webpack-cli": "4.8.0",
+        "webpack-dev-server": "^4.2.1"
+    }
+}
