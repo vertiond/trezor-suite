@@ -3,4 +3,12 @@ module.exports = {
     parserOptions: {
         project: ['./tsconfig.json'],
     },
+    overrides: [
+        {
+            files: ['**/electrum.*', '**/electrum/**/*'],
+            rules: {
+                camelcase: "off",
+            },
+        }
+    ]
 };
