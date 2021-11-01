@@ -36,3 +36,12 @@ export const sumVinVout = (
     }, new BigNumber(initialValue));
     return sum.toString();
 };
+
+export const transformTarget = (target: VinVout, incoming: VinVout[]) => ({
+    n: target.n || 0,
+    addresses: target.addresses,
+    isAddress: target.isAddress,
+    amount: target.value,
+    coinbase: target.coinbase,
+    isAccountTarget: incoming.includes(target) ? true : undefined,
+});
