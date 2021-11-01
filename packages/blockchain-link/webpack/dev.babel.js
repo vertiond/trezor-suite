@@ -26,7 +26,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: [/ripple\/index.ts$/, /blockbook\/index.ts$/, /cardano\/index.ts$/],
+                test: [/ripple\/index.ts$/, /blockbook\/index.ts$/, /blockfrost\/index.ts$/],
                 use: ['worker-loader'],
             },
             {

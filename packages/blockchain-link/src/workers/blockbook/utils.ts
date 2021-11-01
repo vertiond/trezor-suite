@@ -18,7 +18,7 @@ import {
 } from '../../types/blockbook';
 
 import { Utxo } from '../../types/responses';
-import { Addresses, filterTargets, sumVinVout, transformTarget } from '../utils';
+import { Addresses, filterTargets, sumVinVout } from '../utils';
 
 export const transformServerInfo = (payload: ServerInfo) => ({
     name: payload.name,
@@ -80,6 +80,15 @@ export const filterTokenTransfers = (
             };
         });
 };
+
+const transformTarget = (target: VinVout, incoming: VinVout[]) => ({
+    n: target.n || 0,
+    addresses: target.addresses,
+    isAddress: target.isAddress,
+    amount: target.value,
+    coinbase: target.coinbase,
+    isAccountTarget: incoming.includes(target) ? true : undefined,
+});
 
 export const transformTransaction = (
     descriptor: string,

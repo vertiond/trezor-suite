@@ -26,7 +26,7 @@ const blockbookTx = {
     hex: '02000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2503a4f617041fba365d2f4d696e65642042792048454c4c4f2fffffffffafcb4c0000000000ffffffff0113a05502000000001976a91431938090e8a00edb2a42a8fbcf1a56d99de43bc988ac00000000',
 };
 
-const cardanoTx = {
+const blockfrostTx = {
     block: 'e6369fee087d31192016b1659f1c381e9fc4925339278a4eef6f340c96c1947f',
     block_height: 5040611,
     slot: 15650536,
@@ -138,13 +138,13 @@ export default {
             error: '[NotFoundError(Transaction not found)]',
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Successful',
             params: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
             response: {
                 type: 'cardano',
-                tx: cardanoTx,
+                tx: blockfrostTx,
             },
         },
         {

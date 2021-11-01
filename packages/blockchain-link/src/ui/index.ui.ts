@@ -3,7 +3,7 @@ import BlockbookWorker from '../workers/blockbook/index';
 // @ts-ignore no default export
 import RippleWorker from '../workers/ripple/index';
 // @ts-ignore no default export
-import CardanoWorker from '../workers/cardano/index';
+import BlockfrostWorker from '../workers/blockfrost/index';
 
 import CONFIG from './config';
 import BlockchainLink from '../index';
@@ -341,8 +341,8 @@ CONFIG.forEach(i => {
         worker = RippleWorker;
     }
 
-    if (i.blockchain.worker.includes('cardano')) {
-        worker = CardanoWorker;
+    if (i.blockchain.worker.includes('blockfrost')) {
+        worker = BlockfrostWorker;
     }
 
     const b = new BlockchainLink({

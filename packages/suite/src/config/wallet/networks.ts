@@ -372,9 +372,9 @@ const networks = [
         decimals: 6,
         testnet: true,
         explorer: {
-            tx: 'https://testnet.cardanoscan.io/transaction/',
+            tx: 'https://cardanoscan.io/transaction/',
             account: 'https://test.bithomp.com/explorer/',
-            token: 'https://testnet.cardanoscan.io/token/',
+            token: 'https://cardanoscan.io/token/',
         },
     },
     {

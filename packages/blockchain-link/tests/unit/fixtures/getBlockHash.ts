@@ -34,7 +34,7 @@ export default {
             error: 'Unknown message type: m_get_block_hash',
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Successful',
             params: 0,

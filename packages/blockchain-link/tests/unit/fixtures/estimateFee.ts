@@ -52,7 +52,7 @@ export default {
             response: [{ feePerUnit: '12' }],
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Successfull',
             params: { blocks: [1] },

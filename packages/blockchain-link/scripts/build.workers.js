@@ -19,7 +19,7 @@ const buildWorker = entry => {
 const workers = [
     '../src/workers/ripple/index.js',
     '../src/workers/blockbook/index.js',
-    '../src/workers/cardano/index.js',
+    '../src/workers/blockfrost/index.js',
 ];
 
 workers.forEach(w => {

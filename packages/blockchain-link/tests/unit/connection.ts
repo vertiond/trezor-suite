@@ -5,7 +5,7 @@ import BlockchainLink from '../../src';
 const getMethod = (instanceName: string) => {
     let method: string;
     switch (instanceName) {
-        case 'cardano':
+        case 'blockfrost':
             method = 'GET_BLOCK';
             break;
         case 'ripple':
@@ -143,8 +143,8 @@ workers.forEach(instance => {
         });
 
         it('Connect (only one endpoint is valid)', async () => {
-            // cardano has only one valid endpoint
-            if (instance.name === 'cardano') return;
+            // blockfrost has only one valid endpoint
+            if (instance.name === 'blockfrost') return;
 
             blockchain.settings.server = [
                 'gibberish1',

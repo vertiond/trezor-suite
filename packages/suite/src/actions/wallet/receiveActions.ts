@@ -68,14 +68,6 @@ export const showAddress =
             return;
         }
 
-        let response;
-        const params = {
-            device,
-            path,
-            useEmptyPassphrase: device.useEmptyPassphrase,
-            coin: account.symbol,
-        };
-
         // catch button request and open modal
         const buttonRequestHandler = (event: ButtonRequestMessage['payload']) => {
             if (!event || event.code !== 'ButtonRequest_Address') return;
@@ -94,6 +86,14 @@ export const showAddress =
             );
         };
 
+        let response;
+        const params = {
+            device,
+            path,
+            useEmptyPassphrase: device.useEmptyPassphrase,
+            coin: account.symbol,
+        };
+
         TrezorConnect.on(UI.REQUEST_BUTTON, buttonRequestHandler);
 
         switch (account.networkType) {
@@ -102,7 +102,6 @@ export const showAddress =
                 break;
             case 'cardano':
                 response = await TrezorConnect.cardanoGetAddress({
-                    device,
                     useEmptyPassphrase: device.useEmptyPassphrase,
                     addressParameters: {
                         stakingPath: getStakingPath(account.accountType, account.index),

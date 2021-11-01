@@ -3,12 +3,12 @@ import assert from 'assert';
 import getFreePort from './freePort';
 import defaultBlockbookResponses from './fixtures/blockbook';
 import defaultRippleResponses from './fixtures/ripple';
-import defaultCardanoResponses from './fixtures/cardano';
+import defaultBlockfrostResponses from './fixtures/blockfrost';
 
 const DEFAULT_RESPONSES = {
     blockbook: defaultBlockbookResponses,
     ripple: defaultRippleResponses,
-    cardano: defaultCardanoResponses,
+    blockfrost: defaultBlockfrostResponses,
 };
 
 const create = async type => {
@@ -70,12 +70,12 @@ const create = async type => {
                     throw new Error('Unknown blockbook request without method');
                 }
                 server.emit(`blockbook_${request.method}`, request);
-            } else if (type === 'cardano') {
+            } else if (type === 'blockfrost') {
                 if (typeof request.command !== 'string') {
-                    throw new Error('Unknown cardano request without method');
+                    throw new Error('Unknown blockfrost request without method');
                 }
 
-                server.emit(`cardano_${request.command}`, request);
+                server.emit(`blockfrost_${request.command}`, request);
             } else if (type === 'ripple') {
                 if (typeof request.command !== 'string') {
                     throw new Error('Unknown ripple request without command');
@@ -116,25 +116,25 @@ const create = async type => {
         sendResponse(request);
     });
 
-    // Cardano
-    server.on('cardano_GET_BLOCK', request => sendResponse(request));
-    server.on('cardano_GET_SERVER_INFO', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_INFO', request => sendResponse(request));
-    server.on('cardano_ESTIMATE_FEE', request => sendResponse(request));
-    server.on('cardano_GET_ACCOUNT_UTXO', request => sendResponse(request));
-    server.on('cardano_GET_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_PUSH_TRANSACTION', request => sendResponse(request));
-    server.on('cardano_SUBSCRIBE_ADDRESS', request => {
+    // Blockfrost
+    server.on('blockfrost_GET_BLOCK', request => sendResponse(request));
+    server.on('blockfrost_GET_SERVER_INFO', request => sendResponse(request));
+    server.on('blockfrost_GET_ACCOUNT_INFO', request => sendResponse(request));
+    server.on('blockfrost_ESTIMATE_FEE', request => sendResponse(request));
+    server.on('blockfrost_GET_ACCOUNT_UTXO', request => sendResponse(request));
+    server.on('blockfrost_GET_TRANSACTION', request => sendResponse(request));
+    server.on('blockfrost_PUSH_TRANSACTION', request => sendResponse(request));
+    server.on('blockfrost_SUBSCRIBE_ADDRESS', request => {
         addresses = request.params.addresses; // eslint-disable-line prefer-destructuring
         sendResponse(request);
     });
 
-    server.on('cardano_UNSUBSCRIBE_ADDRESS', request => {
+    server.on('blockfrost_UNSUBSCRIBE_ADDRESS', request => {
         addresses = undefined;
         sendResponse(request);
     });
-    server.on('cardano_SUBSCRIBE_BLOCK', request => sendResponse(request));
-    server.on('cardano_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
+    server.on('blockfrost_SUBSCRIBE_BLOCK', request => sendResponse(request));
+    server.on('blockfrost_UNSUBSCRIBE_BLOCK', request => sendResponse(request));
 
     // Ripple
     server.on('ripple_subscribe', request => {

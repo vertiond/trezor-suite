@@ -4,15 +4,6 @@ import { VinVout } from '../types/blockbook';
 
 export type Addresses = (Address | string)[] | string;
 
-export const transformTarget = (target: VinVout, incoming: VinVout[]) => ({
-    n: target.n || 0,
-    addresses: target.addresses,
-    isAddress: target.isAddress,
-    amount: target.value,
-    coinbase: target.coinbase,
-    isAccountTarget: incoming.includes(target) ? true : undefined,
-});
-
 export const filterTargets = (addresses: Addresses, targets: VinVout[]): VinVout[] => {
     if (typeof addresses === 'string') {
         addresses = [addresses];

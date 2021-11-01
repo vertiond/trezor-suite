@@ -6,9 +6,9 @@ export { MESSAGES, RESPONSES };
 export const NETWORKS: {
     RIPPLE: 'ripple';
     BLOCKBOOK: 'blockbook';
-    CARDANO: 'cardano';
+    BLOCKFROST: 'blockfrost';
 } = {
     RIPPLE: 'ripple',
     BLOCKBOOK: 'blockbook',
-    CARDANO: 'cardano',
+    BLOCKFROST: 'blockfrost',
 };
