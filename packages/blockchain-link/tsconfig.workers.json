@@ -8,6 +8,6 @@
     "include": [
         "./src/workers/ripple/index.ts",
         "./src/workers/blockbook/index.ts",
-        "./src/workers/cardano/index.ts"
+        "./src/workers/blockfrost/index.ts"
     ]
 }

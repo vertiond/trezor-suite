@@ -49,16 +49,8 @@ const blockbookWorkerFactory = () => {
     return new MyWorker();
 };
 
-const cardanoWorkerFactory = () => {
-    require('../../../src/workers/cardano/index.ts'); // eslint-disable-line global-require
-    setTimeout(() => {
-        global.postMessage({ id: -1, type: 'm_handshake' });
-    }, 1);
-    return new MyWorker();
-};
-
-const cardanoWorkerFactory = () => {
-    require('../../../src/workers/cardano/index.ts'); // eslint-disable-line global-require
+const blockfrostWorkerFactory = () => {
+    require('../../../src/workers/blockfrost'); // eslint-disable-line global-require
     setTimeout(() => {
         global.postMessage({ id: -1, type: 'm_handshake' });
     }, 1);
@@ -68,5 +60,5 @@ const cardanoWorkerFactory = () => {
 export default [
     { name: 'ripple', worker: rippleWorkerFactory },
     { name: 'blockbook', worker: blockbookWorkerFactory },
-    { name: 'cardano', worker: cardanoWorkerFactory },
+    { name: 'blockfrost', worker: blockfrostWorkerFactory },
 ] as const;

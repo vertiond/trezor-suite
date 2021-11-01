@@ -1,6 +1,10 @@
 import BigNumber from 'bignumber.js';
 import EmurgoCip from '@emurgo/cip14-js';
-import { BlockfrostUtxos, BlockfrostTransaction, BlockfrostAccountInfo } from '../../types/cardano';
+import {
+    BlockfrostUtxos,
+    BlockfrostTransaction,
+    BlockfrostAccountInfo,
+} from '../../types/blockfrost';
 import { Utxo } from '../../types/responses';
 import { VinVout } from '../../types/blockbook';
 import {

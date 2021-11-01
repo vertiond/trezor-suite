@@ -42,8 +42,7 @@ export default {
                     },
                 },
             ],
-            error:
-                'json: cannot unmarshal number into Go struct field estimateFeeReq.blocks of type []int',
+            error: 'json: cannot unmarshal number into Go struct field estimateFeeReq.blocks of type []int',
         },
     ],
     ripple: [
@@ -53,7 +52,7 @@ export default {
             response: [{ feePerUnit: '12' }],
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Successfull',
             params: { blocks: [1] },

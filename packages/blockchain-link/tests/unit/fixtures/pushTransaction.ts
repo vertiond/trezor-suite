@@ -19,7 +19,7 @@ export default {
             error: '-22: TX decode failed',
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Successful',
             params: 'A',
@@ -28,12 +28,12 @@ export default {
                     method: 'PUSH_TRANSACTION',
                     response: {
                         data: {
-                            result: 'cardano_push_tx_result',
+                            result: 'blockfrost_push_tx_result',
                         },
                     },
                 },
             ],
-            response: 'cardano_push_tx_result',
+            response: 'blockfrost_push_tx_result',
         },
         {
             description: 'Unsuccessful',

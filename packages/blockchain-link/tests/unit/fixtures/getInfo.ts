@@ -50,7 +50,7 @@ export default {
             error: 'RippledError Error msg',
         },
     ],
-    cardano: [
+    blockfrost: [
         {
             description: 'Success',
             response: {
@@ -70,12 +70,12 @@ export default {
                     method: 'GET_SERVER_INFO',
                     response: {
                         data: {
-                            error: { message: 'CardanoError Error msg' },
+                            error: { message: 'blockfrost Error Error msg' },
                         },
                     },
                 },
             ],
-            error: 'CardanoError Error msg',
+            error: 'blockfrost Error Error msg',
         },
     ],
 };

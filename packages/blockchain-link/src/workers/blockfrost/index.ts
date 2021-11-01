@@ -6,7 +6,7 @@ import { SubscriptionAccountInfo } from '../../types/common';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostTransaction } from '../../types/cardano';
+import { BlockfrostTransaction } from '../../types/blockfrost';
 import { transformUtxos, transformAccountInfo, transformTransaction } from './utils';
 
 declare function postMessage(data: Response): void;
@@ -35,7 +35,7 @@ const connect = async (): Promise<Connection> => {
         throw new CustomError('connect', 'Endpoint not set');
     }
 
-    common.debug('Connecting to cardano', server[0]);
+    common.debug('Connecting to blockfrost', server[0]);
 
     const connection = new Connection({
         // server is load balanced
@@ -111,7 +111,7 @@ const getTransaction = async (
             id: data.id,
             type: RESPONSES.GET_TRANSACTION,
             payload: {
-                type: 'cardano',
+                type: 'blockfrost',
                 tx,
             },
         });

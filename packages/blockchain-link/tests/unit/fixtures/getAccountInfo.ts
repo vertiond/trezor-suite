@@ -1,9 +1,9 @@
 import blockbook from './getAccountInfo-blockbook';
 import ripple from './getAccountInfo-ripple';
-import cardano from './getAccountInfo-cardano';
+import blockfrost from './getAccountInfo-blockfrost';
 
 export default {
     blockbook,
     ripple,
-    cardano,
+    blockfrost,
 };

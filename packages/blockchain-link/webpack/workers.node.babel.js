@@ -9,7 +9,7 @@ module.exports = {
     entry: {
         'ripple-worker': `${SRC}workers/ripple/index.ts`,
         'blockbook-worker': `${SRC}workers/blockbook/index.ts`,
-        'cardano-worker': `${SRC}workers/cardano/index.ts`,
+        'blockfrost-worker': `${SRC}workers/blockfrost/index.ts`,
     },
     output: {
         filename: '[name].js',
