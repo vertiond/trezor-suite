@@ -25,7 +25,7 @@ export interface GetInfo {
 
 export interface GetBlockHash {
     type: typeof MESSAGES.GET_BLOCK_HASH;
-    payload: number | string;
+    payload: number;
 }
 
 export interface GetAccountInfo {

@@ -174,7 +174,6 @@ interface RawTxData {
     limit: number;
     transactions: any[];
 }
-
 const getRawTransactionsData = async (options: any): Promise<RawTxData> => {
     const api = await connect();
     return api.request('account_tx', options);
@@ -345,7 +344,6 @@ const pushTransaction = async (
 ): Promise<void> => {
     try {
         const api = await connect();
-        if (typeof data.payload !== 'string') return;
         // tx_blob hex must be in upper case
         const info = await api.submit(data.payload.toUpperCase());
 
@@ -430,7 +428,6 @@ const subscribeAccounts = async (accounts: SubscriptionAccountInfo[]) => {
             accounts_proposed: uniqueAddresses,
         });
     }
-
     return { subscribed: common.getAddresses().length > 0 };
 };
 
