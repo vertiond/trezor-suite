@@ -154,10 +154,8 @@
         }
     },
     "ESTIMATE_FEE": {
-        "data": [
-            {
-                "lovelacePerByte": "44"
-            }
-        ]
+        "data": {
+            "lovelacePerByte": "44"
+        }
     }
 }

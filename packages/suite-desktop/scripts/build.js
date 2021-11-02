@@ -40,11 +40,14 @@ const appKey = fs.readFileSync(keyPath, 'utf-8');
 // Start build
 const hrstart = process.hrtime();
 console.log('[Electron Build] Starting...');
+console.log(`[Electron Build] Mode: ${isDev ? 'development' : 'production'}`);
+console.log(`[Electron Build] Using mocks: ${useMocks}`);
+
 build({
     entryPoints: ['app.ts', 'preload.ts', ...modules].map(f => path.join(electronSource, f)),
     platform: 'node',
     bundle: true,
-    target: 'node14.16.0', // Electron 12
+    target: 'node14.17.0', // Electron 14
     external: Object.keys({
         ...pkg.dependencies,
         ...pkg.devDependencies,
@@ -54,8 +57,11 @@ build({
     minify: !isDev,
     outdir: path.join(__dirname, '..', 'dist'),
     define: {
+        'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
         'process.env.COMMITHASH': JSON.stringify(gitRevision),
         'process.env.APP_PUBKEY': JSON.stringify(appKey),
+        'process.env.PROTOCOLS': JSON.stringify(pkg.build.protocols.schemes),
+        'process.env.PKGNAME': JSON.stringify(pkg.name),
     },
     inject: [path.join(__dirname, 'build-inject.js')],
     plugins: useMocks ? [mockPlugin] : [],

@@ -7,11 +7,11 @@ import { FLAGS } from '../../suite/src/config/suite/features';
 
 import { assetPrefix, isDev, launchElectron } from '../utils/env';
 import { getPathForProject } from '../utils/path';
-import ShellExecPlugin from '../plugins/shell-exec-plugin';
+import ShellSpawnPlugin from '../plugins/shell-spawn-plugin';
 
 const baseDir = getPathForProject('desktop');
 const config: webpack.Configuration = {
-    target: 'web',
+    target: 'browserslist:Chrome >= 93', // electron 14
     entry: [path.join(baseDir, 'src', 'index.tsx')],
     output: {
         path: path.join(baseDir, 'build'),
@@ -50,11 +50,25 @@ const config: webpack.Configuration = {
             },
             filename: path.join(baseDir, 'build', 'index.html'),
         }),
-        new ShellExecPlugin({
+        new ShellSpawnPlugin({
             cwd: baseDir,
             runAfterBuild: [
-                `chmod -R +x ${path.join(baseDir, 'build', 'static', 'bin')}`,
-                ...(launchElectron ? ['yarn run dev:prepare && yarn run dev:run'] : []),
+                {
+                    command: 'chmod',
+                    args: ['-R', '+x', path.join(baseDir, 'build', 'static', 'bin')],
+                },
+                ...(launchElectron
+                    ? [
+                          {
+                              command: 'yarn',
+                              args: ['run', 'dev:prepare'],
+                          },
+                          {
+                              command: 'yarn',
+                              args: ['run', 'dev:run'],
+                          },
+                      ]
+                    : []),
             ],
         }),
     ],

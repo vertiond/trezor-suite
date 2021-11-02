@@ -4,6 +4,7 @@ import { SUITE } from '@suite-actions/constants';
 import { NotificationEntry } from '@suite-reducers/notificationReducer';
 import withAction from './components/withAction';
 import withTransaction from './components/withTransaction';
+import withCoinProtocolScheme from './components/withCoinProtocolScheme';
 import { ViewProps } from './definitions';
 
 const simple = (View: React.ComponentType<ViewProps>, props: ViewProps) => (
@@ -19,6 +20,13 @@ const simple = (View: React.ComponentType<ViewProps>, props: ViewProps) => (
  */
 const hocNotification = (notification: NotificationEntry, View: React.ComponentType<ViewProps>) => {
     switch (notification.type) {
+        case 'coin-scheme-protocol':
+            return withCoinProtocolScheme(View, {
+                notification,
+                variant: 'transparent',
+                // values get filled in `withCoinProtocolScheme`
+                message: { id: 'TOAST_COIN_SCHEME_PROTOCOL', values: {} },
+            });
         case 'acquire-error':
             return simple(View, {
                 notification,
@@ -125,7 +133,6 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         account: notification.descriptor,
                     },
                 },
-                actionLabel: 'TOAST_TX_BUTTON',
             });
 
         case 'tx-sent':
@@ -140,7 +147,6 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         account: notification.descriptor,
                     },
                 },
-                actionLabel: 'TOAST_TX_BUTTON',
             });
 
         case 'raw-tx-sent':
@@ -167,7 +173,6 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         account: notification.descriptor,
                     },
                 },
-                actionLabel: 'TOAST_TX_BUTTON',
             });
 
         case 'sign-tx-error':
@@ -216,6 +221,20 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         error: notification.error,
                     },
                 },
+            });
+
+        case 'sign-message-success':
+            return simple(View, {
+                notification,
+                variant: 'success',
+                message: 'TOAST_SIGN_MESSAGE_SUCCESS',
+            });
+
+        case 'verify-message-success':
+            return simple(View, {
+                notification,
+                variant: 'success',
+                message: 'TOAST_VERIFY_MESSAGE_SUCCESS',
             });
 
         case 'error':
@@ -330,7 +349,6 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         label: notification.device.label,
                     },
                 },
-                actionLabel: 'TR_SELECT_DEVICE',
             });
 
         case DEVICE.CONNECT_UNACQUIRED:
@@ -343,30 +361,20 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                         label: { id: 'TR_UNACQUIRED' },
                     },
                 },
-                actionLabel: 'TR_SOLVE_ISSUE',
             });
 
         case SUITE.AUTH_DEVICE:
             return simple(View, {
                 notification,
                 variant: 'info',
-                message: {
-                    id: 'EVENT_WALLET_CREATED',
-                    values: {
-                        walletLabel: 'New wallet',
-                    },
-                },
+                message: 'EVENT_WALLET_CREATED',
             });
 
         default:
             return simple(View, {
                 notification,
                 variant: 'info',
-                message: {
-                    // TODO: proper msg definition
-                    id: notification.type as 'TR_404_DESCRIPTION',
-                    defaultMessage: notification.type,
-                },
+                message: 'TR_404_DESCRIPTION',
             });
     }
 };

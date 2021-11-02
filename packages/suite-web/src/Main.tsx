@@ -13,6 +13,8 @@ import Preloader from '@suite-components/Preloader';
 import ToastContainer from '@suite-components/ToastContainer';
 import IntlProvider from '@suite-support/ConnectedIntlProvider';
 import Resize from '@suite-support/Resize';
+import Protocol from '@suite-support/Protocol';
+import Autodetect from '@suite-support/Autodetect';
 import Tor from '@suite-support/Tor';
 import OnlineStatus from '@suite-support/OnlineStatus';
 import ErrorBoundary from '@suite-support/ErrorBoundary';
@@ -22,11 +24,10 @@ import history from '@suite/support/history';
 
 import AppRouter from './support/Router';
 import { CypressExportStore } from './support/CypressExportStore';
-import GlobalStyleProvider from '@suite-support/styles/GlobalStyleProvider';
 
 const Main = () => {
     useEffect(() => {
-        if (!window.Cypress && !isDev()) {
+        if (!window.Cypress && !isDev) {
             Sentry.init(SENTRY_CONFIG);
             Sentry.configureScope(scope => {
                 scope.setTag('version', process.env.VERSION || 'undefined');
@@ -44,10 +45,11 @@ const Main = () => {
             <ReduxProvider store={store}>
                 <ThemeProvider>
                     <RouterProvider history={history}>
-                        <GlobalStyleProvider />
                         <ErrorBoundary>
+                            <Autodetect />
                             <Resize />
                             <Tor />
+                            <Protocol />
                             <OnlineStatus />
                             <RouterHandler />
                             <IntlProvider>

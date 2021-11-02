@@ -97,13 +97,14 @@ const ArrowUp = styled.div`
     z-index: 10001;
 `;
 
-const Label = styled.label`
+const Label = styled.div`
     display: flex;
     min-height: 32px;
     justify-content: space-between;
 `;
 
-const Left = styled.div`
+const Left = styled.label`
+    display: block;
     font-size: ${variables.FONT_SIZE.NORMAL};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
     padding: 0 0 12px 0;
@@ -139,7 +140,7 @@ interface Props extends StyledTextareaProps {
     borderRadius?: number;
 }
 
-const Textarea = ({
+const Textarea: React.FC<Props> = ({
     className,
     maxLength,
     labelAddon,
@@ -158,8 +159,9 @@ const Textarea = ({
     noError,
     borderWidth = 2,
     borderRadius = 4,
+    children,
     ...rest
-}: Props) => {
+}) => {
     const [isHovered, setIsHovered] = React.useState(false);
 
     return (
@@ -197,6 +199,7 @@ const Textarea = ({
                 <ArrowUp />
                 {tooltipAction}
             </TooltipAction>
+            {children}
             {!noError && <BottomText state={state}>{bottomText}</BottomText>}
         </Wrapper>
     );

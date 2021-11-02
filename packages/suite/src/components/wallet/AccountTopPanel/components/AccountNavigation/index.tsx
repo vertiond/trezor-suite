@@ -1,10 +1,11 @@
 import React from 'react';
 import { Account } from '@wallet-types';
-import AppNavigation, { AppNavigationItem } from '@suite/components/suite/AppNavigation';
+import AppNavigation, { AppNavigationItem } from '@suite-components/AppNavigation';
 import { Translation } from '@suite-components/Translation';
 import { useActions } from '@suite-hooks';
 import * as routerActions from '@suite-actions/routerActions';
 import * as modalActions from '@suite-actions/modalActions';
+import { hasSignVerify } from '@wallet-utils/accountUtils';
 
 interface Props {
     account?: Account;
@@ -115,7 +116,7 @@ const AccountNavigation = (props: Props) => {
             icon: 'SIGN',
             position: 'secondary',
             extra: true,
-            isHidden: () => true,
+            isHidden: () => !account || !hasSignVerify(account),
         },
     ];
 

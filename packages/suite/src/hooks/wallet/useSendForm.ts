@@ -1,10 +1,10 @@
 import { createContext, useContext, useCallback, useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useActions } from '@suite-hooks';
+import { useActions, useSelector } from '@suite-hooks';
 import * as sendFormActions from '@wallet-actions/sendFormActions';
 import * as walletSettingsActions from '@settings-actions/walletSettingsActions';
 import * as routerActions from '@suite-actions/routerActions';
-import { DEFAULT_PAYMENT, DEFAULT_VALUES } from '@wallet-constants/sendForm';
+import * as protocolActions from '@suite-actions/protocolActions';
 import {
     UseSendFormProps,
     UseSendFormState,
@@ -12,29 +12,17 @@ import {
     SendContextValues,
     Output,
 } from '@wallet-types/sendForm';
-import { isEnabled as isFeatureEnabled } from '@suite-utils/features';
 
-import { getFeeLevels } from '@wallet-utils/sendFormUtils';
+import { getFeeLevels, getDefaultValues } from '@wallet-utils/sendFormUtils';
 import { useSendFormOutputs } from './useSendFormOutputs';
 import { useSendFormFields } from './useSendFormFields';
 import { useSendFormCompose } from './useSendFormCompose';
 import { useSendFormImport } from './useSendFormImport';
 import { useFees } from './form/useFees';
+import { PROTOCOL_TO_SYMBOL } from '@suite/support/suite/Protocol';
 
 export const SendContext = createContext<SendContextValues | null>(null);
 SendContext.displayName = 'SendContext';
-
-const getDefaultValues = (
-    currency: Output['currency'],
-    network: UseSendFormState['network'],
-): FormState => ({
-    ...DEFAULT_VALUES,
-    options:
-        isFeatureEnabled('RBF') && network.features?.includes('rbf')
-            ? ['bitcoinRBF', 'broadcast']
-            : ['broadcast'],
-    outputs: [{ ...DEFAULT_PAYMENT, currency }],
-});
 
 // convert UseSendFormProps to UseSendFormState
 const getStateFromProps = (props: UseSendFormProps) => {
@@ -81,6 +69,7 @@ export const useSendForm = (props: UseSendFormProps): SendContextValues => {
         setLastUsedFeeLevel,
         signTransaction,
         goto,
+        fillSendForm,
     } = useActions({
         getDraft: sendFormActions.getDraft,
         saveDraft: sendFormActions.saveDraft,
@@ -89,6 +78,7 @@ export const useSendForm = (props: UseSendFormProps): SendContextValues => {
         setLastUsedFeeLevel: walletSettingsActions.setLastUsedFeeLevel,
         signTransaction: sendFormActions.signTransaction,
         goto: routerActions.goto,
+        fillSendForm: protocolActions.fillSendForm,
     });
 
     const { localCurrencyOption } = state;
@@ -96,7 +86,7 @@ export const useSendForm = (props: UseSendFormProps): SendContextValues => {
     // register `react-hook-form`, defaultValues are set later in "loadDraft" useEffect block
     const useFormMethods = useForm<FormState>({ mode: 'onChange', shouldUnregister: false });
 
-    const { control, reset, register, getValues, errors } = useFormMethods;
+    const { control, reset, register, getValues, errors, setValue } = useFormMethods;
 
     // register array fields (outputs array in react-hook-form)
     const outputsFieldArray = useFieldArray<Output>({
@@ -237,6 +227,43 @@ export const useSendForm = (props: UseSendFormProps): SendContextValues => {
             resetContext();
         }
     }, [props, resetContext, state.account]);
+
+    const { protocol } = useSelector(state => ({
+        protocol: state.protocol,
+    }));
+
+    // fill form using data from URI protocol handler e.g. 'bitcoin:address?amount=0.01'
+    useEffect(() => {
+        if (
+            protocol.sendForm.shouldFillSendForm &&
+            protocol.sendForm.scheme &&
+            props.selectedAccount.network.symbol === PROTOCOL_TO_SYMBOL[protocol.sendForm.scheme]
+        ) {
+            // for now we always fill only first output
+            const outputIndex = 0;
+
+            if (protocol.sendForm.amount) {
+                sendFormUtils.setAmount(outputIndex, protocol.sendForm.amount.toString());
+            }
+            setValue(
+                `outputs[${outputIndex}]`,
+                {
+                    address: protocol.sendForm.address,
+                },
+                { shouldValidate: true },
+            );
+            fillSendForm(false);
+            composeRequest();
+        }
+    }, [
+        setValue,
+        props.selectedAccount.network,
+        protocol,
+        fillSendForm,
+        updateContext,
+        sendFormUtils,
+        composeRequest,
+    ]);
 
     // load draft from reducer
     useEffect(() => {

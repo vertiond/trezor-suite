@@ -1,6 +1,7 @@
 import path from 'path';
 import { spawn, ChildProcess } from 'child_process';
-import isDev from 'electron-is-dev';
+
+import { isDev } from '@suite-utils/build';
 import { b2t } from '@desktop-electron/libs/utils';
 
 export type Status = {
@@ -134,6 +135,7 @@ abstract class BaseProcess {
         this.process = spawn(processPath, params, {
             cwd: processDir,
             env: processEnv,
+            stdio: ['ignore', 'ignore', 'ignore'],
         });
         this.process.on('error', err => this.onError(err));
         this.process.on('exit', code => this.onExit(code));

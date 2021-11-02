@@ -13,12 +13,13 @@ import Preloader from '@suite-components/Preloader';
 import ToastContainer from '@suite-components/ToastContainer';
 import IntlProvider from '@suite-support/ConnectedIntlProvider';
 import Resize from '@suite-support/Resize';
+import Autodetect from '@suite-support/Autodetect';
+import Protocol from '@suite-support/Protocol';
 import Tor from '@suite-support/Tor';
 import OnlineStatus from '@suite-support/OnlineStatus';
 import ErrorBoundary from '@suite-support/ErrorBoundary';
 import RouterHandler from '@suite-support/Router';
 import ThemeProvider from '@suite-support/ThemeProvider';
-import GlobalStyleProvider from '@suite-support/styles/GlobalStyleProvider';
 import DesktopTitlebarWrapper from './support/DesktopTitlebar';
 import history from '@suite/support/history';
 import AppRouter from './support/Router';
@@ -28,7 +29,7 @@ const Index = () => {
     const [isUpdateVisible, setIsUpdateVisible] = useState(false);
 
     useEffect(() => {
-        if (!isDev()) {
+        if (!isDev) {
             Sentry.init(SENTRY_CONFIG);
             Sentry.configureScope(scope => {
                 scope.setTag('version', process.env.VERSION || 'undefined');
@@ -41,11 +42,12 @@ const Index = () => {
         <ReduxProvider store={store}>
             <ThemeProvider>
                 <RouterProvider history={history}>
-                    <GlobalStyleProvider />
                     <DesktopTitlebarWrapper>
                         <ErrorBoundary>
+                            <Autodetect />
                             <Resize />
                             <Tor />
+                            <Protocol />
                             <OnlineStatus />
                             <RouterHandler />
                             <IntlProvider>

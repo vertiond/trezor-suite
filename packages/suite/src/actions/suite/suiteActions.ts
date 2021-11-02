@@ -3,8 +3,6 @@ import * as comparisonUtils from '@suite-utils/comparisonUtils';
 import * as deviceUtils from '@suite-utils/device';
 import { addToast } from '@suite-actions/notificationActions';
 import * as modalActions from '@suite-actions/modalActions';
-import * as storageActions from '@suite-actions/storageActions';
-import { getOsTheme } from '@suite-utils/env';
 import { SUITE, METADATA } from './constants';
 import type { Locale } from '@suite-config/languages';
 import type {
@@ -17,7 +15,7 @@ import type {
     SuiteThemeVariant,
     SuiteThemeColors,
 } from '@suite-types';
-import type { DebugModeOptions } from '@suite-reducers/suiteReducer';
+import type { DebugModeOptions, AutodetectSettings } from '@suite-reducers/suiteReducer';
 
 export type SuiteAction =
     | { type: typeof SUITE.INIT }
@@ -77,6 +75,10 @@ export type SuiteAction =
           type: typeof SUITE.SET_THEME;
           variant: SuiteThemeVariant;
           colors: SuiteThemeColors;
+      }
+    | {
+          type: typeof SUITE.SET_AUTODETECT;
+          payload: Partial<AutodetectSettings>;
       };
 
 export const removeButtonRequests = (device: TrezorDevice | undefined) => ({
@@ -99,6 +101,11 @@ export const setTheme = (variant: SuiteThemeVariant, colors?: SuiteThemeColors) 
     type: SUITE.SET_THEME,
     variant,
     colors,
+});
+
+export const setAutodetect = (payload: Partial<AutodetectSettings>) => ({
+    type: SUITE.SET_AUTODETECT,
+    payload,
 });
 
 export const setProcessMode = (
@@ -581,26 +588,3 @@ export const switchDuplicatedDevice =
         // remove stateless instance
         dispatch(forgetDevice(device));
     };
-
-export const setInitialTheme = () => async (dispatch: Dispatch, getState: GetState) => {
-    try {
-        const storedSettings = await storageActions.loadSuiteSettings();
-        const isInitialRun = storedSettings?.flags.initialRun;
-        const savedTheme = storedSettings?.settings.theme;
-        const currentThemeVariant = getState().suite.settings.theme.variant;
-
-        if (isInitialRun || !storedSettings) {
-            // Initial run
-            // set initial theme (light/dark) based on OS settings
-            const osThemeVariant = getOsTheme();
-            if (osThemeVariant !== currentThemeVariant) {
-                dispatch(setTheme(osThemeVariant, undefined));
-            }
-        } else if (savedTheme && savedTheme.variant !== currentThemeVariant) {
-            // set correct theme from the db (this will be a bit quicker than waiting for STORAGE.LOADED)
-            dispatch(setTheme(savedTheme?.variant, savedTheme?.colors));
-        }
-    } catch (error) {
-        console.log(error); // just simple log to skip sentry as we probably don't care that much about failed initial theme
-    }
-};

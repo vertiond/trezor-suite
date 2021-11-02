@@ -9,13 +9,7 @@ import { Dispatch, GetState, AppState } from '@suite-types';
 import { getAnalyticsRandomId } from '@suite-utils/random';
 import { encodeDataToQueryString } from '@suite-utils/analytics';
 import { Account } from '@wallet-types';
-import {
-    isDesktop,
-    setOnBeforeUnloadListener,
-    getLocationHostname,
-    getOsType,
-    getEnvironment,
-} from '@suite-utils/env';
+import { setOnBeforeUnloadListener, getLocationHostname, getEnvironment } from '@suite-utils/env';
 import { setSentryUser } from '@suite-utils/sentry';
 import { State } from '@suite-reducers/analyticsReducer';
 import { DeviceMode } from 'trezor-connect';
@@ -35,7 +29,7 @@ export type AnalyticsAction =
 
 // Don't forget to update docs with changelog!
 // <breaking-change>.<analytics-extended>
-export const version = '1.12';
+export const version = '1.14';
 
 export type AnalyticsEvent =
     | {
@@ -280,6 +274,7 @@ export type AnalyticsEvent =
           };
       }
     | { type: 'switch-device/add-wallet' }
+    | { type: 'switch-device/add-hidden-wallet' }
     // todo: check if forget remember works as expected
     | { type: 'switch-device/forget' }
     | { type: 'switch-device/remember' }
@@ -380,16 +375,9 @@ export type AnalyticsEvent =
           type: 'check-seed/success';
       }
     | {
-          type: 'wallet/created';
+          type: 'select-wallet-type';
           payload: {
               type: 'hidden' | 'standard';
-          };
-      }
-    | {
-          type: 'desktop-init';
-          payload: {
-              // added in 1.6
-              desktopOSVersion: string;
           };
       }
     | {
@@ -488,7 +476,7 @@ export const report =
  * @param optout if true, analytics will be on by default (opt-out mode)
  */
 export const init =
-    (loadedState: State, optout: boolean) => async (dispatch: Dispatch, getState: GetState) => {
+    (loadedState: State, optout: boolean) => (dispatch: Dispatch, getState: GetState) => {
         // 1. if instanceId does not exist yet (was not loaded from storage), create a new one
         const instanceId = loadedState.instanceId || getAnalyticsRandomId();
         // 2. always create new session id
@@ -521,22 +509,6 @@ export const init =
                 }),
             );
         });
-
-        // send OS type if isDesktop
-        if (isDesktop()) {
-            let desktopOSVersion = '';
-            const resp = await getOsType();
-            if (resp?.success) {
-                desktopOSVersion = `${resp.payload.platform}_${resp.payload.release}`;
-            }
-
-            dispatch(
-                report({
-                    type: 'desktop-init',
-                    payload: { desktopOSVersion },
-                }),
-            );
-        }
     };
 
 export const enable = (): AnalyticsAction => ({

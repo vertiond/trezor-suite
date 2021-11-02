@@ -1,5 +1,5 @@
 import React from 'react';
-import { TooltipConditional } from '@trezor/components';
+import { Tooltip } from '@trezor/components';
 import styled from 'styled-components';
 import { Network } from '@wallet-types';
 import { Coin, Translation } from '@suite-components';
@@ -30,7 +30,7 @@ const CoinsList = ({ onToggleFn, networks, selectedNetworks }: Props) => {
                 const isSelected = selectedNetworks.includes(symbol);
                 const unavailableCapability = device.unavailableCapabilities?.[symbol];
                 const isDisabled = !!unavailableCapability || isDeviceLocked;
-                const tooltipContent = unavailableCapability && (
+                const unavailabilityTooltip = unavailableCapability && (
                     <Translation
                         id={getUnavailabilityMessage(
                             unavailableCapability,
@@ -38,12 +38,13 @@ const CoinsList = ({ onToggleFn, networks, selectedNetworks }: Props) => {
                         )}
                     />
                 );
+                const commonTooltip = tooltip && <Translation id={tooltip} />;
 
                 return (
-                    <TooltipConditional
+                    <Tooltip
                         key={`${symbol}_${accountType}`}
                         placement="top"
-                        content={tooltipContent || tooltip}
+                        content={unavailabilityTooltip || commonTooltip}
                     >
                         <Coin
                             symbol={symbol}
@@ -59,7 +60,7 @@ const CoinsList = ({ onToggleFn, networks, selectedNetworks }: Props) => {
                                       }
                             }
                         />
-                    </TooltipConditional>
+                    </Tooltip>
                 );
             })}
         </Wrapper>

@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import { SRC, BUILD } from './constants';
 
 module.exports = {
+    target: 'webworker',
     mode: 'production',
     entry: {
         'ripple-worker': `${SRC}workers/ripple/index.ts`,
@@ -16,7 +17,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts?$/,
+                test: /\.ts$/,
                 exclude: /node_modules/,
                 use: [
                     {
@@ -24,11 +25,6 @@ module.exports = {
                         options: { configFile: 'tsconfig.workers.json' },
                     },
                 ],
-            },
-            {
-                test: /\.js?$/,
-                exclude: /node_modules/,
-                use: ['babel-loader'],
             },
         ],
     },
@@ -38,21 +34,14 @@ module.exports = {
         alias: {
             'ws-browser': `${SRC}/utils/ws.js`,
         },
+        fallback: {
+            https: false, // required by ripple-lib
+            crypto: require.resolve('crypto-browserify'),
+            stream: require.resolve('stream-browserify'),
+        },
     },
     performance: {
         hints: false,
     },
     plugins: [new webpack.NormalModuleReplacementPlugin(/^ws$/, 'ws-browser')],
-
-    // optimization: {
-    //     minimize: false,
-    // },
-
-    // ignoring Node.js import in fastxpub (hd-wallet)
-    // node: {
-    //     fs: 'empty',
-    //     net: 'empty',
-    //     tls: 'empty',
-    //     path: 'empty',
-    // },
 };

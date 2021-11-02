@@ -7,14 +7,15 @@
     "homepage": "https://trezor.io/",
     "main": "dist/app.js",
     "scripts": {
-        "dev": "ELECTRON_IS_DEV=1 LAUNCH_ELECTRON=true yarn run dev:local",
+        "dev": "LAUNCH_ELECTRON=true yarn run dev:local",
         "dev:run": "electron .",
-        "dev:prepare": "yarn build:app",
+        "dev:prepare": "yarn build:app:dev",
         "dev:local": "rimraf ./build && yarn workspace @trezor/suite-build run dev:desktop",
         "clean": "rimraf ./build-electron && rimraf ./build && rimraf ./dist",
         "copy-files": "yarn workspace @trezor/suite-data copy-static-files",
         "build:ui": "rimraf ./build && yarn workspace @trezor/suite-build run build:desktop",
-        "build:app": "cross-env NODE_ENV=production rimraf ./dist && node scripts/build.js && yarn build:app:electron",
+        "build:app": "rimraf ./dist && NODE_ENV=production node scripts/build.js && yarn build:app:electron",
+        "build:app:dev": "rimraf ./dist && node scripts/build.js && yarn build:app:electron --publish never",
         "build:app:electron": "electron-builder --c.extraMetadata.version=$(node -p \"require('../suite/package').suiteVersion\")",
         "build:app:linux": "yarn build:app  --publish never --linux --x64 --arm64",
         "build:app:mac": "yarn build:app  --publish never --mac --x64 --arm64",
@@ -39,7 +40,7 @@
         "productName": "Trezor Suite",
         "copyright": "Copyright © ${author}",
         "asar": true,
-        "electronVersion": "12.0.0",
+        "electronVersion": "14.0.0",
         "directories": {
             "output": "build-electron"
         },
@@ -56,6 +57,12 @@
                 "to": "images/icons/512x512.png"
             }
         ],
+        "protocols": {
+            "name": "Trezor Suite",
+            "schemes": [
+                "bitcoin"
+            ]
+        },
         "publish": {
             "provider": "github",
             "repo": "trezor-suite",
@@ -99,7 +106,7 @@
             "artifactName": "Trezor-Suite-${version}-mac-${arch}.${ext}",
             "hardenedRuntime": true,
             "gatekeeperAssess": false,
-            "darkModeSupport": false,
+            "darkModeSupport": true,
             "entitlements": "entitlements.mac.inherit.plist",
             "entitlementsInherit": "entitlements.mac.inherit.plist",
             "target": [
@@ -150,32 +157,27 @@
         "afterSign": "scripts/notarize.js"
     },
     "dependencies": {
-        "chalk": "^4.1.0",
-        "electron-is-dev": "^1.2.0",
+        "@sentry/browser": "^6.12.0",
+        "@sentry/integrations": "^6.12.0",
+        "chalk": "^4.1.2",
         "electron-localshortcut": "^3.2.1",
-        "electron-store": "^5.1.1",
-        "electron-updater": "^4.3.5",
+        "electron-store": "^8.0.0",
+        "electron-updater": "^4.3.9",
         "node-fetch": "^2.6.1",
-        "openpgp": "^5.0.0-2",
-        "systeminformation": "^5.4.0"
-    },
-    "devDependencies": {
-        "@sentry/browser": "^6.10.0",
-        "@sentry/integrations": "^6.10.0",
-        "@types/electron-localshortcut": "^3.1.0",
-        "@types/next-redux-wrapper": "^3.0.0",
-        "@types/node-fetch": "^2.5.7",
-        "@types/react": "^17.0.0",
-        "@types/react-dom": "^17.0.0",
-        "@types/react-redux": "^7.1.7",
-        "cross-env": "^7.0.3",
-        "electron": "^12.0.0",
-        "electron-builder": "^22.10.5",
-        "electron-notarize": "^1.0.0",
-        "esbuild": "^0.8.57",
-        "raw-loader": "^4.0.2",
+        "openpgp": "^5.0.0-6",
+        "systeminformation": "^5.8.7",
         "react": "17.0.1",
         "react-dom": "17.0.1",
         "styled-components": "5.1.1"
+    },
+    "devDependencies": {
+        "@types/electron-localshortcut": "^3.1.0",
+        "@types/node-fetch": "^2.5.12",
+        "@types/react": "^17.0.0",
+        "@types/react-dom": "^17.0.0",
+        "electron": "^14.0.0",
+        "electron-builder": "^22.11.7",
+        "electron-notarize": "^1.1.0",
+        "esbuild": "^0.12.25"
     }
 }

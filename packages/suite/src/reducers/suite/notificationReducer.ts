@@ -3,10 +3,12 @@ import { DEVICE } from 'trezor-connect';
 import { NOTIFICATION, SUITE } from '@suite-actions/constants';
 import { Action, TrezorDevice } from '@suite-types';
 import { Network } from '@wallet-types';
+import { PROTOCOL_SCHEME } from '@suite/support/suite/Protocol';
 
 interface Options {
     seen?: boolean;
     resolved?: boolean;
+    autoClose?: number | false;
 }
 
 export type ToastPayload = (
@@ -26,6 +28,7 @@ export type ToastPayload = (
               | 'device-wiped'
               | 'backup-success'
               | 'backup-failed'
+              | 'sign-message-success'
               | 'verify-message-success';
       }
     | {
@@ -80,6 +83,12 @@ export type ToastPayload = (
       }
     | {
           type: 'user-feedback-send-success' | 'user-feedback-send-error';
+      }
+    | {
+          type: 'coin-scheme-protocol';
+          scheme: PROTOCOL_SCHEME;
+          address: string;
+          amount?: number;
       }
 ) &
     Options;

@@ -5,8 +5,7 @@ import Connection from './websocket';
 import { SubscriptionAccountInfo } from '../../types/common';
 import { Response, Message } from '../../types';
 import WorkerCommon from '../common';
-import { Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostTransaction } from '../../types/blockfrost';
+import { BlockfrostTransaction, BlockContent } from '../../types/blockfrost';
 import { transformUtxos, transformAccountInfo, transformTransaction } from './utils';
 
 declare function postMessage(data: Response): void;
@@ -14,6 +13,7 @@ declare function postMessage(data: Response): void;
 const common = new WorkerCommon(postMessage);
 
 let api: Connection | undefined;
+let endpoints: string[] = [];
 
 const cleanup = () => {
     if (api) {
@@ -21,25 +21,27 @@ const cleanup = () => {
         api.removeAllListeners();
         api = undefined;
     }
-
+    endpoints = [];
     common.removeAccounts(common.getAccounts());
     common.removeAddresses(common.getAddresses());
     common.clearSubscriptions();
 };
-
 const connect = async (): Promise<Connection> => {
     if (api && api.isConnected()) return api;
 
+    // validate endpoints
     const { server, timeout, pingTimeout, keepAlive } = common.getSettings();
     if (!server || !Array.isArray(server) || server.length < 1) {
         throw new CustomError('connect', 'Endpoint not set');
     }
 
-    common.debug('Connecting to blockfrost', server[0]);
+    if (endpoints.length < 1) {
+        endpoints = common.shuffleEndpoints(server.slice(0));
+    }
 
+    common.debug('Connecting to', endpoints[0]);
     const connection = new Connection({
-        // server is load balanced
-        url: server[0],
+        url: endpoints[0],
         timeout,
         pingTimeout,
         keepAlive,
@@ -51,7 +53,13 @@ const connect = async (): Promise<Connection> => {
     } catch (error) {
         common.debug('Websocket connection failed');
         api = undefined;
-        throw new CustomError('connect', 'All backends are down');
+        // connection error. remove endpoint
+        endpoints.splice(0, 1);
+        // and try another one or throw error
+        if (endpoints.length < 1) {
+            throw new CustomError('connect', 'All backends are down');
+        }
+        return connect();
     }
 
     connection.on('disconnected', () => {
@@ -65,7 +73,6 @@ const connect = async (): Promise<Connection> => {
     });
 
     common.debug('Connected');
-
     return connection;
 };
 
@@ -190,7 +197,7 @@ const getAccountUtxo = async (
     }
 };
 
-const onNewBlock = (event: Responses['block_content']) => {
+const onNewBlock = (event: BlockContent) => {
     common.response({
         id: -1,
         type: RESPONSES.NOTIFICATION,

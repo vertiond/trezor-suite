@@ -112,8 +112,9 @@ export default [
             availableBalance: '36865987',
             history: {
                 transactions: [],
+                total: 0,
+                unconfirmed: 0,
             },
-            tokens: [],
             page: {
                 index: 0,
                 size: 25,

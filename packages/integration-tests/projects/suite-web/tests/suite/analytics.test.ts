@@ -51,9 +51,9 @@ describe('Analytics', () => {
 
         // important, suite needs time to save initialRun flag into storage
         cy.getTestElement('@suite/loading').should('not.exist');
+        cy.discoveryShouldFinish();
 
         // go to settings
-        cy.wait(5000);
         cy.prefixedVisit('/');
         cy.task('startEmu', { wipe: false });
         cy.discoveryShouldFinish();
@@ -110,6 +110,8 @@ describe('Analytics', () => {
         // adding wallet
         cy.getTestElement('@switch-device/add-hidden-wallet-button').click();
         cy.wait('@data-fetch');
-        cy.wrap(requests).its(5).should('have.property', 'c_type', 'switch-device/add-wallet');
+        cy.wrap(requests)
+            .its(5)
+            .should('have.property', 'c_type', 'switch-device/add-hidden-wallet');
     });
 });

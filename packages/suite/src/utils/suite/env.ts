@@ -5,13 +5,12 @@ import type { SuiteThemeVariant, EnvironmentType } from '@suite-types';
 /* This way, we can override simple utils, which helps to polyfill methods which are not available in react-native. */
 export const getUserAgent = () => window.navigator.userAgent;
 
+// List of platforms https://docker.apachezone.com/blog/74
 export const getPlatform = () => window.navigator.platform;
 
 export const getPlatformLanguage = () => window.navigator.language;
 
 export const getPlatformLanguages = () => window.navigator.languages;
-
-export const getAppVersion = () => window.navigator.appVersion;
 
 export const getScreenWidth = () => window.screen.width;
 
@@ -25,7 +24,7 @@ export const getLocationOrigin = () => window.location.origin;
 
 export const getLocationHostname = () => window.location.hostname;
 
-/* For usage in Electron (SSR) */
+/* For usage in Electron */
 export const getProcessPlatform = () => process.platform;
 
 let userAgentParser: UAParser;
@@ -41,32 +40,38 @@ export const isMacOs = () => {
     if (getProcessPlatform() === 'darwin') return true;
     if (typeof window === 'undefined') return;
 
-    return ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'].includes(getPlatform());
+    return getPlatform().startsWith('Mac');
 };
 
 export const isWindows = () => {
     if (getProcessPlatform() === 'win32') return true;
     if (typeof window === 'undefined') return;
 
-    return ['Win32', 'Win64', 'Windows', 'WinCE'].includes(getPlatform());
+    return getPlatform().startsWith('Win');
 };
+
+export const isIOs = () => ['iPhone', 'iPad', 'iPod'].includes(getPlatform());
+
+export const isAndroid = () => /Android/.test(getUserAgent());
+
+export const isChromeOs = () => /CrOS/.test(getUserAgent());
 
 export const isLinux = () => {
     if (getProcessPlatform() === 'linux') return true;
     if (typeof window === 'undefined') return;
 
-    return /Linux/.test(getPlatform());
+    // exclude Android and Chrome OS as window.navigator.platform of those OS is Linux
+    if (isAndroid() || isChromeOs()) return false;
+
+    return getPlatform().startsWith('Linux');
 };
 
-export const isAndroid = () => getAppVersion().includes('Android');
-
-export const isIOs = () => ['iPhone', 'iPad', 'iPod'].includes(getPlatform());
-
 export const getOsName = () => {
-    if (isMacOs()) return 'macos';
-    if (isLinux()) return 'linux';
     if (isWindows()) return 'windows';
+    if (isMacOs()) return 'macos';
     if (isAndroid()) return 'android';
+    if (isChromeOs()) return 'chromeos';
+    if (isLinux()) return 'linux';
     if (isIOs()) return 'ios';
 
     return '';
@@ -145,14 +150,17 @@ export const setOnBeforeUnloadListener = (callback: () => void) => {
     window.addEventListener('beforeunload', callback);
 };
 
-export const getOsTheme = (): SuiteThemeVariant => {
-    if (typeof window === 'undefined') return 'light'; // in SSR, where window object is not defined, just return light theme
-    // retrieving os color scheme is supported in Chrome 76+, Firefox 67+
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-    }
-    return 'light';
+const getDarkThemeQuery = (): MediaQueryList | undefined => {
+    const matchMedia = window?.matchMedia;
+    return matchMedia && matchMedia('(prefers-color-scheme: dark)');
 };
 
-/* Working only in desktop app */
-export const getOsType = () => window.desktopApi?.getOsType();
+export const getOsTheme = (): SuiteThemeVariant =>
+    getDarkThemeQuery()?.matches ? 'dark' : 'light';
+
+export const watchOsTheme = (callback: (theme: SuiteThemeVariant) => void) => {
+    const onThemeChange = (e: MediaQueryListEvent) => callback(e.matches ? 'dark' : 'light');
+    const query = getDarkThemeQuery();
+    query?.addEventListener('change', onThemeChange);
+    return () => query?.removeEventListener('change', onThemeChange);
+};

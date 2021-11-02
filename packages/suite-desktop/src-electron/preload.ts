@@ -36,6 +36,9 @@ const validChannels = [
 
     // udev
     'udev/install',
+
+    // custom protocol
+    'protocol/open',
 ];
 
 contextBridge.exposeInMainWorld('desktopApi', {
@@ -93,9 +96,6 @@ contextBridge.exposeInMainWorld('desktopApi', {
     toggleTor: (start: boolean) => ipcRenderer.send('tor/toggle', start),
     getTorAddress: () => ipcRenderer.invoke('tor/get-address'),
     setTorAddress: (address: string) => ipcRenderer.send('tor/set-address', address),
-
-    // Analytics
-    getOsType: () => ipcRenderer.invoke('analytics/get-os-type'),
 
     // Store
     clearStore: () => ipcRenderer.send('store/clear'),

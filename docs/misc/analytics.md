@@ -115,6 +115,22 @@ Add event to the analytics overview in the [company Notion](https://www.notion.s
 4. **Option**: Edit NAT to resolve requests to `https://data.trezor.io/suite/log/web/stable.log` to your local server
 
 ## Changelog
+
+### 1.14
+Fixed:
+- suite-ready
+  - osName: android is now correctly detected, added chromeos
+
+### 1.13
+Added:
+- switch-device/add-hidden-wallet
+
+Changed:
+- wallet/created renamed to select-wallet-type
+
+Removed:
+- desktop-init
+
 ### 1.12
 Changed:
 - device-update-firmware
@@ -243,15 +259,6 @@ Added:
   - symbol: string
 - account-create
   - tokensCount: number
-- transaction-created
-  - action: 'sent' | 'copied' | 'downloaded'
-  - symbol: string
-  - broadcast: boolean
-  - outputsCount: number
-  - bitcoinRbf: boolean
-  - bitcoinLockTime: boolean
-  - ethereumData: boolean
-  - tokenSent: boolean
 - add-token
   - networkSymbol: string
   - addedNth: number

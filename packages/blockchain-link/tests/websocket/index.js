@@ -170,14 +170,10 @@ const create = async type => {
         server.fixtures = f;
     };
 
-    server.getAddresses = () => {
-        return addresses;
-    };
+    server.getAddresses = () => addresses;
 
-    server.close = () => {
-        return new Promise(resolve => close.call(server, resolve));
-        // close.call(server);
-    };
+    server.close = () => new Promise(resolve => close.call(server, resolve));
+    // close.call(server);
 
     server.sendNotification = async notification => {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -214,18 +210,16 @@ const create = async type => {
 
 export default create;
 
-const connectToServer = server => {
-    return new Promise((resolve, reject) => {
+const connectToServer = server =>
+    new Promise((resolve, reject) => {
         const ws = new WebSocket(`ws://localhost:${server.options.port}`);
         const dfd = ws.once('error', reject);
         ws.on('open', () => resolve(ws));
     });
-};
 
-const receiveMessage = ws => {
-    return new Promise(resolve => {
+const receiveMessage = ws =>
+    new Promise(resolve => {
         ws.on('close', () => setTimeout(resolve, 100));
         // ws.on('close', resolve);
         ws.on('message', () => ws.close());
     });
-};

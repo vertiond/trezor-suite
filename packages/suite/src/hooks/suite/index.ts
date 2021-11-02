@@ -10,7 +10,10 @@ export { useFirmware } from './useFirmware';
 export { useSelector } from './useSelector';
 export { useLoadingSkeleton } from './useLoadingSkeleton';
 export { useTranslation } from './useTranslation';
-export { useTheme } from './useTheme';
+export { useThemeContext } from './useThemeContext';
 export { useOnboarding } from './useOnboarding';
 export { useRecovery } from './useRecovery';
-export { useGuide } from './useGuide';
+export { useExternalLink } from './useExternalLink';
+
+// replaced in suite-native
+export { useLocales } from '@suite-hooks/useLocales';

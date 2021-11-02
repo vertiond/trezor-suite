@@ -55,7 +55,7 @@ export default {
     blockfrost: [
         {
             description: 'Successfull',
-            params: { blocks: [1] },
+            params: {},
             response: [{ feePerUnit: '44' }],
         },
     ],

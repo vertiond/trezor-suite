@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js';
-import EmurgoCip from '@emurgo/cip14-js';
 import {
     BlockfrostUtxos,
     BlockfrostTransaction,
     BlockfrostAccountInfo,
+    ParseAssetResult,
 } from '../../types/blockfrost';
 import { Utxo } from '../../types/responses';
 import { VinVout } from '../../types/blockbook';
@@ -16,33 +16,132 @@ import {
 } from '../../types/common';
 import { filterTargets, sumVinVout, transformTarget } from '../utils';
 
-export const hexToString = (input: string) => {
-    const hex = input.toString();
+export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
+    const result: Utxo[] = [];
+
+    utxos.forEach(utxo => {
+        const lovelaceBalance = utxo.utxoData.amount.find(b => b.unit === 'lovelace');
+        if (!lovelaceBalance) return;
+
+        result.push({
+            address: utxo.address,
+            txid: utxo.utxoData.tx_hash,
+            confirmations: utxo.blockInfo.confirmations,
+            blockHeight: utxo.blockInfo.height || 0,
+            amount: lovelaceBalance?.quantity || '0',
+            vout: utxo.utxoData.output_index,
+            path: utxo.path,
+        });
+    });
+
+    return result;
+};
+
+const hexToString = (input: string): string => {
     let str = '';
-    for (let n = 0; n < hex.length; n += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+    for (let n = 0; n < input.length; n += 2) {
+        str += String.fromCharCode(parseInt(input.substr(n, 2), 16));
     }
 
     return str;
 };
 
-export const getFingerprint = (policyId: string, assetName?: string): string =>
-    new EmurgoCip(
-        Uint8Array.from(Buffer.from(policyId, 'hex')),
-        Uint8Array.from(Buffer.from(assetName || '', 'hex'))
-    ).fingerprint();
-
-export const parseAsset = (hex: string) => {
+export const parseAsset = (hex: string): ParseAssetResult => {
     const policyIdSize = 56;
     const policyId = hex.slice(0, policyIdSize);
     const assetNameInHex = hex.slice(policyIdSize);
     const assetName = hexToString(assetNameInHex);
-    const fingerprint = getFingerprint(policyId, assetNameInHex);
+
     return {
         policyId,
         assetName,
-        fingerprint,
     };
+};
+
+export const transformTokenInfo = (
+    tokens: BlockfrostAccountInfo['tokens']
+): TokenInfo[] | undefined => {
+    if (!tokens || !Array.isArray(tokens)) return undefined;
+    const info = tokens.map(t => {
+        const { assetName } = parseAsset(t.unit);
+        return {
+            type: 'BLOCKFROST',
+            name: t.fingerprint!, // this is safe as fingerprint is defined for all tokens except lovelace and lovelace is never included in account.tokens
+            address: t.fingerprint!,
+            symbol: assetName,
+            balance: t.quantity,
+            decimals: t.decimals,
+        };
+    });
+
+    return info.length > 0 ? info : undefined;
+};
+
+export const transformInputOutput = (
+    data: BlockfrostTransaction['txUtxos']['inputs'] | BlockfrostTransaction['txUtxos']['outputs'],
+    asset = 'lovelace'
+): VinVout[] =>
+    data.map(utxo => ({
+        n: utxo.output_index,
+        addresses: [utxo.address],
+        isAddress: true,
+        value: utxo.amount.find(a => a.unit === asset)?.quantity ?? '0',
+    }));
+
+export const filterTokenTransfers = (
+    accountAddress: AccountAddresses,
+    tx: BlockfrostTransaction,
+    type: Transaction['type']
+): TokenTransfer[] => {
+    const myAddresses = accountAddress.change.concat(accountAddress.used, accountAddress.unused);
+    const tokens = Array.from(
+        new Set(tx.txData.output_amount.filter(asset => asset.unit !== 'lovelace'))
+    );
+
+    const transfers = tokens.reduce<TokenTransfer[]>((transfers, asset) => {
+        const inputs = transformInputOutput(tx.txUtxos.inputs, asset.unit);
+        const outputs = transformInputOutput(tx.txUtxos.outputs, asset.unit);
+        const outgoing = filterTargets(myAddresses, inputs);
+        const incoming = filterTargets(myAddresses, outputs);
+        if (incoming.length === 0 && outgoing.length === 0) return transfers;
+
+        let amount = '0';
+        // const internal = accountAddress ? filterTargets(accountAddress.change, outputs) : [];
+        if (type === 'sent') {
+            const myInputsSum = sumVinVout(outgoing, '0');
+            // reduce sum by my outputs values
+            amount = sumVinVout(incoming, myInputsSum, 'reduce');
+        } else if (type === 'recv') {
+            if (incoming.length > 0) {
+                amount = sumVinVout(incoming, '0');
+            }
+        }
+
+        if (amount === '0' || !asset.fingerprint) return transfers;
+
+        const { assetName } = parseAsset(asset.unit);
+        transfers.push({
+            type,
+            name: assetName,
+            symbol: assetName,
+            address: asset.fingerprint,
+            decimals: 0,
+            amount: amount.toString(),
+            from:
+                type === 'sent' || type === 'self'
+                    ? tx.address
+                    : tx.txUtxos.inputs.find(i => i.amount.find(a => a.unit === asset.unit))
+                          ?.address,
+            to:
+                type === 'recv'
+                    ? tx.address
+                    : tx.txUtxos.outputs.find(i => i.amount.find(a => a.unit === asset.unit))
+                          ?.address,
+        });
+        return transfers;
+    }, []);
+
+    return transfers;
 };
 
 const getSubtype = (tx: BlockfrostTransaction) => {
@@ -68,115 +167,6 @@ const getSubtype = (tx: BlockfrostTransaction) => {
     return null;
 };
 
-export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
-    const result: Utxo[] = [];
-
-    utxos.forEach(utxo =>
-        utxo.utxoData.amount.forEach(u => {
-            result.push({
-                address: utxo.address,
-                txid: utxo.utxoData.tx_hash,
-                confirmations: utxo.blockInfo.confirmations,
-                blockHeight: utxo.blockInfo.height || 0,
-                amount: u.quantity,
-                vout: utxo.utxoData.output_index,
-                path: utxo.path,
-                cardanoUnit: u.unit,
-            });
-        })
-    );
-
-    return result;
-};
-
-export const transformTokenInfo = (
-    tokens: BlockfrostAccountInfo['tokens']
-): TokenInfo[] | undefined => {
-    if (!tokens || !Array.isArray(tokens)) return undefined;
-    const info = tokens.map(t => {
-        const { fingerprint, assetName } = parseAsset(t.unit);
-        return {
-            type: 'CARDANO',
-            name: fingerprint,
-            address: t.unit,
-            symbol: assetName || fingerprint, // fallback to fingerprint if assetName is empty string
-            balance: t.quantity,
-            decimals: t.decimals,
-        };
-    });
-
-    return info.length > 0 ? info : undefined;
-};
-
-export const transformInputOutput = (
-    data: BlockfrostTransaction['txUtxos']['inputs'] | BlockfrostTransaction['txUtxos']['outputs'],
-    asset = 'lovelace'
-): VinVout[] =>
-    data.map((utxo, i) => ({
-        n: i,
-        addresses: [utxo.address],
-        isAddress: true,
-        value: utxo.amount.find(a => a.unit === asset)?.quantity ?? '0',
-    }));
-
-export const filterTokenTransfers = (
-    accountAddress: AccountAddresses,
-    tx: BlockfrostTransaction,
-    type: Transaction['type']
-): TokenTransfer[] => {
-    const transfers: TokenTransfer[] = [];
-    const myNonChangeAddresses = accountAddress.used.concat(accountAddress.unused);
-    const myAddresses = accountAddress.change.concat(myNonChangeAddresses);
-    tx.txUtxos.outputs.forEach(output => {
-        output.amount
-            .filter(a => a.unit !== 'lovelace')
-            .forEach(asset => {
-                const token = asset.unit;
-                const inputs = transformInputOutput(tx.txUtxos.inputs, token);
-                const outputs = transformInputOutput(tx.txUtxos.outputs, token);
-                const outgoing = filterTargets(myAddresses, inputs); // inputs going from account address
-                const incoming = filterTargets(myAddresses, outputs); // outputs to account address
-                const isChange = accountAddress.change.find(a => a.address === output.address);
-
-                if (incoming.length === 0 && outgoing.length === 0) return null;
-
-                const incomingForOutput = filterTargets(
-                    myNonChangeAddresses,
-                    transformInputOutput([output], token)
-                );
-
-                let amount = '0';
-                if (type === 'sent') {
-                    amount = isChange ? '0' : asset.quantity;
-                } else if (type === 'recv') {
-                    amount = sumVinVout(incomingForOutput, '0');
-                } else if (type === 'self' && !isChange) {
-                    amount = sumVinVout(incomingForOutput, '0');
-                }
-
-                if (amount === '0') return null;
-
-                const { fingerprint, assetName } = parseAsset(token);
-                transfers.push({
-                    type,
-                    name: fingerprint,
-                    symbol: assetName || fingerprint,
-                    address: token,
-                    decimals: 0,
-                    amount: amount.toString(),
-                    from:
-                        type === 'sent' || type === 'self'
-                            ? tx.address
-                            : tx.txUtxos.inputs.find(i => i.amount.find(a => a.unit === token))
-                                  ?.address,
-                    to: type === 'recv' ? tx.address : output.address,
-                });
-            });
-    });
-
-    return transfers.filter(t => !!t) as TokenTransfer[];
-};
-
 export const transformTransaction = (
     descriptor: string,
     accountAddress: AccountAddresses | undefined,
@@ -191,7 +181,7 @@ export const transformTransaction = (
     let amount =
         blockfrostTxData.txData.output_amount.find(b => b.unit === 'lovelace')?.quantity || '0';
     const fee = blockfrostTxData.txData.fees;
-    let totalSpent = new BigNumber(amount || '0').plus(fee).toString();
+    let totalSpent = amount;
     const inputs = transformInputOutput(blockfrostTxData.txUtxos.inputs);
     const outputs = transformInputOutput(blockfrostTxData.txUtxos.outputs);
     const vinLength = Array.isArray(inputs) ? inputs.length : 0;
@@ -269,16 +259,18 @@ export const transformTransaction = (
 };
 
 export const transformAccountInfo = (info: BlockfrostAccountInfo): AccountInfo => {
-    const cardanoTxs = info.history.transactions;
+    const blockfrostTxs = info.history.transactions;
 
     const result = {
         ...info,
         tokens: transformTokenInfo(info.tokens),
         history: {
             ...info.history,
-            transactions: !cardanoTxs
+            transactions: !blockfrostTxs
                 ? []
-                : cardanoTxs?.map(tx => transformTransaction(info.descriptor, info.addresses, tx)),
+                : blockfrostTxs?.map(tx =>
+                      transformTransaction(info.descriptor, info.addresses, tx)
+                  ),
         },
     };
 

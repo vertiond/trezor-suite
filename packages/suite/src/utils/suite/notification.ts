@@ -1,5 +1,7 @@
 import { NotificationEntry } from '@suite-reducers/notificationReducer';
 import { ToastNotificationVariant, AppState } from '@suite-types';
+import { colors } from '@trezor/components';
+import { ViewProps } from '@suite-components/hocNotification/definitions';
 
 export const findTransactionEvents = (descriptor: string, notifications: NotificationEntry[]) =>
     notifications.filter(
@@ -22,12 +24,32 @@ export const getNotificationIcon = (variant: ToastNotificationVariant) => {
     }
 };
 
+export const getVariantColor = (variant: ViewProps['variant']) => {
+    switch (variant) {
+        case 'info':
+            return colors.TYPE_BLUE;
+        case 'warning':
+            return colors.TYPE_ORANGE;
+        case 'error':
+            return colors.TYPE_RED;
+        case 'success':
+            return colors.TYPE_GREEN;
+        case 'transparent':
+        default:
+            return 'transparent';
+    }
+};
+
+// filter notifications which should not be visible in notifications popup
+export const filterNonActivityNotifications = (notifications: AppState['notifications']) =>
+    notifications.filter(notification => notification.type !== 'coin-scheme-protocol');
+
 export const getSeenAndUnseenNotifications = (notifications: AppState['notifications']) => {
     const seen: Array<NotificationEntry> = [];
     const unseen: Array<NotificationEntry> = [];
 
     // loop over all notifications and check which of them there were seen or not
-    notifications.forEach(notification => {
+    filterNonActivityNotifications(notifications).forEach(notification => {
         if (notification.seen) {
             seen.push(notification);
         } else {

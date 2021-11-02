@@ -190,7 +190,7 @@ const StyledDropdown = styled(Dropdown)`
     width: 38px;
     height: 38px;
     border-radius: 4px;
-    & > * {
+    & > :first-child {
         width: 100%;
         height: 100%;
     }
@@ -369,6 +369,7 @@ const AppNavigation = ({ items, primaryContent, maxWidth }: Props) => {
                                     <StyledDropdown
                                         alignMenu="right"
                                         offset={5}
+                                        data-test="@wallet/menu/extra-dropdown"
                                         items={[
                                             {
                                                 key: 'extra',
@@ -381,6 +382,7 @@ const AppNavigation = ({ items, primaryContent, maxWidth }: Props) => {
                                                             return true;
                                                         },
                                                         label: title,
+                                                        'data-test': item['data-test'],
                                                     };
                                                 }),
                                             },

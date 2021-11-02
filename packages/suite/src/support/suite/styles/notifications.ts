@@ -5,7 +5,7 @@ import { DESKTOP_TITLEBAR_HEIGHT } from '@suite-constants/layout';
 const OFFSET_TOP = isDesktop() ? `calc(${DESKTOP_TITLEBAR_HEIGHT} + 1em)` : '1em';
 export const notifications = `
     .Toastify__toast-container {
-        z-index: 10001;
+        z-index: 10002;
         position: fixed;
         padding: 4px;
         max-width: 800px;
@@ -83,7 +83,6 @@ export const notifications = `
         max-height: 800px;
         overflow: hidden;
         font-family: sans-serif;
-        cursor: pointer;
         direction: ltr;
         word-break: break-all;
     }

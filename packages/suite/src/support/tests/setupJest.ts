@@ -8,6 +8,7 @@ import { Account, WalletAccountTransaction } from '@wallet-types';
 // in-memory implementation of indexedDB
 import 'fake-indexeddb/auto';
 import { MessageSystem, Action } from '@suite/types/suite/messageSystem';
+import { Node, Page, Category } from '@suite/types/suite/guide';
 /**
  * Generate wallet account
  * @param {Partial<Account>} [account]
@@ -398,6 +399,7 @@ const getMessageSystemConfig = (
                         windows: '!',
                         android: '*',
                         ios: '13',
+                        chromeos: '*',
                     },
                     environment: {
                         desktop: '<21.5',
@@ -427,6 +429,7 @@ const getMessageSystemConfig = (
                         {
                             model: 'T',
                             firmware: '2.1.1',
+                            variant: 'regular',
                             vendor: 'trezor.io',
                         },
                     ],
@@ -442,6 +445,7 @@ const getMessageSystemConfig = (
                     'en-GB': 'New Trezor firmware is available!',
                     en: 'New Trezor firmware is available!',
                     es: 'El nuevo firmware de Trezor está disponible!',
+                    cs: 'Nová verze Trezor firmware je k dispozici',
                 },
                 cta: {
                     action: 'internal-link',
@@ -450,6 +454,7 @@ const getMessageSystemConfig = (
                         'en-GB': 'Update now',
                         en: 'Update now',
                         es: 'Actualizar ahora',
+                        cs: 'Aktualizovat',
                     },
                 },
             },
@@ -467,6 +472,7 @@ const getMessageSystemConfig = (
                     'en-GB': 'New Trezor app is available!',
                     en: 'New Trezor app is available!',
                     es: 'La nueva aplicación Trezor está disponible',
+                    cs: 'Nová Trezor aplikace je k dispozici',
                 },
                 cta: {
                     action: 'external-link',
@@ -475,6 +481,7 @@ const getMessageSystemConfig = (
                         'en-GB': 'Download now',
                         en: 'Download now',
                         es: 'Descargar ahora',
+                        cs: 'Stáhnout nyní',
                     },
                 },
                 modal: {
@@ -482,6 +489,7 @@ const getMessageSystemConfig = (
                         'en-GB': 'Update now',
                         en: 'Update now',
                         es: 'Actualizar ahora',
+                        cs: 'Aktualizovat',
                     },
                     image: 'https://example.com/example.png',
                 },
@@ -494,6 +502,80 @@ const getMessageSystemConfig = (
     ],
     ...root,
 });
+
+const getGuideNode = (type: string, id?: string): Node => {
+    let result: Node;
+    if (type === 'page' && id === '/') {
+        result = {
+            type: 'page',
+            id: '/',
+            locales: ['en'],
+            title: {
+                en: 'Locktime',
+            },
+        } as Page;
+    } else if (type === 'page' && id !== '/') {
+        result = {
+            type: 'page',
+            id: '/suite-basics/send/locktime.md',
+            locales: ['en'],
+            title: {
+                en: 'Locktime',
+            },
+        } as Page;
+    } else {
+        result = {
+            type: 'category',
+            id: '/',
+            locales: ['en'],
+            title: {
+                en: 'test title',
+            },
+            children: [
+                {
+                    type: 'category',
+                    id: '/privacy',
+                    locales: ['en'],
+                    title: {
+                        en: 'Privacy',
+                    },
+                    children: [],
+                },
+                {
+                    type: 'category',
+                    id: '/security',
+                    locales: ['en'],
+                    title: {
+                        en: 'Security',
+                    },
+                    children: [
+                        {
+                            type: 'category',
+                            id: '/security/suite-basics',
+                            locales: ['en'],
+                            title: {
+                                en: 'Suite basics',
+                            },
+                            children: [
+                                {
+                                    type: 'category',
+                                    id: '/security/suite-basics/send',
+                                    locales: ['en'],
+                                    title: {
+                                        en: 'Send',
+                                    },
+                                    children: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        } as Category;
+    }
+
+    return result;
+};
 
 class BroadcastChannel {
     name: string;
@@ -526,6 +608,7 @@ declare global {
                 getWalletTransaction: typeof getWalletTransaction;
                 getTrezorConnect: typeof getTrezorConnect;
                 getMessageSystemConfig: typeof getMessageSystemConfig;
+                getGuideNode: typeof getGuideNode;
                 intlMock: typeof intlMock;
             };
             BroadcastChannel: typeof BroadcastChannel;
@@ -547,6 +630,7 @@ global.JestMocks = {
     getWalletTransaction,
     getTrezorConnect,
     getMessageSystemConfig,
+    getGuideNode,
     intlMock,
 };
 

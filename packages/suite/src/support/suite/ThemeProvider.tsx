@@ -1,11 +1,16 @@
 import React from 'react';
 import { ThemeProvider as SCThemeProvider } from 'styled-components';
-import { useSelector } from '@suite-hooks';
-import { getThemeColors } from '@suite-utils/theme';
+import { useThemeContext } from '@suite-hooks';
+import GlobalStyle from './styles/GlobalStyle';
 
 const ThemeProvider: React.FC = ({ children }) => {
-    const theme = useSelector(state => state.suite.settings.theme);
-    return <SCThemeProvider theme={getThemeColors(theme)}>{children}</SCThemeProvider>;
+    const theme = useThemeContext();
+    return (
+        <SCThemeProvider theme={theme}>
+            <GlobalStyle theme={theme} />
+            {children}
+        </SCThemeProvider>
+    );
 };
 
 export default ThemeProvider;

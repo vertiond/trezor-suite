@@ -138,7 +138,7 @@ export interface AccountInfo {
         rewards?: string;
     };
     page?: {
-        // blockbook and cardano
+        // blockbook and blockfrost
         index: number;
         size: number;
         total: number;

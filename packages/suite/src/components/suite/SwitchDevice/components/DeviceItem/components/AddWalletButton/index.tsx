@@ -61,14 +61,16 @@ const AddWalletButton = ({ device, instances, addDeviceInstance, selectDeviceIns
             selectDeviceInstance(instances[0]);
         }
         analytics.report({
-            type: 'switch-device/add-wallet',
+            type: emptyPassphraseWalletExists
+                ? 'switch-device/add-hidden-wallet'
+                : 'switch-device/add-wallet',
         });
     };
 
     return (
         <AddWallet>
             <StyledTooltip
-                content={<Translation id="TR_TO_ACCESS_OTHER_WALLETS" />}
+                content={isLocked && <Translation id="TR_TO_ACCESS_OTHER_WALLETS" />}
                 cursor="pointer"
             >
                 <StyledButton

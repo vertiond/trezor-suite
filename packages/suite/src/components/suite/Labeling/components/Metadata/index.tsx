@@ -35,6 +35,7 @@ const Label = styled.div`
     display: flex;
     overflow: hidden;
     padding-left: 1px;
+    position: relative;
 `;
 
 const LabelButton = styled(Button)`
@@ -83,8 +84,16 @@ const LabelContainer = styled.div`
     }
 `;
 
+const RelativeButton = styled(Button)`
+    position: relative;
+`;
+
+const RelativeLabel = styled(Label)`
+    position: relative;
+`;
+
 const ButtonLikeLabel = (props: ExtendedProps) => {
-    const EditableButton = useMemo(() => withEditable(Button), []);
+    const EditableButton = useMemo(() => withEditable(RelativeButton), []);
 
     if (props.editActive) {
         return (
@@ -97,6 +106,7 @@ const ButtonLikeLabel = (props: ExtendedProps) => {
                 onSubmit={props.onSubmit}
                 onBlur={props.onBlur}
                 defaultVisibleValue={props.defaultVisibleValue}
+                isButton
             />
         );
     }
@@ -118,7 +128,7 @@ const ButtonLikeLabel = (props: ExtendedProps) => {
 };
 
 const TextLikeLabel = (props: ExtendedProps) => {
-    const EditableLabel = useMemo(() => withEditable(Label), []);
+    const EditableLabel = useMemo(() => withEditable(RelativeLabel), []);
 
     if (props.editActive) {
         return (
@@ -285,10 +295,12 @@ const MetadataLabeling = (props: Props) => {
         return ButtonLikeLabel;
     }, [props.payload.value]);
 
+    const labelContainerDatatest = `${dataTestBase}/hover-container`;
+
     // metadata is still initiating, on hover, show only disabled button with spinner
     if (metadata.initiating)
         return (
-            <LabelContainer>
+            <LabelContainer data-test={labelContainerDatatest}>
                 {props.defaultVisibleValue}
                 <ActionButton variant="tertiary" isDisabled isLoading>
                     <Translation id="TR_LOADING" />
@@ -307,7 +319,10 @@ const MetadataLabeling = (props: Props) => {
         showActionButton && (!props.payload.value || (props.payload.value && pending));
 
     return (
-        <LabelContainer>
+        <LabelContainer
+            data-test={labelContainerDatatest}
+            onClick={e => editActive && e.stopPropagation()}
+        >
             {props.payload.type === 'outputLabel' ? (
                 <>
                     <ButtonLikeLabelWithDropdown

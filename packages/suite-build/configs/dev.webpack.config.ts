@@ -15,7 +15,6 @@ const config: webpack.Configuration = {
     },
     mode: 'development',
     watch: true,
-    target: 'web',
     devtool: 'eval-source-map',
     entry: ['webpack-plugin-serve/client'],
     output: {
@@ -28,8 +27,6 @@ const config: webpack.Configuration = {
             hmr: true,
             static: distPath,
             progress: true,
-            // @ts-ignore - https://github.com/shellscape/webpack-plugin-serve#ramdisk
-            ramdisk: true,
             historyFallback: {
                 htmlAcceptHeaders: ['text/html', '*/*'],
                 rewrites: [],

@@ -27,6 +27,7 @@ const selectStyle = (
         display: 'flex',
         alignItems: 'center',
         width: '100%',
+        maxWidth: 'initial',
         margin: 0,
         padding: '0 8px',
         color: isClean ? theme.TYPE_LIGHT_GREY : theme.TYPE_DARK_GREY,
@@ -110,13 +111,17 @@ const selectStyle = (
         ...base,
         fontSize: variables.NEUE_FONT_SIZE.TINY,
         textTransform: 'initial',
-        margin: '8px',
-        padding: 0,
+        margin: 0,
+        padding: '8px',
     }),
     group: (base: Record<string, any>) => ({
         ...base,
-        paddingTop: '0px',
-        paddingBottom: '4px',
+        padding: 0,
+        '& + &': {
+            borderTop: `1px solid ${theme.BG_WHITE_ALT_HOVER}`,
+            paddingTop: '4px',
+            marginTop: '4px',
+        },
     }),
     option: (base: Record<string, any>, { isFocused }: { isFocused: boolean }) => ({
         ...base,
@@ -169,6 +174,16 @@ const Wrapper = styled.div<Props>`
 
 const Label = styled.span`
     min-height: 32px;
+    font-size: ${variables.FONT_SIZE.NORMAL};
+    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
+`;
+
+const BottomText = styled.div<Props>`
+    display: flex;
+    font-size: ${variables.FONT_SIZE.TINY};
+    color: ${props => getStateColor(props.state, props.theme)};
+    padding: 10px 10px 0 10px;
+    min-height: 27px;
 `;
 
 interface Option {
@@ -188,6 +203,8 @@ interface CommonProps extends Omit<SelectProps, 'components' | 'isSearchable'> {
     wrapperProps?: Record<string, any>;
     variant?: InputVariant;
     noTopLabel?: boolean;
+    noError?: boolean;
+    bottomText?: React.ReactNode;
     hideTextCursor?: boolean; // this prop hides blinking text cursor
     minWidth?: string;
     borderWidth?: number;
@@ -213,6 +230,8 @@ const Select = ({
     width,
     variant = 'large',
     noTopLabel = false,
+    noError = true,
+    bottomText,
     useKeyPressScroll,
     isSearchable = false,
     minWidth = 'initial',
@@ -250,6 +269,9 @@ const Select = ({
             }}
         />
     );
+
+    const GroupHeading = (groupHeadingProps: any) =>
+        groupHeadingProps?.data?.label ? <components.GroupHeading {...groupHeadingProps} /> : null;
 
     const findOption = (options: OptionsType<Option>, query: string) => {
         // Option that will be returned
@@ -393,8 +415,9 @@ const Select = ({
                 )}
                 isSearchable={isSearchable}
                 {...props}
-                components={{ Control, Option, ...props.components }}
+                components={{ Control, Option, GroupHeading, ...props.components }}
             />
+            {!noError && <BottomText state={state}>{bottomText}</BottomText>}
         </Wrapper>
     );
 };

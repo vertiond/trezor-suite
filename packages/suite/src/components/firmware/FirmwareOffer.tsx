@@ -60,6 +60,7 @@ const IconWrapper = styled.div`
 const Changelog = styled.div`
     color: ${props => props.theme.TYPE_DARK_GREY};
     max-height: 360px;
+    min-width: 305px;
     overflow: auto;
 `;
 
@@ -98,7 +99,10 @@ const FirmwareOffer = ({ device, customFirmware }: Props) => {
     ) : (
         getFwUpdateVersion(device)
     );
-    const parsedChangelog = !customFirmware && parseFirmwareChangelog(device.firmwareRelease);
+
+    const parsedChangelog =
+        !customFirmware && parseFirmwareChangelog(device.features, device.firmwareRelease);
+
     const bitcoinOnlyVersion = isBitcoinOnly(device) && ' (bitcoin-only)';
 
     return (
@@ -132,37 +136,39 @@ const FirmwareOffer = ({ device, customFirmware }: Props) => {
                             dashed
                             content={
                                 <Changelog>
-                                    {parsedChangelog.slice(0, 1).map(log => (
-                                        <ChangelogGroup key={log.versionString}>
-                                            <ChangelogHeading>
-                                                <Translation
-                                                    id="TR_VERSION"
-                                                    values={{ version: log.versionString }}
-                                                />
-                                                <TrezorLink
-                                                    size="small"
-                                                    variant="nostyle"
-                                                    href={CHANGELOG_URL}
+                                    <ChangelogGroup key={parsedChangelog.versionString}>
+                                        <ChangelogHeading>
+                                            <Translation
+                                                id="TR_VERSION"
+                                                values={{ version: parsedChangelog.versionString }}
+                                            />
+                                            <TrezorLink
+                                                size="small"
+                                                variant="nostyle"
+                                                href={
+                                                    parsedChangelog.notes
+                                                        ? parsedChangelog.notes
+                                                        : CHANGELOG_URL
+                                                }
+                                            >
+                                                <Button
+                                                    variant="tertiary"
+                                                    icon="EXTERNAL_LINK"
+                                                    alignIcon="right"
                                                 >
-                                                    <Button
-                                                        variant="tertiary"
-                                                        icon="EXTERNAL_LINK"
-                                                        alignIcon="right"
-                                                    >
-                                                        View all
-                                                    </Button>
-                                                </TrezorLink>
-                                            </ChangelogHeading>
-                                            <ChangesUl>
-                                                {/* render individual changes for a given version */}
-                                                {log.changelog.map(
-                                                    change =>
-                                                        // return only if change is not an empty array
-                                                        change && <li key={change}>{change}</li>,
-                                                )}
-                                            </ChangesUl>
-                                        </ChangelogGroup>
-                                    ))}
+                                                    View all
+                                                </Button>
+                                            </TrezorLink>
+                                        </ChangelogHeading>
+                                        <ChangesUl>
+                                            {/* render individual changes for a given version */}
+                                            {parsedChangelog.changelog.map(
+                                                change =>
+                                                    // return only if change is not an empty array
+                                                    change && <li key={change}>{change}</li>,
+                                            )}
+                                        </ChangesUl>
+                                    </ChangelogGroup>
                                 </Changelog>
                             }
                             placement="top"

@@ -93,10 +93,12 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'A',
-                tx: {
-                    vin: [{ addresses: ['A'] }],
-                    vout: [{ addresses: ['B'] }],
+                txData: { output_amount: [] },
+                txUtxos: {
+                    inputs: [{ address: 'A', amount: [] }],
+                    outputs: [{ address: 'B', amount: [] }],
                 },
+                blockInfo: {},
             },
         },
 
@@ -107,11 +109,10 @@ const notifyAddresses = [
                 amount: '0',
                 totalSpent: '0',
                 type: 'sent',
-                targets: [{ addresses: ['B'], n: 0 }],
+                targets: [{ addresses: ['B'], n: 0, amount: '0', isAddress: true }],
                 details: {
-                    vin: [{ addresses: ['A'] }],
-                    vout: [{ addresses: ['B'] }],
-                    size: 0,
+                    vin: [{ addresses: ['A'], isAddress: true, value: '0' }],
+                    vout: [{ addresses: ['B'], isAddress: true, value: '0' }],
                     totalInput: '0',
                     totalOutput: '0',
                 },
@@ -128,10 +129,28 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'A',
-                tx: {
-                    vin: [{ addresses: ['B'], value: '100' }],
-                    vout: [{ addresses: ['A'], value: '50', n: 1 }],
+                txData: { output_amount: [] },
+                txUtxos: {
+                    inputs: [
+                        {
+                            address: 'B',
+                            amount: [{ unit: 'lovelace', quantity: '100' }],
+                        },
+                    ],
+                    outputs: [
+                        {
+                            address: 'A',
+                            amount: [
+                                {
+                                    unit: 'lovelace',
+                                    quantity: '50',
+                                },
+                            ],
+                            output_index: 1,
+                        },
+                    ],
                 },
+                blockInfo: {},
             },
         },
         result: {
@@ -141,11 +160,18 @@ const notifyAddresses = [
                 type: 'recv',
                 amount: '50',
                 totalSpent: '50',
-                targets: [{ addresses: ['A'], amount: '50', isAccountTarget: true, n: 1 }],
+                targets: [
+                    {
+                        addresses: ['A'],
+                        amount: '50',
+                        isAccountTarget: true,
+                        n: 1,
+                        isAddress: true,
+                    },
+                ],
                 details: {
-                    vin: [{ addresses: ['B'], value: '100' }],
-                    vout: [{ addresses: ['A'], value: '50', n: 1 }],
-                    size: 0,
+                    vin: [{ addresses: ['B'], value: '100', isAddress: true }],
+                    vout: [{ addresses: ['A'], value: '50', isAddress: true, n: 1 }],
                     totalInput: '100',
                     totalOutput: '50',
                 },
@@ -162,10 +188,12 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'A',
-                tx: {
-                    vin: [{ addresses: ['A'] }],
-                    vout: [{ addresses: ['A'] }],
+                txData: { output_amount: [] },
+                txUtxos: {
+                    inputs: [{ address: 'A', amount: [] }],
+                    outputs: [{ address: 'A', amount: [] }],
                 },
+                blockInfo: {},
             },
         },
         result: {
@@ -173,11 +201,12 @@ const notifyAddresses = [
             tx: {
                 ...tx,
                 type: 'self',
-                targets: [{ addresses: ['A'], isAccountTarget: true, n: 0 }],
+                targets: [
+                    { addresses: ['A'], isAccountTarget: true, n: 0, amount: '0', isAddress: true },
+                ],
                 details: {
-                    vin: [{ addresses: ['A'] }],
-                    vout: [{ addresses: ['A'] }],
-                    size: 0,
+                    vin: [{ addresses: ['A'], isAddress: true, value: '0' }],
+                    vout: [{ addresses: ['A'], isAddress: true, value: '0' }],
                     totalInput: '0',
                     totalOutput: '0',
                 },
@@ -203,13 +232,15 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'B',
-                tx: {
-                    vin: [{ addresses: ['B'], value: '100' }],
-                    vout: [
-                        { addresses: ['A'], value: '40' },
-                        { addresses: ['B-change'], value: '40' },
+                txData: { output_amount: [{ unit: 'lovelace', quantity: '100' }] },
+                txUtxos: {
+                    inputs: [{ address: 'B', amount: [{ unit: 'lovelace', quantity: '100' }] }],
+                    outputs: [
+                        { address: 'A', amount: [{ unit: 'lovelace', quantity: '40' }] },
+                        { address: 'B-change', amount: [{ unit: 'lovelace', quantity: '40' }] },
                     ],
                 },
+                blockInfo: {},
             },
         },
         result: {
@@ -219,14 +250,13 @@ const notifyAddresses = [
                 amount: '60',
                 totalSpent: '60',
                 type: 'sent',
-                targets: [{ addresses: ['A'], amount: '40', n: 0 }],
+                targets: [{ addresses: ['A'], amount: '40', n: 0, isAddress: true }],
                 details: {
-                    vin: [{ addresses: ['B'], value: '100' }],
+                    vin: [{ addresses: ['B'], value: '100', isAddress: true }],
                     vout: [
-                        { addresses: ['A'], value: '40' },
-                        { addresses: ['B-change'], value: '40' },
+                        { addresses: ['A'], value: '40', isAddress: true },
+                        { addresses: ['B-change'], value: '40', isAddress: true },
                     ],
-                    size: 0,
                     totalInput: '100',
                     totalOutput: '80',
                 },
@@ -248,10 +278,12 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'B',
-                tx: {
-                    vin: [{ addresses: ['A'], value: '100' }],
-                    vout: [{ addresses: ['B'], value: '50' }],
+                txData: { output_amount: [{ unit: 'lovelace', quantity: '50' }] },
+                txUtxos: {
+                    inputs: [{ address: 'A', amount: [{ unit: 'lovelace', quantity: '100' }] }],
+                    outputs: [{ address: 'B', amount: [{ unit: 'lovelace', quantity: '50' }] }],
                 },
+                blockInfo: {},
             },
         },
         result: {
@@ -261,11 +293,19 @@ const notifyAddresses = [
                 type: 'recv',
                 amount: '50',
                 totalSpent: '50',
-                targets: [{ addresses: ['B'], amount: '50', isAccountTarget: true, n: 0 }],
+                targets: [
+                    {
+                        addresses: ['B'],
+                        amount: '50',
+                        isAccountTarget: true,
+                        n: 0,
+                        isAddress: true,
+                    },
+                ],
                 details: {
-                    vin: [{ addresses: ['A'], value: '100' }],
-                    vout: [{ addresses: ['B'], value: '50' }],
-                    size: 0,
+                    vin: [{ addresses: ['A'], value: '100', isAddress: true }],
+                    vout: [{ addresses: ['B'], value: '50', isAddress: true }],
+
                     totalInput: '100',
                     totalOutput: '50',
                 },
@@ -282,10 +322,12 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: '0x0',
-                tx: {
-                    vin: [{ addresses: ['0x0'] }],
-                    vout: [{ addresses: ['0x1'] }],
+                txData: { output_amount: [] },
+                txUtxos: {
+                    inputs: [{ address: '0x0', amount: [] }],
+                    outputs: [{ address: '0x1', amount: [] }],
                 },
+                blockInfo: {},
             },
         },
         result: {
@@ -295,11 +337,11 @@ const notifyAddresses = [
                 type: 'sent',
                 amount: '0',
                 totalSpent: '0',
-                targets: [{ addresses: ['0x1'], n: 0 }],
+                targets: [{ addresses: ['0x1'], n: 0, isAddress: true, amount: '0' }],
                 details: {
-                    vin: [{ addresses: ['0x0'] }],
-                    vout: [{ addresses: ['0x1'] }],
-                    size: 0,
+                    vin: [{ addresses: ['0x0'], isAddress: true, value: '0' }],
+                    vout: [{ addresses: ['0x1'], isAddress: true, value: '0' }],
+
                     totalInput: '0',
                     totalOutput: '0',
                 },
@@ -326,28 +368,43 @@ const notifyAddresses = [
             {
                 data: {
                     address: 'B',
-                    tx: {
-                        vin: [{ addresses: ['B'] }, { addresses: ['C'] }],
-                        vout: [{ addresses: ['D'] }],
+                    txData: { output_amount: [{ unit: 'lovelace', quantity: '100' }] },
+                    txUtxos: {
+                        inputs: [
+                            { address: 'B', amount: [] },
+                            { address: 'C', amount: [] },
+                        ],
+                        outputs: [{ address: 'D', amount: [] }],
                     },
+                    blockInfo: {},
                 },
             },
             {
                 data: {
                     address: 'C',
-                    tx: {
-                        vin: [{ addresses: ['B'] }, { addresses: ['C'] }],
-                        vout: [{ addresses: ['D'] }],
+                    txData: { output_amount: [] },
+                    txUtxos: {
+                        inputs: [
+                            { address: 'B', amount: [] },
+                            { address: 'C', amount: [] },
+                        ],
+                        outputs: [{ address: 'D', amount: [] }],
                     },
+                    blockInfo: {},
                 },
             },
             {
                 data: {
                     address: 'D',
-                    tx: {
-                        vin: [{ addresses: ['B'] }, { addresses: ['C'] }],
-                        vout: [{ addresses: ['D'] }],
+                    txData: { output_amount: [] },
+                    txUtxos: {
+                        inputs: [
+                            { address: 'B', amount: [] },
+                            { address: 'C', amount: [] },
+                        ],
+                        outputs: [{ address: 'D', amount: [] }],
                     },
+                    blockInfo: {},
                 },
             },
         ],
@@ -357,9 +414,11 @@ const notifyAddresses = [
                 ...tx,
                 type: 'self',
                 details: {
-                    vin: [{ addresses: ['B'] }, { addresses: ['C'] }],
-                    vout: [{ addresses: ['D'] }],
-                    size: 0,
+                    vin: [
+                        { addresses: ['B'], isAddress: true, value: '0' },
+                        { addresses: ['C'], isAddress: true, value: '0' },
+                    ],
+                    vout: [{ addresses: ['D'], isAddress: true, value: '0' }],
                     totalInput: '0',
                     totalOutput: '0',
                 },
@@ -376,7 +435,12 @@ const notifyAddresses = [
         notifications: {
             data: {
                 address: 'X',
-                tx: {},
+                txData: { output_amount: [] },
+                txUtxos: {
+                    inputs: [{ address: 'B', amount: [] }],
+                    outputs: [{ address: 'D', amount: [] }],
+                },
+                blockInfo: {},
             },
         },
         result: {
@@ -384,8 +448,11 @@ const notifyAddresses = [
             tx: {
                 ...tx,
                 type: 'unknown',
+                amount: '0',
+                totalSpent: '0',
                 details: {
-                    size: 0,
+                    vin: [{ addresses: ['B'], isAddress: true, value: '0' }],
+                    vout: [{ addresses: ['D'], isAddress: true, value: '0' }],
                     totalInput: '0',
                     totalOutput: '0',
                 },

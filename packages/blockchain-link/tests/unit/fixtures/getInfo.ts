@@ -57,7 +57,7 @@ export default {
                 blockHeight: 1,
                 blockHash: 'test_block_hash-hash',
                 decimals: 6,
-                name: 'Cardano',
+                name: 'Blockfrost',
                 shortcut: 'ada',
                 testnet: false,
                 version: '1.4.0',
@@ -70,12 +70,12 @@ export default {
                     method: 'GET_SERVER_INFO',
                     response: {
                         data: {
-                            error: { message: 'blockfrost Error Error msg' },
+                            error: { message: 'BlockfrostError Error msg' },
                         },
                     },
                 },
             ],
-            error: 'blockfrost Error Error msg',
+            error: 'BlockfrostError Error msg',
         },
     ],
 };

@@ -369,16 +369,26 @@ export const isTestnet = (symbol: Account['symbol']) => {
 };
 
 export const isAccountOutdated = (account: Account, freshInfo: AccountInfo) => {
-    // changed transaction count (total + unconfirmed)
-    const changedTxCount =
+    // changed transaction count when app is running during tx confirmation
+    const changedTxCountOnline =
         freshInfo.history.total + (freshInfo.history.unconfirmed || 0) >
         account.history.total + (account.history.unconfirmed || 0);
+
+    // changed transaction count when app was closed before tx confirmation
+    const changedTxCountOffline =
+        freshInfo.history.total > account.history.total &&
+        (freshInfo.history.unconfirmed || 0) < (account.history.unconfirmed || 0);
+
+    // changed transaction count when app was closed during tx confirmation and account was empty
+    const changedTxCountOfflineFresh =
+        freshInfo.history.total === 0 && freshInfo.history.unconfirmed;
 
     // different sequence or balance
     const changedRipple =
         account.networkType === 'ripple' &&
         (freshInfo.misc!.sequence !== account.misc.sequence ||
-            freshInfo.balance !== account.balance);
+            freshInfo.balance !== account.balance ||
+            freshInfo.misc!.reserve !== account.misc.reserve);
 
     const changedEthereum =
         account.networkType === 'ethereum' && freshInfo.misc!.nonce !== account.misc.nonce;
@@ -388,7 +398,14 @@ export const isAccountOutdated = (account: Account, freshInfo: AccountInfo) => {
         freshInfo.misc!.staking?.isActive !== account.misc.staking.isActive &&
         freshInfo.misc!.staking?.poolId !== account.misc.staking.poolId;
 
-    return changedTxCount || changedRipple || changedEthereum || changedCardano;
+    return (
+        changedTxCountOfflineFresh ||
+        changedTxCountOffline ||
+        changedTxCountOnline ||
+        changedCardano ||
+        changedRipple ||
+        changedEthereum
+    );
 };
 
 // Used in accountActions and failed accounts
@@ -633,3 +650,12 @@ export const getPendingAccount = (
         utxo,
     };
 };
+
+export const hasSignVerify = (account: Account) =>
+    !!NETWORKS.find(
+        ({ networkType, symbol, accountType, features }) =>
+            networkType === account.networkType &&
+            symbol === account.symbol &&
+            (accountType || 'normal') === account.accountType &&
+            (features || []).includes('sign-verify'),
+    );

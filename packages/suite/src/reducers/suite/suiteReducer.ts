@@ -5,12 +5,17 @@ import { DISCOVERY } from '@wallet-actions/constants';
 import { Action, TrezorDevice, Lock, SuiteThemeVariant, SuiteThemeColors } from '@suite-types';
 import type { Locale } from '@suite-config/languages';
 import { isWeb } from '@suite-utils/env';
-import { ensureLocale } from '@suite-utils/translation';
+import { ensureLocale } from '@suite-utils/l10n';
 
 export interface DebugModeOptions {
     invityAPIUrl?: string;
     showDebugMenu: boolean;
     bridgeDevMode: boolean;
+}
+
+export interface AutodetectSettings {
+    language: boolean;
+    theme: boolean;
 }
 
 interface Flags {
@@ -34,12 +39,14 @@ interface SuiteSettings {
     language: Locale;
     torOnionLinks: boolean;
     debug: DebugModeOptions;
+    autodetect: AutodetectSettings;
 }
 
 export interface SuiteState {
     online: boolean;
     tor: boolean;
     loading: boolean;
+    storageLoaded: boolean;
     loaded: boolean;
     error?: string; // errors set from connect, should be renamed
     dbError?: 'blocking' | 'blocked' | undefined; // blocked if the instance cannot upgrade due to older version running, blocking in case instance is running older version thus blocking other instance
@@ -55,6 +62,7 @@ const initialState: SuiteState = {
     online: true,
     tor: false,
     loading: false,
+    storageLoaded: false,
     loaded: false,
     messages: {},
     locks: [],
@@ -79,6 +87,10 @@ const initialState: SuiteState = {
             invityAPIUrl: undefined,
             showDebugMenu: false,
             bridgeDevMode: false,
+        },
+        autodetect: {
+            language: true,
+            theme: true,
         },
     },
 };
@@ -106,6 +118,7 @@ const suiteReducer = (state: SuiteState = initialState, action: Action): SuiteSt
             case STORAGE.LOADED:
                 draft.flags = action.payload.suite.flags;
                 draft.settings = action.payload.suite.settings;
+                draft.storageLoaded = action.payload.suite.storageLoaded;
                 break;
 
             case SUITE.READY:
@@ -146,6 +159,13 @@ const suiteReducer = (state: SuiteState = initialState, action: Action): SuiteSt
             case SUITE.SET_THEME:
                 draft.settings.theme.variant = action.variant;
                 draft.settings.theme.colors = action.colors;
+                break;
+
+            case SUITE.SET_AUTODETECT:
+                draft.settings.autodetect = {
+                    ...draft.settings.autodetect,
+                    ...action.payload,
+                };
                 break;
 
             case TRANSPORT.START:

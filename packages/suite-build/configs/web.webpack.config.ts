@@ -6,22 +6,12 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import routes from '../../suite/src/config/suite/routes';
 import { FLAGS } from '../../suite/src/config/suite/features';
 
-import { assetPrefix } from '../utils/env';
+import { assetPrefix, isDev } from '../utils/env';
 import { getPathForProject } from '../utils/path';
-
-// Configuration for HTML output (html-webpack-plugin)
-const htmlConfig = {
-    minify: false, // !isDev,
-    templateParameters: {
-        assetPrefix,
-        isOnionLocation: FLAGS.ONION_LOCATION_META,
-    },
-    inject: 'body' as const,
-    scriptLoading: 'blocking' as const,
-};
 
 const baseDir = getPathForProject('web');
 const config: webpack.Configuration = {
+    target: 'browserslist',
     entry: [path.join(baseDir, 'src', 'index.ts')],
     output: {
         path: path.join(baseDir, 'build'),
@@ -56,7 +46,13 @@ const config: webpack.Configuration = {
         ...routes.map(
             route =>
                 new HtmlWebpackPlugin({
-                    ...htmlConfig,
+                    minify: !isDev,
+                    templateParameters: {
+                        assetPrefix,
+                        isOnionLocation: FLAGS.ONION_LOCATION_META,
+                    },
+                    inject: 'body' as const,
+                    scriptLoading: 'blocking' as const,
                     template: path.join(baseDir, 'src', 'static', 'index.html'),
                     filename: path.join(baseDir, 'build', route.pattern, 'index.html'),
                 }),

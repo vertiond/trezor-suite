@@ -2,6 +2,11 @@ import AccountsMenu from './AccountsMenu';
 import DiscoveryProgress from './DiscoveryProgress';
 import Title from './Title';
 import WalletLayout from './WalletLayout';
+import WalletLayoutHeader from './WalletLayout/components/WalletLayoutHeader';
+import {
+    WalletLayoutNavigation,
+    WalletLayoutNavLink,
+} from './WalletLayout/components/WalletLayoutNavigation';
 import CoinBalance from './CoinBalance';
 import OnOffSwitcher from './OnOffSwitcher';
 import InputError from './InputError';
@@ -27,6 +32,9 @@ export {
     Title,
     AccountsMenu,
     WalletLayout,
+    WalletLayoutHeader,
+    WalletLayoutNavigation,
+    WalletLayoutNavLink,
     DiscoveryProgress,
     CoinBalance,
     CoinmarketLayout,

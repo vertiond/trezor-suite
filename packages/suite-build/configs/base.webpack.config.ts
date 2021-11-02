@@ -26,7 +26,6 @@ const sentryRelease = `${suiteVersion}.${project}${
 
 const config: webpack.Configuration = {
     mode: 'production',
-    target: 'browserslist',
     devtool: 'source-map',
     output: {
         publicPath: `${assetPrefix}/`,
@@ -40,18 +39,15 @@ const config: webpack.Configuration = {
         modules: ['node_modules'],
         alias,
         fallback: {
-            // Polyfills API for NodeJS libraries in the browser
-            buffer: require.resolve('buffer'),
-            crypto: require.resolve('crypto-browserify'), // Can maybe be removed after getting rid of Google OAuth Lib
+            // Polyfills API for NodeJS libraries in the browser. Google OAuth and JWS libs require it
+            crypto: require.resolve('crypto-browserify'),
             stream: require.resolve('stream-browserify'),
-            // For Google OAuth library to work
+            // Not required
             child_process: false,
             fs: false,
             net: false,
             tls: false,
-            // Not needed
             os: false,
-            process: false,
             path: false,
         },
     },

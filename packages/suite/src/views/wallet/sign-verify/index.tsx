@@ -1,207 +1,191 @@
-import React, { useCallback } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Input, Button, Textarea, variables } from '@trezor/components';
-import Title from '@wallet-components/Title';
-import { WalletLayout } from '@wallet-components';
-import * as signVerifyActions from '@wallet-actions/signVerifyActions';
-import { Translation } from '@suite-components/Translation';
-import { useActions, useSelector } from '@suite-hooks';
-
-const Wrapper = styled.div`
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    background: ${props => props.theme.BG_WHITE};
-
-    @media screen and (max-width: ${variables.SCREEN_SIZE.MD}) {
-        flex-wrap: wrap;
-    }
-`;
+import { Input, Button, Textarea, Card, Switch, variables } from '@trezor/components';
+import { WalletLayout, WalletLayoutHeader } from '@wallet-components';
+import { CharacterCount, Translation } from '@suite-components';
+import { useActions, useDevice, useSelector, useTranslation } from '@suite-hooks';
+import { sign as signAction, verify as verifyAction } from '@wallet-actions/signVerifyActions';
+import Navigation, { NavPages } from './components/Navigation';
+import SignAddressInput from './components/SignAddressInput';
+import { useCopySignedMessage } from '@wallet-hooks/sign-verify/useCopySignedMessage';
+import {
+    useSignVerifyForm,
+    SignVerifyFields,
+    MAX_LENGTH_MESSAGE,
+    MAX_LENGTH_SIGNATURE,
+} from '@wallet-hooks/sign-verify/useSignVerifyForm';
 
 const Row = styled.div`
-    padding-bottom: 28px;
-`;
-
-const RowButtons = styled(Row)`
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
+    & + & {
+        padding-top: 12px;
+    }
 `;
 
 const StyledButton = styled(Button)`
-    width: 110px;
-    margin-left: 10px;
-
-    &:first-child {
-        margin-left: 0;
-    }
+    width: 230px;
 `;
 
-const Column = styled.div`
+const SwitchWrapper = styled.label`
     display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-
-    @media screen and (max-width: ${variables.SCREEN_SIZE.MD}) {
-        flex: 1 1 100%;
+    font-size: ${variables.FONT_SIZE.TINY};
+    align-items: center;
+    height: 100%;
+    & > * + * {
+        margin-left: 10px;
     }
 `;
 
-const Sign = styled(Column)``;
-
-const Verify = styled(Column)`
-    padding-left: 20px;
-
-    @media screen and (max-width: ${variables.SCREEN_SIZE.MD}) {
-        padding-left: 0px;
-    }
+const Form = styled.form`
+    padding: 42px;
 `;
-
-type InputNameType = Parameters<typeof signVerifyActions.inputChange>;
 
 const SignVerify = () => {
-    const { signVerify, selectedAccount } = useSelector(state => ({
-        signVerify: state.wallet.signVerify,
+    const [page, setPage] = useState<NavPages>('sign');
+
+    const { selectedAccount, revealedAddresses } = useSelector(state => ({
         selectedAccount: state.wallet.selectedAccount,
+        revealedAddresses: state.wallet.receive,
     }));
-    const { inputChange, clearSign, clearVerify, verify } = useActions({
-        inputChange: signVerifyActions.inputChange,
-        clearSign: signVerifyActions.clearSign,
-        clearVerify: signVerifyActions.clearVerify,
-        verify: signVerifyActions.verify,
+
+    const { isLocked } = useDevice();
+    const { translationString } = useTranslation();
+
+    const {
+        formDirty,
+        formReset,
+        formSubmit,
+        formValues,
+        formErrors,
+        formSetSignature,
+        messageRef,
+        signatureRef,
+        hexField,
+        addressField,
+        pathField,
+    } = useSignVerifyForm(page, selectedAccount.account);
+
+    const { sign, verify } = useActions({
+        sign: signAction,
+        verify: verifyAction,
     });
 
-    const getError = useCallback(
-        (inputName: string) => {
-            if (!signVerify) return null;
-            return signVerify.errors.find(e => e.inputName === inputName);
-        },
-        [signVerify],
-    );
+    const onSubmit = async (data: SignVerifyFields) => {
+        const { address, path, message, signature, hex } = data;
+        if (page === 'sign') {
+            const result = await sign(path, message, hex);
+            if (result?.signSignature) formSetSignature(result.signSignature);
+        } else {
+            await verify(address, message, signature, hex);
+        }
+    };
 
-    const handleInputChange = useCallback(
-        ({ target }) => {
-            inputChange(target.name as InputNameType[0], target.value);
-        },
-        [inputChange],
-    );
+    const errorState = (err?: string) => (err ? 'error' : undefined);
 
-    const verifyAddressError = getError('verifyAddress');
+    const { canCopy, copy } = useCopySignedMessage(formValues, selectedAccount.network?.name);
 
     return (
         <WalletLayout title="TR_NAV_SIGN_VERIFY" account={selectedAccount}>
-            <Wrapper>
-                <Sign>
-                    <Title>
-                        <Translation id="TR_SIGN_MESSAGE" />
-                    </Title>
-                    <Row>
-                        <Input
-                            label={<Translation id="TR_ADDRESS" />}
-                            name="signAddress"
-                            value=""
-                            // value={account.descriptor}
-                            type="text"
-                            readOnly
-                        />
-                    </Row>
+            <WalletLayoutHeader title="TR_NAV_SIGN_VERIFY">
+                {page === 'sign' && canCopy && (
+                    <Button type="button" variant="tertiary" onClick={copy}>
+                        <Translation id="TR_COPY_TO_CLIPBOARD" />
+                    </Button>
+                )}
+                {formDirty && (
+                    <Button type="button" variant="tertiary" onClick={formReset}>
+                        <Translation id="TR_CLEAR_ALL" />
+                    </Button>
+                )}
+            </WalletLayoutHeader>
+            <Card noPadding>
+                <Navigation page={page} setPage={setPage} />
+                <Form onSubmit={formSubmit(onSubmit)}>
                     <Row>
                         <Textarea
+                            name="message"
                             label={<Translation id="TR_MESSAGE" />}
-                            name="signMessage"
-                            value={signVerify.signMessage}
-                            onChange={handleInputChange}
+                            labelRight={
+                                <SwitchWrapper>
+                                    <Translation id="TR_HEX_FORMAT" />
+                                    <Switch {...hexField} isSmall />
+                                </SwitchWrapper>
+                            }
+                            maxLength={MAX_LENGTH_MESSAGE}
+                            innerRef={messageRef}
+                            state={errorState(formErrors.message)}
+                            bottomText={formErrors.message}
                             rows={4}
                             maxRows={4}
-                            maxLength={255}
-                        />
-                    </Row>
-                    <Row>
-                        <Textarea
-                            label={<Translation id="TR_SIGNATURE" />}
-                            name="signSignature"
-                            value={signVerify.signSignature}
-                            rows={4}
-                            maxRows={4}
-                            maxLength={255}
-                            readOnly
-                        />
-                    </Row>
-                    <RowButtons>
-                        <StyledButton onClick={clearSign} variant="secondary">
-                            <Translation id="TR_CLEAR" />
-                        </StyledButton>
-                        <StyledButton
-                            // isDisabled={!device.connected}
-                            isDisabled={false}
-                            // TODO:
-                            // onClick={() =>
-                            //      signVerifyActions.sign(account.accountPath, signMessage)
-                            // }
+                            data-test="@sign-verify/message"
                         >
-                            <Translation id="TR_SIGN" />
-                        </StyledButton>
-                    </RowButtons>
-                </Sign>
-                <Verify>
-                    <Title>
-                        <Translation id="TR_VERIFY_MESSAGE" />
-                    </Title>
+                            <CharacterCount
+                                current={formValues.message?.length || 0}
+                                max={MAX_LENGTH_MESSAGE}
+                            />
+                        </Textarea>
+                    </Row>
                     <Row>
-                        <Input
-                            label={<Translation id="TR_ADDRESS" />}
-                            name="verifyAddress"
-                            value={signVerify.verifyAddress}
-                            onChange={handleInputChange}
-                            type="text"
-                            state={verifyAddressError ? 'error' : undefined}
-                            bottomText={verifyAddressError ? verifyAddressError.message : null}
-                        />
+                        {page === 'sign' ? (
+                            <SignAddressInput
+                                name="path"
+                                label={<Translation id="TR_ADDRESS" />}
+                                account={selectedAccount.account}
+                                revealedAddresses={revealedAddresses}
+                                error={formErrors.path}
+                                data-test="@sign-verify/path"
+                                {...pathField}
+                            />
+                        ) : (
+                            <Input
+                                name="address"
+                                label={<Translation id="TR_ADDRESS" />}
+                                type="text"
+                                state={errorState(formErrors.address)}
+                                bottomText={formErrors.address}
+                                data-test="@sign-verify/select-address"
+                                {...addressField}
+                            />
+                        )}
                     </Row>
                     <Row>
                         <Textarea
-                            label={<Translation id="TR_MESSAGE" />}
-                            name="verifyMessage"
-                            value={signVerify.verifyMessage}
-                            onChange={handleInputChange}
-                            rows={4}
-                            maxRows={4}
-                            maxLength={255}
-                        />
-                    </Row>
-                    <Row>
-                        <Textarea
+                            name="signature"
                             label={<Translation id="TR_SIGNATURE" />}
-                            name="verifySignature"
-                            value={signVerify.verifySignature}
-                            onChange={handleInputChange}
+                            maxLength={MAX_LENGTH_SIGNATURE}
+                            innerRef={signatureRef}
+                            readOnly={page === 'sign'}
+                            state={errorState(formErrors.signature)}
+                            bottomText={formErrors.signature}
                             rows={4}
                             maxRows={4}
-                            maxLength={255}
-                        />
-                    </Row>
-                    <RowButtons>
-                        <StyledButton onClick={clearVerify}>
-                            <Translation id="TR_CLEAR" />
-                        </StyledButton>
-                        <StyledButton
-                            // isDisabled={!!verifyAddressError || !device.connected}
-                            isDisabled
-                            onClick={() => {
-                                if (signVerify.errors.length <= 0) {
-                                    verify(
-                                        signVerify.verifyAddress,
-                                        signVerify.verifyMessage,
-                                        signVerify.verifySignature,
-                                    );
-                                }
-                            }}
+                            placeholder={
+                                page === 'sign'
+                                    ? translationString('TR_SIGNATURE_AFTER_SIGNING_PLACEHOLDER')
+                                    : undefined
+                            }
+                            data-test="@sign-verify/signature"
                         >
-                            <Translation id="TR_VERIFY" />
+                            {page === 'verify' && (
+                                <CharacterCount
+                                    current={formValues.signature?.length || 0}
+                                    max={MAX_LENGTH_SIGNATURE}
+                                />
+                            )}
+                        </Textarea>
+                    </Row>
+                    <Row>
+                        <StyledButton
+                            type="submit"
+                            isDisabled={isLocked()}
+                            data-test="@sign-verify/submit"
+                        >
+                            <Translation id={page === 'sign' ? 'TR_SIGN' : 'TR_VERIFY'} />
                         </StyledButton>
-                    </RowButtons>
-                </Verify>
-            </Wrapper>
+                    </Row>
+                </Form>
+            </Card>
         </WalletLayout>
     );
 };

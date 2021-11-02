@@ -6,9 +6,10 @@ import { Translation } from '@suite-components';
 import * as guideActions from '@suite-actions/guideActions';
 import { useActions, useAnalytics, useSelector } from '@suite-hooks';
 import { Icon, variables } from '@trezor/components';
-import { resolveStaticPath } from '@suite-utils/build';
+import { isDev, resolveStaticPath } from '@suite-utils/build';
 import { getFwVersion } from '@suite-utils/device';
 import { ViewWrapper, Header, Content } from '@guide-components';
+import { isDesktop } from '@suite-utils/env';
 
 const FeedbackTypeButton = styled.button`
     border: 0;
@@ -79,7 +80,10 @@ const FeedbackTypeSelection = () => {
         device: state.suite.device,
     }));
 
-    const appUpToDate = !desktopUpdate?.enabled || desktopUpdate?.state === 'not-available';
+    const appUpToDate =
+        isDesktop() &&
+        ['checking', 'not-available'].includes(desktopUpdate.state) &&
+        !desktopUpdate.skip;
 
     const firmwareUpToDate = device?.firmware === 'valid';
     const firmwareVersion = device?.features ? (
@@ -103,6 +107,7 @@ const FeedbackTypeSelection = () => {
                             payload: { type: 'bug' },
                         });
                     }}
+                    data-test="@guide/feedback/bug"
                 >
                     <FeedbackButtonImage
                         src={resolveStaticPath('images/suite/3d/recovery.png')}
@@ -127,6 +132,7 @@ const FeedbackTypeSelection = () => {
                             payload: { type: 'suggestion' },
                         });
                     }}
+                    data-test="@guide/feedback/suggestion"
                 >
                     <FeedbackButtonImage
                         src={resolveStaticPath('images/suite/3d/understand.png')}
@@ -147,13 +153,16 @@ const FeedbackTypeSelection = () => {
                     <DetailItem>
                         <Translation id="TR_APP" />
                         :&nbsp;
-                        {appUpToDate ? (
+                        {!isDev && appUpToDate ? (
                             <>
                                 <StyledIcon icon="CHECK" size={10} />
                                 <Translation id="TR_UP_TO_DATE" />
                             </>
                         ) : (
-                            process.env.VERSION
+                            <>
+                                {process.env.VERSION}
+                                {isDev && '-dev'}
+                            </>
                         )}
                     </DetailItem>
                     <DetailItem>

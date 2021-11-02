@@ -1,3 +1,5 @@
+import { PROTOCOL_SCHEME } from '@suite-support/Protocol';
+
 /* eslint-disable prefer-destructuring */
 export interface ParsedURI {
     address: string;
@@ -14,7 +16,7 @@ const stripPrefix = (str: string): string => {
 };
 
 // Parse URL query string (like 'foo=bar&baz=1337) into an object
-const parseQuery = (str: string) =>
+export const parseQuery = (str: string) =>
     str
         .split('&')
         .map(val => val.split('='))
@@ -26,7 +28,7 @@ const parseQuery = (str: string) =>
         }, {});
 
 // Parse a string read from a bitcoin QR code into an object
-const parseUri = (uri: string): ParsedURI => {
+export const parseUri = (uri: string): ParsedURI => {
     const str = stripPrefix(uri);
     const query: string[] = str.split('?');
     const values: Record<string, any> = query.length > 1 ? parseQuery(query[1]) : {};
@@ -38,4 +40,42 @@ const parseUri = (uri: string): ParsedURI => {
     };
 };
 
-export { parseUri };
+interface BaseProtocol {
+    scheme: string;
+    address: string;
+}
+
+interface BitcoinProtocol extends BaseProtocol {
+    scheme: PROTOCOL_SCHEME;
+    amount?: number;
+}
+
+export const getProtocolInfo = (uri: string): BitcoinProtocol | null => {
+    const { protocol, pathname, search } = new URL(uri.replace('://', ':'));
+    const scheme = protocol.slice(0, -1);
+
+    const params: { [key: string]: string } = {};
+
+    new URLSearchParams(search).forEach((v, k) => {
+        params[k] = v;
+    });
+
+    const floatAmount = Number.parseFloat(params.amount);
+    const amount = !Number.isNaN(floatAmount) && floatAmount > 0 ? floatAmount : undefined;
+
+    if (scheme === PROTOCOL_SCHEME.BITCOIN && pathname) {
+        return {
+            scheme,
+            address: pathname,
+            amount,
+        };
+    }
+
+    console.error(
+        `Unsupported scheme '${scheme}', missing address '${pathname}' or there is a problem with params '${JSON.stringify(
+            params,
+        )}'!`,
+    );
+
+    return null;
+};

@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import { SRC, BUILD } from './constants';
 
 module.exports = {
+    target: 'web',
     mode: 'production',
     entry: {
         'blockbook-worker': `${SRC}workers/blockbook/index.ts`,
@@ -19,12 +20,12 @@ module.exports = {
     module: {
         rules: [
             {
-                test: [/blockbook\/index.ts?$/, /ripple\/index.ts?$/, /blockfrost\/index.ts?$/],
+                test: [/workers.*\/index.ts$/],
                 exclude: /node_modules/,
                 use: ['module-worker-loader'],
             },
             {
-                test: /\.ts?$/,
+                test: /\.ts$/,
                 exclude: /node_modules/,
                 use: [
                     {
@@ -33,11 +34,6 @@ module.exports = {
                     },
                 ],
             },
-            {
-                test: /\.js?$/,
-                exclude: /node_modules/,
-                use: ['babel-loader'],
-            },
         ],
     },
     resolve: {
@@ -45,6 +41,11 @@ module.exports = {
         extensions: ['.ts', '.js'],
         alias: {
             'ws-browser': `${SRC}/utils/ws.js`,
+        },
+        fallback: {
+            https: false, // required by ripple-lib
+            crypto: require.resolve('crypto-browserify'),
+            stream: require.resolve('stream-browserify'),
         },
     },
     resolveLoader: {
@@ -56,8 +57,7 @@ module.exports = {
     performance: {
         hints: false,
     },
-    // plugins: [new webpack.NormalModuleReplacementPlugin(/^ws$/, 'ws-browser')],
-
+    plugins: [new webpack.NormalModuleReplacementPlugin(/^ws$/, 'ws-browser')],
     optimization: {
         minimize: false,
     },

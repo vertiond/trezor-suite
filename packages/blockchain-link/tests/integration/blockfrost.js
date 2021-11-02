@@ -94,7 +94,7 @@ describe('Blockfrost', () => {
     it('Get info', async () => {
         const result = await blockchain.getInfo();
         expect(result).toEqual({
-            name: 'Cardano',
+            name: 'Blockfrost',
             shortcut: 'ada',
             decimals: 6,
             blockHeight: 1,

@@ -37,12 +37,9 @@ export const LTC_ADDRESS_INFO_URL =
     'https://blog.trezor.io/litecoins-new-p2sh-segwit-addresses-843633e3e707';
 export const BRIDGE_CHANGELOG_URL = 'https://github.com/trezor/trezord-go/blob/master/CHANGELOG.md';
 export const WIKI_QR_CODE = 'https://wiki.trezor.io/QR_code';
-export const CHANGELOG_URL = 'https://wiki.trezor.io/Firmware_changelog';
+export const CHANGELOG_URL =
+    'https://github.com/trezor/trezor-firmware/blob/master/core/CHANGELOG.md';
 export const FAILED_BACKUP_URL = 'https://wiki.trezor.io/Recovery_seed_backup_fail';
-export const CHROME_DOWNLOAD_URL = 'https://www.google.com/chrome/';
-export const CHROME_UPDATE_URL = 'https://support.google.com/chrome/answer/95414';
-export const FF_DOWNLOAD_URL = 'https://www.mozilla.org/en-US/firefox/new/';
-export const FF_UPDATE_URL = 'https://support.mozilla.org/en-US/kb/update-firefox-latest-version';
 export const WIKI_XPUB_URL =
     'https://wiki.trezor.io/User_manual:Displaying_account_public_key_(XPUB)';
 export const WIKI_BECH32_URL = 'https://wiki.trezor.io/Bech32';
@@ -57,8 +54,4 @@ export const FEEDBACK_FORM = 'https://satoshilabs.typeform.com/to/Dqb71wm1';
 export const FIRMWARE_COMMIT_URL = 'https://github.com/trezor/trezor-firmware/commit/';
 export const FIRMWARE_BINARIES_URL =
     'https://github.com/trezor/webwallet-data/tree/master/firmware';
-
-// Tor domain
-export const TOR_DOMAIN = 'trezoriovpjcahpzkrewelclulmszwbqpzmzgub37gbcjlvluxtruqad.onion';
-
 export const SL_SIGNING_KEY = 'https://trezor.io/security/satoshilabs-2021-signing-key.asc';
