@@ -2,6 +2,7 @@ import { RippleAPI } from 'ripple-lib';
 import BigNumber from 'bignumber.js';
 import { CustomError } from '../../constants/errors';
 import { MESSAGES, RESPONSES } from '../../constants';
+
 import * as MessageTypes from '../../types/messages';
 import { Message, Response, SubscriptionAccountInfo, AccountInfo } from '../../types';
 import * as utils from './utils';

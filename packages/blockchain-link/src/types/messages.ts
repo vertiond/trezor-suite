@@ -14,7 +14,6 @@ import * as MESSAGES from '../constants/messages';
 export interface Connect {
     type: typeof MESSAGES.CONNECT;
 }
-
 export interface Disconnect {
     type: typeof MESSAGES.DISCONNECT;
 }

@@ -101,7 +101,7 @@ const getInfo = async (data: { id: number } & MessageTypes.GetInfo): Promise<voi
 const getBlockHash = async (data: { id: number } & MessageTypes.GetBlockHash): Promise<void> => {
     try {
         const socket = await connect();
-        const info = await socket.getBlockHash(data.id);
+        const info = await socket.getBlockHash(data.payload);
         common.response({
             id: data.id,
             type: RESPONSES.GET_BLOCK_HASH,
