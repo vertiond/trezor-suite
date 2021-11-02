@@ -6680,7 +6680,7 @@ export default defineMessages({
         defaultMessage: 'Available Rewards',
     },
     TR_STAKING_REWARDS_DESCRIPTION: {
-        id: 'TR_STAKING_REWARDS',
+        id: 'TR_STAKING_REWARDS_DESCRIPTION',
         defaultMessage: 'TR_STAKING_REWARDS_DESCRIPTION',
     },
     TR_STAKING_STAKE_DESCRIPTION: {

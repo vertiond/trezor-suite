@@ -162,7 +162,6 @@ export default [
             tx: '',
             subscribe: '',
         },
-        selected: true,
     },
     {
         blockchain: {
@@ -196,6 +195,7 @@ export default [
             subscribe: '1G47mSr3oANXMafVrR8UC4pzV7FEAzo3r9', // Poloniex: https://www.walletexplorer.com/wallet/Poloniex.com
             // subscribe: '0x2a0c0dbecc7e4d658f48e01e3fa353f44050c208', // Poloniex: https://www.walletexplorer.com/wallet/Poloniex.com
         },
+        selected: true,
     },
     {
         blockchain: {
