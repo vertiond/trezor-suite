@@ -124,7 +124,7 @@ const handleClick = (event: MouseEvent) => {
 
         case 'get-blockhash':
             blockchain
-                .getBlockHash(getInputValue('blockhash-hashOrNumber'))
+                .getBlockHash(getInputValue('blockhash-number'))
                 .then(onResponse)
                 .catch(onError);
             break;
