@@ -57,8 +57,6 @@
         "worker-loader": "^3.0.8"
     },
     "dependencies": {
-        "@blockfrost/blockfrost-js": "0.2.3",
-        "@emurgo/cip14-js": "2.0.0",
         "bignumber.js": "^9.0.1",
         "es6-promise": "^4.2.8",
         "events": "^3.2.0",
