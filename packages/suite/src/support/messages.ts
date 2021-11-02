@@ -177,6 +177,14 @@ export default defineMessages({
         defaultMessage: 'Review on your Trezor',
         id: 'TR_ADDRESS_MODAL_CHECK_ON_TREZOR',
     },
+    TR_ADDRESSES_FRESH: {
+        id: 'TR_ADDRESSES_FRESH',
+        defaultMessage: 'Fresh addresses',
+    },
+    TR_ADDRESSES_USED: {
+        id: 'TR_ADDRESSES_USED',
+        defaultMessage: 'Used addresses',
+    },
     TR_TRADE_NOT_FOUND: {
         defaultMessage: 'Trade not found',
         id: 'TR_TRADE_NOT_FOUND',
@@ -1396,6 +1404,11 @@ export default defineMessages({
         defaultMessage: 'Connect your Trezor to verify this address',
         id: 'TR_CONNECT_YOUR_TREZOR_TO_CHECK',
     },
+    TR_WARNING: {
+        defaultMessage: 'Warning',
+        description: 'Device status',
+        id: 'TR_WARNING',
+    },
     TR_CONNECTED: {
         defaultMessage: 'Connected',
         description: 'Device status',
@@ -2210,10 +2223,6 @@ export default defineMessages({
         description: 'Title of the navigation tab that contains tx history.',
         id: 'TR_NAV_TRANSACTIONS',
     },
-    TR_NAV_STAKING: {
-        defaultMessage: 'Staking',
-        id: 'TR_NAV_STAKING',
-    },
     TR_NETWORK_BITCOIN: {
         defaultMessage: 'Bitcoin',
         id: 'TR_NETWORK_BITCOIN',
@@ -2233,14 +2242,6 @@ export default defineMessages({
     TR_NETWORK_CARDANO: {
         defaultMessage: 'Cardano',
         id: 'TR_NETWORK_CARDANO',
-    },
-    TR_ACCOUNT_TYPE_SHELLEY: {
-        defaultMessage: 'Shelley',
-        id: 'TR_ACCOUNT_TYPE_SHELLEY',
-    },
-    TR_NETWORK_CARDANO_TESTNET: {
-        defaultMessage: 'Cardano Testnet',
-        id: 'TR_NETWORK_CARDANO_TESTNET',
     },
     TR_NETWORK_DASH: {
         defaultMessage: 'Dash',
@@ -2405,7 +2406,7 @@ export default defineMessages({
     },
     TR_PASSPHRASE_CASE_SENSITIVE: {
         defaultMessage: 'Note: Passphrase is case-sensitive.',
-        id: 'PASSPHRASE_CASE_SENSITIVE',
+        id: 'TR_PASSPHRASE_CASE_SENSITIVE',
     },
     TR_PASSPHRASE_HIDDEN_WALLET: {
         defaultMessage: 'Hidden wallet',
@@ -2682,6 +2683,10 @@ export default defineMessages({
         defaultMessage: 'Settings',
         id: 'TR_SETTINGS',
     },
+    TR_SETTINGS_SAME_AS_SYSTEM: {
+        defaultMessage: 'System',
+        id: 'TR_SETTINGS_SAME_AS_SYSTEM',
+    },
     TR_SHOW_ADDRESS_ANYWAY: {
         defaultMessage: 'Show address anyway',
         id: 'TR_SHOW_ADDRESS_ANYWAY',
@@ -2717,7 +2722,7 @@ export default defineMessages({
         id: 'TR_SIGN',
     },
     TR_SIGN_MESSAGE: {
-        defaultMessage: 'Sign Message',
+        defaultMessage: 'Sign message',
         description: 'Header for the Sign and Verify form',
         id: 'TR_SIGN_MESSAGE',
     },
@@ -2725,6 +2730,10 @@ export default defineMessages({
         defaultMessage: 'Signature',
         description: 'Used as a label for signature input field in Sign and Verify form',
         id: 'TR_SIGNATURE',
+    },
+    TR_SIGNATURE_AFTER_SIGNING_PLACEHOLDER: {
+        defaultMessage: 'Will be generated after signing',
+        id: 'TR_SIGNATURE_AFTER_SIGNING_PLACEHOLDER',
     },
     TR_SKIP: {
         defaultMessage: 'Skip',
@@ -2964,6 +2973,30 @@ export default defineMessages({
         defaultMessage: 'Failed transaction',
         id: 'TR_FAILED_TRANSACTION',
     },
+    TR_SENDING_TRANSACTION: {
+        defaultMessage: 'Sending {symbol}',
+        id: 'TR_SENDING_TRANSACTION',
+    },
+    TR_SENT_TRANSACTION: {
+        defaultMessage: 'Sent {symbol}',
+        id: 'TR_SENT_TRANSACTION',
+    },
+    TR_SENDING_TO_MYSELF_TRANSACTION: {
+        defaultMessage: 'Sending {symbol} to myself',
+        id: 'TR_SENDING_TO_MYSELF_TRANSACTION',
+    },
+    TR_SENT_TO_MYSELF_TRANSACTION: {
+        defaultMessage: 'Sent {symbol} to myself',
+        id: 'TR_SENT_TO_MYSELF_TRANSACTION',
+    },
+    TR_RECEIVING_TRANSACTION: {
+        defaultMessage: 'Receiving {symbol}',
+        id: 'TR_RECEIVING_TRANSACTION',
+    },
+    TR_RECEIVED_TRANSACTION: {
+        defaultMessage: 'Received {symbol}',
+        id: 'TR_RECEIVED_TRANSACTION',
+    },
     TR_UNKNOWN_ERROR_SEE_CONSOLE: {
         defaultMessage: 'Unknown error. See console logs for details.',
         id: 'TR_UNKNOWN_ERROR_SEE_CONSOLE',
@@ -3025,7 +3058,7 @@ export default defineMessages({
         id: 'TR_VERIFY',
     },
     TR_VERIFY_MESSAGE: {
-        defaultMessage: 'Verify Message',
+        defaultMessage: 'Verify message',
         description: 'Header for the Sign and Verify form',
         id: 'TR_VERIFY_MESSAGE',
     },
@@ -3269,6 +3302,19 @@ export default defineMessages({
         id: 'TR_ACCOUNT_TYPE_P2PKH',
         defaultMessage: 'P2PKH',
     },
+    TOAST_COIN_SCHEME_PROTOCOL: {
+        id: 'TOAST_COIN_SCHEME_PROTOCOL',
+        describe: 'Required for current notifications. Do not change.',
+        defaultMessage: '{header}{body}',
+    },
+    TOAST_COIN_SCHEME_PROTOCOL_ACTION: {
+        id: 'TOAST_COIN_SCHEME_PROTOCOL_ACTION',
+        defaultMessage: 'Autofill send form',
+    },
+    TOAST_COIN_SCHEME_PROTOCOL_HEADER: {
+        id: 'TOAST_COIN_SCHEME_PROTOCOL_HEADER',
+        defaultMessage: 'Get to an account to send',
+    },
     TOAST_ACQUIRE_ERROR: {
         id: 'TOAST_ACQUIRE_ERROR',
         defaultMessage: 'Acquire error {error}',
@@ -3341,9 +3387,17 @@ export default defineMessages({
         id: 'TOAST_VERIFY_ADDRESS_ERROR',
         defaultMessage: 'Verify address error: {error}',
     },
+    TOAST_SIGN_MESSAGE_SUCCESS: {
+        id: 'TOAST_SIGN_MESSAGE_SUCCESS',
+        defaultMessage: 'Message signing successful',
+    },
     TOAST_SIGN_MESSAGE_ERROR: {
         id: 'TOAST_SIGN_MESSAGE_ERROR',
         defaultMessage: 'Sign message error: {error}',
+    },
+    TOAST_VERIFY_MESSAGE_SUCCESS: {
+        id: 'TOAST_VERIFY_MESSAGE_SUCCESS',
+        defaultMessage: 'Message verification successful',
     },
     TOAST_VERIFY_MESSAGE_ERROR: {
         id: 'TOAST_VERIFY_MESSAGE_ERROR',
@@ -3503,7 +3557,7 @@ export default defineMessages({
     },
     EVENT_WALLET_CREATED: {
         id: 'EVENT_WALLET_CREATED',
-        defaultMessage: '{walletLabel} created',
+        defaultMessage: 'New wallet created',
     },
     TR_WIPE_DEVICE_HEADING: {
         id: 'TR_WIPE_DEVICE_HEADING',
@@ -4309,6 +4363,10 @@ export default defineMessages({
         id: 'TR_HELP',
         defaultMessage: 'Support',
     },
+    TR_HEX_FORMAT: {
+        id: 'TR_HEX_FORMAT',
+        defaultMessage: 'Hex format',
+    },
     TR_BUY_TREZOR: {
         id: 'TR_BUY_TREZOR',
         defaultMessage: 'Buy Trezor',
@@ -4811,7 +4869,7 @@ export default defineMessages({
     },
     TR_NAV_SIGN_VERIFY: {
         id: 'TR_NAV_SIGN_VERIFY',
-        defaultMessage: 'Sign & verify',
+        defaultMessage: 'Sign/Verify message',
     },
     TR_BALANCE: {
         id: 'TR_BALANCE',
@@ -5193,6 +5251,26 @@ export default defineMessages({
         defaultMessage: 'Fee',
         description: 'Label in Send form',
         id: 'FEE',
+    },
+    FEE_LEVEL_CUSTOM: {
+        defaultMessage: 'Custom',
+        id: 'FEE_LEVEL_CUSTOM',
+    },
+    FEE_LEVEL_HIGH: {
+        defaultMessage: 'High',
+        id: 'FEE_LEVEL_HIGH',
+    },
+    FEE_LEVEL_NORMAL: {
+        defaultMessage: 'Normal',
+        id: 'FEE_LEVEL_NORMAL',
+    },
+    FEE_LEVEL_ECONOMY: {
+        defaultMessage: 'Economy',
+        id: 'FEE_LEVEL_ECONOMY',
+    },
+    FEE_LEVEL_LOW: {
+        defaultMessage: 'Low',
+        id: 'FEE_LEVEL_LOW',
     },
     FEE_NEEDS_UPDATE: {
         defaultMessage: 'Fee levels are outdated',
@@ -5656,9 +5734,9 @@ export default defineMessages({
         id: 'TR_UPDATE_MODAL_AVAILABLE_HEADING',
         defaultMessage: 'Update available',
     },
-    TR_UPDATE_MODAL_SKIP_THIS_VERSION: {
-        id: 'TR_UPDATE_MODAL_SKIP_THIS_VERSION',
-        defaultMessage: 'Skip',
+    TR_UPDATE_MODAL_NOT_NOW: {
+        id: 'TR_UPDATE_MODAL_NOT_NOW',
+        defaultMessage: 'Not now',
     },
     TR_UPDATE_MODAL_START_DOWNLOAD: {
         id: 'TR_UPDATE_MODAL_START_DOWNLOAD',
@@ -5833,18 +5911,6 @@ export default defineMessages({
         id: 'TR_SUITE_WEB_LANDING_SUITE_ON_WEB',
         defaultMessage: 'Trezor Suite for web',
     },
-    TR_SUITE_WEB_LANDING_FOOTER_HEADLINE_1: {
-        id: 'TR_SUITE_WEB_LANDING_FOOTER_HEADLINE_1',
-        defaultMessage: 'Improve',
-    },
-    TR_SUITE_WEB_LANDING_FOOTER_FEEDBACK: {
-        id: 'TR_SUITE_WEB_LANDING_FOOTER_FEEDBACK',
-        defaultMessage: 'Give feedback',
-    },
-    TR_SUITE_WEB_LANDING_FOOTER_JOIN_CLOSED_BETA: {
-        id: 'TR_SUITE_WEB_LANDING_FOOTER_JOIN_CLOSED_BETA',
-        defaultMessage: 'Join closed Beta',
-    },
     TR_SUITE_WEB_LANDING_FOOTER_BLOG: {
         id: 'TR_SUITE_WEB_LANDING_FOOTER_BLOG',
         defaultMessage: 'Trezor Blog',
@@ -5943,14 +6009,22 @@ export default defineMessages({
         id: 'TR_SUITE_WEB_LANDING_START_BOTTOM_HEADLINE',
         defaultMessage: 'Dozens of features to discover.{lineBreak}Try Suite now.',
     },
-    TR_DARK_MODE: {
-        id: 'TR_DARK_MODE',
-        defaultMessage: 'Dark mode',
+    TR_COLOR_SCHEME: {
+        id: 'TR_COLOR_SCHEME',
+        defaultMessage: 'Color scheme',
     },
-    TR_DARK_MODE_DESCRIPTION: {
-        id: 'TR_DARK_MODE_DESCRIPTION',
+    TR_COLOR_SCHEME_DESCRIPTION: {
+        id: 'TR_COLOR_SCHEME_DESCRIPTION',
         defaultMessage:
-            'This color scheme uses light-colored text, icons, and graphical user interface elements on a dark background.',
+            'You can choose whether the application uses dark-colored elements on a light background or light-colored elements on a dark background.',
+    },
+    TR_COLOR_SCHEME_DARK: {
+        id: 'TR_COLOR_SCHEME_DARK',
+        defaultMessage: 'Dark',
+    },
+    TR_COLOR_SCHEME_LIGHT: {
+        id: 'TR_COLOR_SCHEME_LIGHT',
+        defaultMessage: 'Light',
     },
     TR_DEVICE_IS_IN_UNEXPECTED_MODE: {
         id: 'TR_DEVICE_IS_IN_UNEXPECTED_MODE',
@@ -5964,6 +6038,10 @@ export default defineMessages({
     TR_EXPORT_FAIL: {
         id: 'TR_EXPORT_FAIL',
         defaultMessage: 'Export failed.',
+    },
+    TR_SEARCH: {
+        id: 'TR_SEARCH',
+        defaultMessage: 'Search',
     },
     TR_SEARCH_FAIL: {
         id: 'TR_SEARCH_FAIL',
@@ -6133,6 +6211,18 @@ export default defineMessages({
         id: 'TR_BYTES',
         defaultMessage: 'bytes',
     },
+    TR_GRAPH_LINEAR: {
+        id: 'TR_GRAPH_LINEAR',
+        defaultMessage: 'Linear',
+    },
+    TR_GRAPH_LOGARITHMIC: {
+        id: 'TR_GRAPH_LOGARITHMIC',
+        defaultMessage: 'Logarithmic',
+    },
+    TR_GRAPH_VIEW: {
+        id: 'TR_GRAPH_VIEW',
+        defaultMessage: 'Graph View',
+    },
     TR_SHOW_GRAPH: {
         id: 'TR_SHOW_GRAPH',
         defaultMessage: 'Show Graph',
@@ -6140,6 +6230,38 @@ export default defineMessages({
     TR_HIDE_GRAPH: {
         id: 'TR_HIDE_GRAPH',
         defaultMessage: 'Hide Graph',
+    },
+    TR_DATE_DAY_LONG: {
+        id: 'TR_DATE_DAY_LONG',
+        defaultMessage: '1 day',
+    },
+    TR_DATE_DAY_SHORT: {
+        id: 'TR_DATE_DAY_SHORT',
+        defaultMessage: '1D',
+    },
+    TR_DATE_WEEK_LONG: {
+        id: 'TR_DATE_WEEK_LONG',
+        defaultMessage: '1 week',
+    },
+    TR_DATE_WEEK_SHORT: {
+        id: 'TR_DATE_WEEK_SHORT',
+        defaultMessage: '1W',
+    },
+    TR_DATE_MONTH_LONG: {
+        id: 'TR_DATE_MONTH_LONG',
+        defaultMessage: '1 month',
+    },
+    TR_DATE_MONTH_SHORT: {
+        id: 'TR_DATE_MONTH_SHORT',
+        defaultMessage: '1M',
+    },
+    TR_DATE_YEAR_LONG: {
+        id: 'TR_DATE_YEAR_LONG',
+        defaultMessage: '1 year',
+    },
+    TR_DATE_YEAR_SHORT: {
+        id: 'TR_DATE_YEAR_SHORT',
+        defaultMessage: '1Y',
     },
     TR_SUITE_META_DESCRIPTION: {
         id: 'TR_SUITE_META_DESCRIPTION',
@@ -6397,11 +6519,11 @@ export default defineMessages({
     },
     TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_TITLE: {
         defaultMessage: 'Ensure the Trezor Bridge process is running',
-        id: 'TR_TROUBLESHOOTING_BRIDGE_STATUS_TITLE',
+        id: 'TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_TITLE',
     },
     TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_DESCRIPTION: {
         defaultMessage: 'Visit <a>Trezor Bridge status page</a>',
-        id: 'TR_TROUBLESHOOTING_BRIDGE_STATUS_DESCRIPTION',
+        id: 'TR_TROUBLESHOOTING_TIP_BRIDGE_STATUS_DESCRIPTION',
     },
     TR_TROUBLESHOOTING_TIP_BRIDGE_INSTALL_TITLE: {
         id: 'TR_TOUBLESHOOTING_TIP_BRIDGE_INSTALL_TITLE',
@@ -6512,6 +6634,18 @@ export default defineMessages({
     TR_DO_YOU_REALLY_WANT_TO_SKIP: {
         id: 'TR_DO_YOU_REALLY_WANT_TO_SKIP',
         defaultMessage: 'Do you really want to skip this step?',
+    },
+    TR_NAV_STAKING: {
+        defaultMessage: 'Staking',
+        id: 'TR_NAV_STAKING',
+    },
+    TR_ACCOUNT_TYPE_SHELLEY: {
+        defaultMessage: 'Shelley',
+        id: 'TR_ACCOUNT_TYPE_SHELLEY',
+    },
+    TR_NETWORK_CARDANO_TESTNET: {
+        defaultMessage: 'Cardano Testnet',
+        id: 'TR_NETWORK_CARDANO_TESTNET',
     },
     TR_STAKING_REWARDS_TITLE: {
         id: 'TR_STAKING_REWARDS_TITLE',
