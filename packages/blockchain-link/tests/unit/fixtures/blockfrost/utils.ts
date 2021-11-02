@@ -698,6 +698,7 @@ export default {
                                 {
                                     unit: '2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79',
                                     quantity: '1',
+                                    fingerprint: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06'
                                 },
                             ],
                             tx_hash:
@@ -738,6 +739,7 @@ export default {
                                 {
                                     unit: '2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79',
                                     quantity: '1',
+                                    fingerprint: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                                 },
                             ],
                             output_index: 0,
@@ -804,7 +806,7 @@ export default {
                 tokens: [
                     {
                         type: 'recv',
-                        name: 'veternikNezjedeny',
+                        name: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                         symbol: 'veternikNezjedeny',
                         address: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                         decimals: 0,
