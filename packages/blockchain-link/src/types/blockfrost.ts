@@ -20,14 +20,11 @@ type TxContentUtxo = {
     outputs: {
         /** Output address */
         address: string;
-        amount: {
-            /** The unit of the value */
-            unit: string;
-            /** The quantity of the unit */
-            quantity: string;
-            /** The hash of the transaction output datum */
-            data_hash?: string | null;
-        }[];
+        amount: AssetBalance[];
+        /** UTXO index in the transaction */
+        output_index: number;
+        /** The hash of the transaction output datum */
+        data_hash?: string | null;
     }[];
 };
 
@@ -218,10 +215,6 @@ export interface AssetBalance {
     fingerprint?: string; // defined for all assets except lovelace
 }
 
-export interface Push {
-    result: string;
-}
-
 export interface Output {
     address: string;
     amount: AssetBalance[];
@@ -267,7 +260,7 @@ declare function FSend(
     method: 'GET_TRANSACTION',
     params: { txId: string }
 ): Promise<BlockfrostTransaction>;
-declare function FSend(method: 'PUSH_TRANSACTION', params: { txData: string }): Promise<Push>;
+declare function FSend(method: 'PUSH_TRANSACTION', params: { txData: string }): Promise<string>;
 declare function FSend(method: 'SUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(method: 'UNSUBSCRIBE_BLOCK'): Promise<Subscribe>;
 declare function FSend(

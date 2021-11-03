@@ -58,6 +58,19 @@ export default {
                     amount: '1000000',
                     vout: 1,
                     path: 'path',
+                    cardanoUnit: 'lovelace',
+                },
+                {
+                    address:
+                        'addr1qywvux9d5u4cqyzrhp587sty33gt5pl5hpxmnzrw5nk5j87fdzm3eywgf7uexyytfzfcrp4hhcck7ch9kd753k33jpyqa3mzep',
+                    txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
+                    confirmations: 100,
+                    blockHeight: 101,
+                    amount: '100',
+                    vout: 1,
+                    path: 'path',
+                    cardanoUnit:
+                        'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795361707068697265',
                 },
                 {
                     address:
@@ -68,6 +81,19 @@ export default {
                     amount: '1000000',
                     vout: 2,
                     path: 'path2',
+                    cardanoUnit: 'lovelace',
+                },
+                {
+                    address:
+                        'addr1qywvux9d5u4cqyzrhp587sty33gt5pl5hpxmnzrw5nk5j87fdzm3eywgf7uexyytfzfcrp4hhcck7ch9kd753k33jpyqa3mzep',
+                    txid: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
+                    confirmations: 0,
+                    blockHeight: 0,
+                    amount: '100',
+                    vout: 2,
+                    path: 'path2',
+                    cardanoUnit:
+                        'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795361707068697265',
                 },
             ],
         },
@@ -423,6 +449,9 @@ export default {
                             totalSpent: '171265',
                             targets: [],
                             tokens: [],
+                            cardanoSpecific: {
+                                subtype: 'withdrawal',
+                            },
                             details: {
                                 vin: [
                                     {
@@ -669,6 +698,7 @@ export default {
                                 {
                                     unit: '2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79',
                                     quantity: '1',
+                                    fingerprint: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06'
                                 },
                             ],
                             tx_hash:
@@ -709,6 +739,7 @@ export default {
                                 {
                                     unit: '2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79',
                                     quantity: '1',
+                                    fingerprint: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                                 },
                             ],
                             output_index: 0,
@@ -775,7 +806,7 @@ export default {
                 tokens: [
                     {
                         type: 'recv',
-                        name: 'veternikNezjedeny',
+                        name: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                         symbol: 'veternikNezjedeny',
                         address: 'asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06',
                         decimals: 0,
