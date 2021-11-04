@@ -81,6 +81,11 @@ export const update = (account: Account, accountInfo: AccountInfo): AccountActio
             account.symbol,
         ),
         utxo: accountUtils.enhanceUtxo(accountInfo.utxo, account.networkType, account.index),
+        addresses: accountUtils.enhanceAddresses(
+            accountInfo.addresses,
+            account.networkType,
+            account.index,
+        ),
         tokens: accountUtils.enhanceTokens(accountInfo.tokens),
         ...accountUtils.getAccountSpecific(accountInfo, account.networkType),
     },
