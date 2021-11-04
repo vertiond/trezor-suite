@@ -131,6 +131,8 @@ const ConfirmationStatusWrapper = styled.div`
 `;
 
 const TxSentStatus = styled(H3)`
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: ${props => props.theme.TYPE_DARK_GREY};
 `;
 
