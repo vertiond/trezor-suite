@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon, useTheme, variables, CoinLogo, Tooltip } from '@trezor/components';
+import { Icon, useTheme, variables, CoinLogo, Tooltip, H3 } from '@trezor/components';
 import {
     Translation,
     HiddenPlaceholder,
@@ -16,7 +16,7 @@ import TransactionHeader from '@suite/components/wallet/TransactionItem/componen
 const Wrapper = styled.div`
     background-color: ${props => props.theme.BG_GREY};
     padding: 18px;
-    border-radius: 6px;
+    border-radius: 8px;
 `;
 
 const TransactionId = styled(props => <HiddenPlaceholder {...props} />)`
@@ -130,12 +130,8 @@ const ConfirmationStatusWrapper = styled.div`
     justify-content: flex-end;
 `;
 
-const TxSentStatus = styled.div`
+const TxSentStatus = styled(H3)`
     color: ${props => props.theme.TYPE_DARK_GREY};
-    font-size: ${variables.NEUE_FONT_SIZE.H2};
-    font-weight: ${variables.FONT_WEIGHT.MEDIUM};
-    overflow: hidden;
-    text-overflow: ellipsis;
 `;
 
 const ConfirmationStatus = styled.div<{ confirmed: boolean; tiny?: boolean }>`

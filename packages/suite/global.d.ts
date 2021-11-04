@@ -11,7 +11,6 @@ export interface DesktopApi {
     downloadUpdate: () => void;
     installUpdate: () => void;
     cancelUpdate: () => void;
-    skipUpdate: (version: string) => void;
     // Window controls
     windowClose: () => void;
     windowMinimize: () => void;
@@ -19,6 +18,9 @@ export interface DesktopApi {
     windowMaximize: () => void;
     windowUnmaximize: () => void;
     windowExpand: () => void;
+    // Theme
+    themeChange: (theme: SuiteThemeVariant) => void;
+    themeSystem: () => void;
     // Client controls
     clientReady: () => void;
     // Metadata
@@ -44,8 +46,9 @@ export interface DesktopApi {
 
 declare global {
     interface Window {
-        __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: () => any | null;
+        __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: (props: any) => any | null;
         desktopApi?: DesktopApi; // Electron API
+        chrome?: any; // Only in Chromium browsers
 
         // Needed for Cypress
         Cypress?: any;

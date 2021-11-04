@@ -64,7 +64,7 @@ const Wrapper = styled.button<WrapperProps>`
     border: none;
     white-space: nowrap;
     cursor: ${props => (props.isDisabled ? 'default' : 'pointer')};
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: ${props => getFontSize(props.variant)};
     font-weight: ${variables.FONT_WEIGHT.MEDIUM};
     outline: none;
@@ -93,7 +93,7 @@ const Wrapper = styled.button<WrapperProps>`
         css`
             background: ${props => props.theme.BG_SECONDARY};
             font-weight: ${variables.FONT_WEIGHT.MEDIUM};
-            color: ${props => props.theme.TYPE_GREEN};
+            color: ${props => props.theme.TYPE_SECONDARY_TEXT};
 
             &:hover,
             &:focus,

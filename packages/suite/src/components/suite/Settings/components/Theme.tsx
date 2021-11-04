@@ -1,32 +1,43 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import * as suiteActions from '@suite-actions/suiteActions';
 import { Translation } from '@suite-components/Translation';
 import { SectionItem, ActionColumn, ActionSelect, TextColumn } from '@suite-components/Settings';
-import { useActions, useSelector } from '@suite-hooks';
-import type { SuiteThemeVariant } from '@suite-types';
+import { useActions, useSelector, useTranslation } from '@suite-hooks';
+import type { SuiteThemeVariant, SuiteThemeVariantOptions } from '@suite-types';
 
-const THEME_OPTIONS = [
-    {
-        options: [{ value: 'auto', label: <Translation id="TR_SETTINGS_SAME_AS_SYSTEM" /> }],
-    },
-    {
-        options: [
-            { value: 'light', label: <Translation id="TR_COLOR_SCHEME_LIGHT" /> },
-            { value: 'dark', label: <Translation id="TR_COLOR_SCHEME_DARK" /> },
+const useThemeOptions = () => {
+    const { translationString } = useTranslation();
+    const options = useMemo(
+        () => [
+            {
+                options: [
+                    { value: 'system', label: translationString('TR_SETTINGS_SAME_AS_SYSTEM') },
+                ],
+            },
+            {
+                options: [
+                    { value: 'light', label: translationString('TR_COLOR_SCHEME_LIGHT') },
+                    { value: 'dark', label: translationString('TR_COLOR_SCHEME_DARK') },
+                ],
+            },
         ],
-    },
-] as const;
-
-const getThemeOption = (theme: 'auto' | 'light' | 'dark') => {
-    switch (theme) {
-        case 'auto':
-            return THEME_OPTIONS[0].options[0];
-        case 'dark':
-            return THEME_OPTIONS[1].options[1];
-        case 'light':
-        default:
-            return THEME_OPTIONS[1].options[0];
-    }
+        [translationString],
+    );
+    const getOption = (theme: SuiteThemeVariantOptions) => {
+        switch (theme) {
+            case 'system':
+                return options[0].options[0];
+            case 'dark':
+                return options[1].options[1];
+            case 'light':
+            default:
+                return options[1].options[0];
+        }
+    };
+    return {
+        options,
+        getOption,
+    };
 };
 
 const Theme = () => {
@@ -39,16 +50,21 @@ const Theme = () => {
         setAutodetect: suiteActions.setAutodetect,
     });
 
+    const { options, getOption } = useThemeOptions();
+
     const getVariant = (variant: SuiteThemeVariant) => (variant !== 'light' ? 'dark' : 'light');
 
-    const selectedValue = getThemeOption(autodetectTheme ? 'auto' : getVariant(theme.variant));
+    const selectedValue = getOption(autodetectTheme ? 'system' : getVariant(theme.variant));
 
-    const onChange = ({ value }: typeof THEME_OPTIONS[number]['options'][number]) => {
-        if ((value === 'auto') !== autodetectTheme) {
+    const onChange = ({ value }: { value: SuiteThemeVariantOptions }) => {
+        if ((value === 'system') !== autodetectTheme) {
             setAutodetect({ theme: !autodetectTheme });
         }
-        if (value !== 'auto') {
+        if (value === 'system') {
+            window.desktopApi?.themeSystem();
+        } else {
             setTheme(getVariant(value));
+            window.desktopApi?.themeChange(value);
         }
     };
 
@@ -64,7 +80,7 @@ const Theme = () => {
                     useKeyPressScroll
                     noTopLabel
                     value={selectedValue}
-                    options={THEME_OPTIONS}
+                    options={options}
                     onChange={onChange}
                     data-test="@theme/color-scheme-select"
                 />

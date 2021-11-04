@@ -10,7 +10,7 @@ import { getAnalyticsRandomId } from '@suite-utils/random';
 import { encodeDataToQueryString } from '@suite-utils/analytics';
 import { Account } from '@wallet-types';
 import { setOnBeforeUnloadListener, getLocationHostname, getEnvironment } from '@suite-utils/env';
-import { setSentryUser } from '@suite-utils/sentry';
+import { allowSentryReport, setSentryUser } from '@suite-utils/sentry';
 import { State } from '@suite-reducers/analyticsReducer';
 import { DeviceMode } from 'trezor-connect';
 
@@ -23,6 +23,7 @@ export type AnalyticsAction =
               instanceId: string;
               sessionId: string;
               enabled: boolean;
+              confirmed: boolean;
               sessionStart: number;
           };
       };
@@ -100,6 +101,17 @@ export type AnalyticsEvent =
           payload: { mode: 'bootloader' };
       }
     | {
+          /**
+           * accounts/status
+           * - logged when discovery is completed (app start, coin added, account added)
+           * - sends number of accounts having at least 1 transaction grouped by '[symbol]_[accountType]' (e.g. 'btc_segwit')
+           */
+          type: 'accounts/status';
+          payload: {
+              [key: string]: number;
+          };
+      }
+    | {
           type: 'device-disconnect';
       }
     | {
@@ -140,24 +152,6 @@ export type AnalyticsEvent =
               createSeed: boolean;
               /** how many users chose to do recovery */
               recoverSeed: boolean;
-          };
-      }
-    | {
-          /**
-         account-create
-         logged either automatically upon each suite start as default switched on accounts are loaded
-         or when user adds account manually
-         */
-          type: 'account-create';
-          payload: {
-              /** normal, segwit, legacy */
-              type: Account['accountType'];
-              /** index of account  */
-              path: Account['path'];
-              /** network (btc, eth, etc.) */
-              symbol: Account['symbol'];
-              /** if tokens added */
-              tokensCount: number;
           };
       }
     | {
@@ -441,11 +435,10 @@ export const report =
             return;
         }
 
-        const { enabled, sessionId, instanceId } = getState().analytics;
-        const { initialRun } = getState().suite.flags;
+        const { enabled, sessionId, instanceId, confirmed } = getState().analytics;
 
-        // don't report until user had chance to optout
-        if (initialRun) {
+        // don't report until user confirmed his choice
+        if (!confirmed) {
             return;
         }
 
@@ -470,46 +463,49 @@ export const report =
 /**
  * Init analytics, should be always run on application start (see suiteMiddleware). It:
  * - sets common analytics variables based on what was loaded from storage
- * - initiates sentry
+ * - set sentry user id
  * - registers event listeners for reporting events from electron
  * @param loadedState - analytics state loaded from storage
- * @param optout if true, analytics will be on by default (opt-out mode)
  */
-export const init =
-    (loadedState: State, optout: boolean) => (dispatch: Dispatch, getState: GetState) => {
-        // 1. if instanceId does not exist yet (was not loaded from storage), create a new one
-        const instanceId = loadedState.instanceId || getAnalyticsRandomId();
-        // 2. always create new session id
-        const sessionId = getAnalyticsRandomId();
-        // 3. if enabled was already set to some value, keep it (user made choice), otherwise set it to default represented by optout param
-        const enabled = typeof loadedState.enabled !== 'undefined' ? loadedState.enabled : optout;
-        // 4. set application state
-        dispatch({
-            type: ANALYTICS.INIT,
-            payload: {
-                instanceId,
-                sessionId,
-                sessionStart: Date.now(),
-                enabled,
-            },
-        });
-        // 5. if analytics was initiated as enabled, continue with setting up side effects
-        if (!getState().analytics.enabled) return;
-        // 6. error logging to sentry
-        setSentryUser(instanceId);
-        // 7. register event listeners
-        setOnBeforeUnloadListener(() => {
-            dispatch(
-                report({
-                    type: 'session-end',
-                    payload: {
-                        start: getState().analytics.sessionStart!,
-                        end: Date.now(),
-                    },
-                }),
-            );
-        });
-    };
+export const init = (loadedState: State) => (dispatch: Dispatch, getState: GetState) => {
+    // if instanceId does not exist yet (was not loaded from storage), create a new one
+    const instanceId = loadedState.instanceId || getAnalyticsRandomId();
+    // always create new session id
+    const sessionId = getAnalyticsRandomId();
+    // if user made choice, keep it, otherwise set it to true by default just to prefill the confirmation toggle
+    const confirmed = !!loadedState.confirmed;
+    const enabled = confirmed ? !!loadedState.enabled : true;
+    // set application state
+    dispatch({
+        type: ANALYTICS.INIT,
+        payload: {
+            instanceId,
+            sessionId,
+            sessionStart: Date.now(),
+            enabled,
+            confirmed,
+        },
+    });
+    // allow sentry reporting only if user already confirmed enabling of analytics
+    const userAllowedAnalytics = confirmed && enabled;
+    allowSentryReport(userAllowedAnalytics);
+    // set sentry user id same as session id for analytics
+    setSentryUser(instanceId);
+    // if analytics was initiated as enabled, continue with setting up side effects
+    if (!getState().analytics.enabled) return;
+    // register event listeners to report end of session
+    setOnBeforeUnloadListener(() => {
+        dispatch(
+            report({
+                type: 'session-end',
+                payload: {
+                    start: getState().analytics.sessionStart!,
+                    end: Date.now(),
+                },
+            }),
+        );
+    });
+};
 
 export const enable = (): AnalyticsAction => ({
     type: ANALYTICS.ENABLE,

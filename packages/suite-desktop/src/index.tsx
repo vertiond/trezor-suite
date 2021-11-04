@@ -7,7 +7,7 @@ import { store } from '@suite/reducers/store';
 import { isDev } from '@suite-utils/build';
 import { SENTRY_CONFIG } from '@suite-config';
 
-import * as Sentry from '@sentry/browser';
+import { initSentry } from '@suite-utils/sentry';
 import Metadata from '@suite-components/Metadata';
 import Preloader from '@suite-components/Preloader';
 import ToastContainer from '@suite-components/ToastContainer';
@@ -20,7 +20,6 @@ import OnlineStatus from '@suite-support/OnlineStatus';
 import ErrorBoundary from '@suite-support/ErrorBoundary';
 import RouterHandler from '@suite-support/Router';
 import ThemeProvider from '@suite-support/ThemeProvider';
-import DesktopTitlebarWrapper from './support/DesktopTitlebar';
 import history from '@suite/support/history';
 import AppRouter from './support/Router';
 import DesktopUpdater from './support/DesktopUpdater';
@@ -30,10 +29,7 @@ const Index = () => {
 
     useEffect(() => {
         if (!isDev) {
-            Sentry.init(SENTRY_CONFIG);
-            Sentry.configureScope(scope => {
-                scope.setTag('version', process.env.VERSION || 'undefined');
-            });
+            initSentry(SENTRY_CONFIG);
         }
         window.desktopApi!.clientReady();
     }, []);
@@ -42,24 +38,22 @@ const Index = () => {
         <ReduxProvider store={store}>
             <ThemeProvider>
                 <RouterProvider history={history}>
-                    <DesktopTitlebarWrapper>
-                        <ErrorBoundary>
-                            <Autodetect />
-                            <Resize />
-                            <Tor />
-                            <Protocol />
-                            <OnlineStatus />
-                            <RouterHandler />
-                            <IntlProvider>
-                                <DesktopUpdater setIsUpdateVisible={setIsUpdateVisible} />
-                                <Metadata />
-                                <ToastContainer />
-                                <Preloader hideModals={isUpdateVisible}>
-                                    <AppRouter />
-                                </Preloader>
-                            </IntlProvider>
-                        </ErrorBoundary>
-                    </DesktopTitlebarWrapper>
+                    <ErrorBoundary>
+                        <Autodetect />
+                        <Resize />
+                        <Tor />
+                        <Protocol />
+                        <OnlineStatus />
+                        <RouterHandler />
+                        <IntlProvider>
+                            <DesktopUpdater setIsUpdateVisible={setIsUpdateVisible} />
+                            <Metadata />
+                            <ToastContainer />
+                            <Preloader hideModals={isUpdateVisible}>
+                                <AppRouter />
+                            </Preloader>
+                        </IntlProvider>
+                    </ErrorBoundary>
                 </RouterProvider>
             </ThemeProvider>
         </ReduxProvider>

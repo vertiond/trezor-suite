@@ -29,6 +29,7 @@ export const FONT_SIZE = {
     BUTTON: '14px',
     H1: '36px',
     H2: '24px',
+    H3: '20px',
 } as const;
 
 export const NEUE_FONT_SIZE = {
@@ -169,12 +170,6 @@ export const ICONS: IconType[] = [
     'OS_MAC',
     'OS_WINDOWS',
     'TRADE',
-    'WINDOW_CLOSE',
-    'WINDOW_MINIMIZE',
-    'WINDOW_MAXIMIZE',
-    'WINDOW_MAXIMIZE_MAC',
-    'WINDOW_RESTORE',
-    'WINDOW_RESTORE_MAC',
     'TOR',
     'RECOVER',
     'NEW',

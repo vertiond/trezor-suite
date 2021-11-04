@@ -1,6 +1,8 @@
 import Store from 'electron-store';
 import { getInitialWindowSize } from './screen';
 
+import { SuiteThemeVariantOptions } from '@suite-types';
+
 // creates config.json inside appData folder https://electronjs.org/docs/api/app#appgetpathname
 const store = new Store();
 
@@ -19,10 +21,17 @@ export const setWinBounds = (winBounds: WinBounds): void => {
 };
 
 export const getUpdateSettings = (): UpdateSettings =>
-    store.get('updateSettings', { skipVersion: '' }) as UpdateSettings;
+    store.get('updateSettings') as UpdateSettings;
 
 export const setUpdateSettings = (updateSettings: UpdateSettings): void => {
     store.set('updateSettings', updateSettings);
+};
+
+export const getThemeSettings = (): SuiteThemeVariantOptions =>
+    store.get('themeSettings', 'system') as SuiteThemeVariantOptions;
+
+export const setThemeSettings = (themeSettings: SuiteThemeVariantOptions): void => {
+    store.set('themeSettings', themeSettings);
 };
 
 export const getTorSettings = (): TorSettings =>

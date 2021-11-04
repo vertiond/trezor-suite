@@ -3,7 +3,7 @@
 import { MiddlewareAPI } from 'redux';
 import { TRANSPORT, DEVICE } from 'trezor-connect';
 import { SUITE, ROUTER, ANALYTICS } from '@suite-actions/constants';
-import { ACCOUNT } from '@wallet-actions/constants';
+import { DISCOVERY } from '@wallet-actions/constants';
 
 import { AppState, Action, Dispatch } from '@suite-types';
 import * as analyticsActions from '@suite-actions/analyticsActions';
@@ -21,7 +21,7 @@ import {
     getPlatformLanguages,
 } from '@suite-utils/env';
 import { isBitcoinOnly, getPhysicalDeviceCount } from '@suite-utils/device';
-import { setSentryUser, unsetSentryUser } from '@suite/utils/suite/sentry';
+import { allowSentryReport } from '@suite/utils/suite/sentry';
 
 const reportSuiteReadyAction = (state: AppState) =>
     analyticsActions.report({
@@ -117,6 +117,23 @@ const analytics =
                 }
                 break;
             }
+            case DISCOVERY.COMPLETE: {
+                const accountsStatus = state.wallet.accounts
+                    .filter(account => account.history.total + (account.history.unconfirmed || 0))
+                    .reduce((acc: { [key: string]: number }, obj) => {
+                        const id = `${obj.symbol}_${obj.accountType}`;
+                        acc[id] = (acc[id] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                api.dispatch(
+                    analyticsActions.report({
+                        type: 'accounts/status',
+                        payload: { ...accountsStatus },
+                    }),
+                );
+                break;
+            }
             case DEVICE.DISCONNECT:
                 api.dispatch(analyticsActions.report({ type: 'device-disconnect' }));
                 break;
@@ -153,21 +170,6 @@ const analytics =
                 }
 
                 break;
-            case ACCOUNT.CREATE: {
-                const { tokens } = action.payload;
-                api.dispatch(
-                    analyticsActions.report({
-                        type: 'account-create',
-                        payload: {
-                            type: action.payload.accountType,
-                            symbol: action.payload.symbol,
-                            path: action.payload.path,
-                            tokensCount: tokens ? tokens.length : 0,
-                        },
-                    }),
-                );
-                break;
-            }
             case ROUTER.LOCATION_CHANGE:
                 api.dispatch(
                     analyticsActions.report({
@@ -181,13 +183,11 @@ const analytics =
                 break;
             case ANALYTICS.ENABLE:
                 api.dispatch(analyticsActions.report({ type: 'analytics/enable' }));
-                if (state.analytics.instanceId) {
-                    setSentryUser(state.analytics.instanceId);
-                }
+                allowSentryReport(true);
                 break;
             case ANALYTICS.DISPOSE:
                 api.dispatch(analyticsActions.report({ type: 'analytics/dispose' }, true));
-                unsetSentryUser();
+                allowSentryReport(false);
                 break;
             case SUITE.AUTH_DEVICE:
                 api.dispatch(
