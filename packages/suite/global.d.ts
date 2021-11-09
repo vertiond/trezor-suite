@@ -1,5 +1,11 @@
 type SuiteThemeVariant = 'light' | 'dark' | 'custom';
 
+type SocketOptions = {
+    timeout?: number;
+    keepAlive?: boolean;
+    torAddress?: string;
+};
+
 // Interface for exposed Electron API (ipcRenderer)
 interface DesktopApi {
     on: (channel: string, func: (...args: any[]) => any) => void;
@@ -38,6 +44,10 @@ interface DesktopApi {
     clearStore: () => void;
     // Udev rules
     installUdevRules: () => Promise<{ success: true } | { success: false; error: string }>;
+    // Electrum server
+    electrumConnect: (server: string, options?: SocketOptions) => Promise<boolean>;
+    electrumClose: () => Promise<void>;
+    electrumSend: (msg: string) => void;
 }
 
 interface Window {

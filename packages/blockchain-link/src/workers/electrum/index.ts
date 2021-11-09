@@ -4,21 +4,29 @@ import type { Message, Response } from '../../types';
 import * as M from './methods';
 import * as L from './listeners';
 import WorkerCommon from '../common';
-import { createSocket } from './sockets';
 import { ElectrumClient } from './client/electrum';
 import { CachingElectrumClient } from './client/caching';
+import { getContext } from '../context';
+import { ProxySocket } from './sockets/proxy';
 
-declare function postMessage(data: Response): void;
+const { ctx, common, state, BlockchainLinkModule: ElectrumModule } = getContext({});
 
-const common = new WorkerCommon(postMessage);
 const electrumClient = new CachingElectrumClient();
 const blockListener = L.blockListener(electrumClient, common);
 const txListener = L.txListener(electrumClient, common);
 
+const chooseServer = (server: string[]): string => {
+    if (!server || !Array.isArray(server) || server.length < 1) {
+        throw new CustomError('connect', 'Endpoint not set');
+    }
+    return server[0];
+};
+
 const connect = async () => {
     if (!electrumClient.connected()) {
         const { server, debug, timeout, keepAlive } = common.getSettings();
-        const { url, socket } = createSocket(server, { timeout, keepAlive });
+        const url = chooseServer(server);
+        const socket = new ProxySocket(url, { timeout, keepAlive });
         await electrumClient.connect(socket, {
             url,
             debug,
@@ -26,6 +34,10 @@ const connect = async () => {
                 name: 'blockchain-link',
                 protocolVersion: '1.4',
             },
+        });
+        common.response({
+            id: -1,
+            type: RESPONSES.CONNECTED,
         });
     }
     return electrumClient;
@@ -38,7 +50,7 @@ const disconnect = ({ id }: { id: number }) => {
     common.response({ id, type: RESPONSES.DISCONNECTED, payload: true });
 };
 
-const cleanup = () => {};
+const cleanup = () => {}; // TODO
 
 const call = <M extends Message & { payload: any }, R extends Response>(
     method: (
@@ -55,7 +67,7 @@ const call = <M extends Message & { payload: any }, R extends Response>(
         .catch(error => common.errorHandler({ id: data.id, error }));
 
 // WebWorker message handling
-export const onmessage = (event: { data: Message }) => {
+ctx.onmessage = (event: { data: Message }) => {
     if (!event.data) return;
     const { data } = event;
     const { id, type } = data;
@@ -167,3 +179,5 @@ export const onmessage = (event: { data: Message }) => {
 
 // Handshake to host
 common.handshake();
+
+export default ElectrumModule;
