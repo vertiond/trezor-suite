@@ -141,6 +141,7 @@ export const reconnect = (coin: Network['symbol']) => (_dispatch: Dispatch) =>
 // called from WalletMiddleware after ADD/REMOVE_BLOCKBOOK_URL action
 // or from blockchainActions.init
 export const setCustomBackend = (symbol?: string) => (_: Dispatch, getState: GetState) => {
+    if (localStorage.getItem('electrum')) return;
     const { blockbookUrls } = getState().wallet.settings;
     // collect unique coins
     const coins = symbol
@@ -165,6 +166,7 @@ export const setCustomBackend = (symbol?: string) => (_: Dispatch, getState: Get
 };
 
 export const clearCustomBackend = (symbol: string | string[]) => () => {
+    if (localStorage.getItem('electrum')) return;
     const coins = typeof symbol === 'string' ? [symbol] : [...new Set(symbol)];
     const promises = coins.map(coin =>
         TrezorConnect.blockchainSetCustomBackend({

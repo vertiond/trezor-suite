@@ -77,6 +77,23 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
             },
         });
 
+        /* TODO better mechanism for enforcing specific backend needed */
+        const electrum = new URLSearchParams(window.location.search).get('electrum');
+        console.log('SETTING ELECTRUM', electrum);
+        if (electrum) {
+            localStorage.setItem('electrum', electrum);
+            await TrezorConnect.blockchainSetCustomBackend({
+                coin: 'btc',
+                blockchainLink: {
+                    type: 'electrum',
+                    url: [electrum],
+                },
+            });
+        } else {
+            localStorage.removeItem('electrum');
+        }
+        /* */
+
         dispatch({
             type: SUITE.CONNECT_INITIALIZED,
         });

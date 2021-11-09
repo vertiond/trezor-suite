@@ -1,0 +1,38 @@
+diff --git a/node_modules/trezor-connect/lib/backend/BlockchainLink.js b/node_modules/trezor-connect/lib/backend/BlockchainLink.js
+index 42de861..98e0dde 100644
+--- a/node_modules/trezor-connect/lib/backend/BlockchainLink.js
++++ b/node_modules/trezor-connect/lib/backend/BlockchainLink.js
+@@ -31,6 +31,9 @@ var getWorker = function getWorker(type) {
+     case 'ripple':
+       return _workers.RippleWorker;
+ 
++    case 'electrum':
++      return _workers.ElectrumWorker;
++
+     default:
+       return null;
+   }
+@@ -58,7 +61,7 @@ var Blockchain = /*#__PURE__*/function () {
+       name: this.coinInfo.shortcut,
+       worker: worker,
+       server: settings.url,
+-      debug: false
++      debug: true
+     });
+   }
+ 
+diff --git a/node_modules/trezor-connect/lib/env/browser/workers.js b/node_modules/trezor-connect/lib/env/browser/workers.js
+index 914ddd8..6577b17 100644
+--- a/node_modules/trezor-connect/lib/env/browser/workers.js
++++ b/node_modules/trezor-connect/lib/env/browser/workers.js
+@@ -15,6 +15,10 @@ var _ripple = _interopRequireDefault(require("@trezor/blockchain-link/lib/worker
+ 
+ exports.RippleWorker = _ripple["default"];
+ 
++var _electrum = _interopRequireDefault(require("@trezor/blockchain-link/lib/workers/electrum"));
++
++exports.ElectrumWorker = _electrum["default"];
++
+ var _trezorLink = _interopRequireDefault(require("trezor-link"));
+ 
+ var WebUsbPlugin = function WebUsbPlugin() {
