@@ -61,17 +61,19 @@ export const transformUtxos = (utxos: Account['utxo']): types.Utxo[] => {
             res => res.txHash === utxo.txid && res.outputIndex === utxo.vout,
         );
 
-        if (!foundItem) {
-            // path: utxo.path,
-            result.push({
+        if (utxo.cardanoSpecific) {
+            if (!foundItem) {
                 // path: utxo.path,
-                address: utxo.address,
-                txHash: utxo.txid,
-                outputIndex: utxo.vout,
-                amount: [{ quantity: utxo.amount, unit: utxo.cardanoUnit }],
-            });
-        } else {
-            foundItem.amount.push({ quantity: utxo.amount, unit: utxo.cardanoUnit });
+                result.push({
+                    // path: utxo.path,
+                    address: utxo.address,
+                    txHash: utxo.txid,
+                    outputIndex: utxo.vout,
+                    amount: [{ quantity: utxo.amount, unit: utxo.cardanoSpecific.unit }],
+                });
+            } else {
+                foundItem.amount.push({ quantity: utxo.amount, unit: utxo.cardanoSpecific.unit });
+            }
         }
     });
 
