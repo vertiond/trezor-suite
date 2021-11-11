@@ -1,16 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import { SuiteThemeVariant } from '@suite-types';
+import type { SuiteThemeVariant } from '@suite-types';
 
 // todo: would be great to have these channels strongly typed. for example this is nice reading: https://blog.logrocket.com/electron-ipc-response-request-architecture-with-typescript/
 const validChannels = [
-    // app
-    'app/restart',
-    'app/focus',
-
-    // bridge
-    'bridge/start',
-
     // oauth
     'oauth/response',
 
@@ -25,36 +18,16 @@ const validChannels = [
     'update/new-version-first-run',
 
     // invity
-    'buy-receiver',
     'spend/message',
-
-    // window
-    'window/is-maximized',
-    'window/is-active',
-
-    // theme
-    'theme/change',
-    'theme/system',
 
     // tor
     'tor/status',
-
-    // udev
-    'udev/install',
 
     // custom protocol
     'protocol/open',
 ];
 
 contextBridge.exposeInMainWorld('desktopApi', {
-    /**
-     * @deprecated Use dedicated methods instead of send
-     */
-    send: (channel: string, data?: any) => {
-        if (validChannels.includes(channel)) {
-            ipcRenderer.send(channel, data);
-        }
-    },
     on: (channel: string, func: (...args: any[]) => any) => {
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (_, ...args) => func(...args));
@@ -70,23 +43,20 @@ contextBridge.exposeInMainWorld('desktopApi', {
             ipcRenderer.removeAllListeners(channel);
         }
     },
-    // Updater
+
+    // App
+    appRestart: () => ipcRenderer.send('app/restart'),
+    appFocus: () => ipcRenderer.send('app/focus'),
+
+    // Auto-updater
     checkForUpdates: (isManual?: boolean) => ipcRenderer.send('update/check', isManual),
     downloadUpdate: () => ipcRenderer.send('update/download'),
     installUpdate: () => ipcRenderer.send('update/install'),
     cancelUpdate: () => ipcRenderer.send('update/cancel'),
 
-    // Window controls
-    windowClose: () => ipcRenderer.send('window/close'),
-    windowFocus: () => ipcRenderer.send('window/focus'),
-    windowMinimize: () => ipcRenderer.send('window/minimize'),
-    windowMaximize: () => ipcRenderer.send('window/maximize'),
-    windowUnmaximize: () => ipcRenderer.send('window/unmaximize'),
-    windowExpand: () => ipcRenderer.send('window/expand'),
-
     // Theme
-    themeChange: (theme: SuiteThemeVariant) => ipcRenderer.invoke('theme/change', theme),
-    themeSystem: () => ipcRenderer.invoke('theme/system'),
+    themeChange: (theme: SuiteThemeVariant) => ipcRenderer.send('theme/change', theme),
+    themeSystem: () => ipcRenderer.send('theme/system'),
 
     // Client
     clientReady: () => ipcRenderer.send('client/ready'),

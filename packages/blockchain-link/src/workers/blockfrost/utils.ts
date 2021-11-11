@@ -28,7 +28,9 @@ export const transformUtxos = (utxos: BlockfrostUtxos[]): Utxo[] => {
                 amount: u.quantity,
                 vout: utxo.utxoData.output_index,
                 path: utxo.path,
-                cardanoUnit: u.unit,
+                cardanoSpecific: {
+                    unit: u.unit,
+                },
             });
         })
     );
@@ -42,6 +44,29 @@ const hexToString = (input: string): string => {
     }
 
     return str;
+};
+
+export const getSubtype = (tx: BlockfrostTransaction) => {
+    const withdrawal = tx.txData.withdrawal_count > 0;
+    if (withdrawal) {
+        return 'withdrawal';
+    }
+
+    const registrations = tx.txData.stake_cert_count;
+    const delegations = tx.txData.delegation_count;
+    if (registrations === 0 && delegations === 0) return null;
+
+    if (delegations > 0) {
+        // transaction could both register staking address and delegate stake at once. In that case we treat it as "delegation"
+        return 'stake_delegation';
+    }
+    if (registrations > 0) {
+        if (new BigNumber(tx.txData.deposit).gt(0)) {
+            return 'stake_registration';
+        }
+        return 'stake_deregistration';
+    }
+    return null;
 };
 
 export const parseAsset = (hex: string): ParseAssetResult => {
@@ -121,15 +146,16 @@ export const filterTokenTransfers = (
                     amount = sumVinVout(incomingForOutput, '0');
                 }
 
-                if (amount === '0') return null;
+                // fingerprint is always defined on tokens
+                if (amount === '0' || !asset.fingerprint) return null;
 
                 const { assetName } = parseAsset(token);
                 transfers.push({
                     type,
-                    name: asset.fingerprint!,
-                    symbol: assetName || asset.fingerprint!, // fingerprint is always defined on tokens
-                    address: asset.fingerprint!,
-                    decimals: 0,
+                    name: asset.fingerprint,
+                    symbol: assetName || asset.fingerprint,
+                    address: asset.fingerprint,
+                    decimals: asset.decimals,
                     amount: amount.toString(),
                     from:
                         type === 'sent' || type === 'self'
@@ -142,29 +168,6 @@ export const filterTokenTransfers = (
     });
 
     return transfers.filter(t => !!t) as TokenTransfer[];
-};
-
-const getSubtype = (tx: BlockfrostTransaction) => {
-    const withdrawal = tx.txData.withdrawal_count > 0;
-    if (withdrawal) {
-        return 'withdrawal';
-    }
-
-    const registrations = tx.txData.stake_cert_count;
-    const delegations = tx.txData.delegation_count;
-    if (registrations === 0 && delegations === 0) return null;
-
-    if (delegations > 0) {
-        // transaction could both register staking address and delegate stake at once. In that case we treat it as "delegation"
-        return 'stake_delegation';
-    }
-    if (registrations > 0) {
-        if (new BigNumber(tx.txData.deposit).gt(0)) {
-            return 'stake_registration';
-        }
-        return 'stake_deregistration';
-    }
-    return null;
 };
 
 export const transformTransaction = (
@@ -237,9 +240,9 @@ export const transformTransaction = (
     return {
         type,
         txid: blockfrostTxData.txHash,
-        blockTime: blockfrostTxData.blockInfo.time,
-        blockHeight: blockfrostTxData.blockInfo.height || undefined,
-        blockHash: blockfrostTxData.blockInfo.hash,
+        blockTime: blockfrostTxData.txData.block_time,
+        blockHeight: blockfrostTxData.txData.block_height || undefined,
+        blockHash: blockfrostTxData.txData.block,
         amount,
         fee,
         totalSpent,

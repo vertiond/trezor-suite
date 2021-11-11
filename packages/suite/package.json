@@ -1,6 +1,6 @@
 {
     "name": "@trezor/suite",
-    "suiteVersion": "21.11.0",
+    "suiteVersion": "21.12.0",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -63,7 +63,7 @@
         "semver": "^7.3.5",
         "styled-components": "5.1.1",
         "trezor-address-validator": "0.4.1",
-        "trezor-connect": "8.2.2-beta.1",
+        "trezor-connect": "8.2.2-beta.4",
         "ua-parser-js": "^0.7.28",
         "uuid": "^8.3.2",
         "web3-utils": "^1.2.6",

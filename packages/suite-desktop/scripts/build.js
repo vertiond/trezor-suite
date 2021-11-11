@@ -4,6 +4,7 @@ const child_process = require('child_process');
 const glob = require('glob');
 const { build } = require('esbuild');
 const pkg = require('../package.json');
+const { suiteVersion } = require('../../suite/package.json');
 
 const { NODE_ENV, USE_MOCKS } = process.env;
 
@@ -47,7 +48,7 @@ build({
     entryPoints: ['app.ts', 'preload.ts', ...modules].map(f => path.join(electronSource, f)),
     platform: 'node',
     bundle: true,
-    target: 'node14.17.0', // Electron 14
+    target: 'node16.5.0', // Electron 15
     external: Object.keys({
         ...pkg.dependencies,
         ...pkg.devDependencies,
@@ -62,6 +63,7 @@ build({
         'process.env.APP_PUBKEY': JSON.stringify(appKey),
         'process.env.PROTOCOLS': JSON.stringify(pkg.build.protocols.schemes),
         'process.env.PKGNAME': JSON.stringify(pkg.name),
+        'process.env.VERSION': JSON.stringify(suiteVersion),
     },
     inject: [path.join(__dirname, 'build-inject.js')],
     plugins: useMocks ? [mockPlugin] : [],

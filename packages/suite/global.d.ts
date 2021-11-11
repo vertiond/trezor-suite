@@ -1,23 +1,16 @@
 // Interface for exposed Electron API (ipcRenderer)
 export interface DesktopApi {
-    send: (channel: string, data?: any) => void;
     on: (channel: string, func: (...args: any[]) => any) => void;
     once: (channel: string, func: (...args: any[]) => any) => void;
     removeAllListeners: (channel: string) => void;
-    // App Ready
-    ready: () => void;
-    // Auto Updater
+    // App
+    appRestart: () => void;
+    appFocus: () => void;
+    // Auto-updater
     checkForUpdates: (isManual?: boolean) => void;
     downloadUpdate: () => void;
     installUpdate: () => void;
     cancelUpdate: () => void;
-    // Window controls
-    windowClose: () => void;
-    windowMinimize: () => void;
-    windowFocus: () => void;
-    windowMaximize: () => void;
-    windowUnmaximize: () => void;
-    windowExpand: () => void;
     // Theme
     themeChange: (theme: SuiteThemeVariant) => void;
     themeSystem: () => void;
