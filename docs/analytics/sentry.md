@@ -8,7 +8,7 @@ Trezor Suite uses [Sentry.io](https://sentry.io/) to track errors and monitor ap
 
 ### General data
 
-Browser (User Agent), System, Suite version, session id shared with analytics.
+Browser (User Agent), System, Suite version, instance id shared with analytics.
 
 ### Breadcrumbs
 
