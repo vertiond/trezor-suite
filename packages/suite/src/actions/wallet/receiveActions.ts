@@ -102,6 +102,7 @@ export const showAddress =
                 break;
             case 'cardano':
                 response = await TrezorConnect.cardanoGetAddress({
+                    device,
                     useEmptyPassphrase: device.useEmptyPassphrase,
                     addressParameters: {
                         stakingPath: getStakingPath(account.accountType, account.index),
