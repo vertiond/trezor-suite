@@ -24,7 +24,10 @@ export const initialState: State = {
     enabledNetworks: ['btc'],
     lastUsedFeeLevel: {},
     blockbookUrls: [],
-    blockfrostCardanoDerivationType: { value: 'icarus', label: 'Icarus' },
+    blockfrostCardanoDerivationType: {
+        label: 'Icarus',
+        value: 1,
+    },
 };
 
 const settingsReducer = (state: State = initialState, action: Action): State =>

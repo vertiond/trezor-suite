@@ -62,9 +62,9 @@ const CardanoDerivationSettings = ({
                     noTopLabel
                     value={blockfrostCardanoDerivationType}
                     options={[
-                        { label: 'Icarus', value: 'icarus' },
-                        { label: 'Icarus Trezor', value: 'icarus-trezor' },
-                        // { label: 'Ledger', value: 'ledger' },
+                        { label: 'Icarus', value: 1 },
+                        { label: 'Icarus Trezor', value: 2 },
+                        // { label: 'Ledger', value: 0 },
                     ]}
                     onChange={(option: DerivationType) => {
                         setBlockfrostCardanoDerivationType(option);

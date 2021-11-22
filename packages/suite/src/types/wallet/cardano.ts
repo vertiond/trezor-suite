@@ -8,5 +8,8 @@ export interface CardanoMergedUtxo extends Omit<AccountUtxo, 'amount'> {
 }
 
 export type DerivationType =
-    | { value: 'icarus'; label: 'Icarus' }
-    | { value: 'icarus-trezor'; label: 'Icarus Trezor' };
+    | {
+          value: 1;
+          label: 'Icarus';
+      }
+    | { value: 2; label: 'Icarus Trezor' };

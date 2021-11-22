@@ -47,6 +47,7 @@ export const showAddress =
     (path: string, address: string) => async (dispatch: Dispatch, getState: GetState) => {
         const { device } = getState().suite;
         const { account } = getState().wallet.selectedAccount;
+        const { value } = getState().wallet.settings.blockfrostCardanoDerivationType;
         if (!device || !account) return;
 
         const modalPayload = {
@@ -101,6 +102,7 @@ export const showAddress =
                 response = await TrezorConnect.ethereumGetAddress(params);
                 break;
             case 'cardano':
+                // @ts-ignore
                 response = await TrezorConnect.cardanoGetAddress({
                     device,
                     useEmptyPassphrase: device.useEmptyPassphrase,
@@ -111,6 +113,7 @@ export const showAddress =
                     },
                     protocolMagic: getProtocolMagic(account.symbol),
                     networkId: getNetworkId(account.symbol),
+                    derivationType: value,
                 });
                 break;
             case 'ripple':

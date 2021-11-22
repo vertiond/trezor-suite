@@ -287,6 +287,7 @@ export const start =
     async (dispatch: Dispatch, getState: GetState): Promise<void> => {
         const { device } = getState().suite;
         const { metadata } = getState();
+        const { value } = getState().wallet.settings.blockfrostCardanoDerivationType;
 
         const discovery = dispatch(getDiscoveryForDevice());
         if (!device) {
@@ -374,12 +375,14 @@ export const start =
         };
 
         TrezorConnect.on<AccountInfo>(UI.BUNDLE_PROGRESS, onBundleProgress);
+        // @ts-ignore
         const result = await TrezorConnect.getAccountInfo({
             device,
             bundle,
             keepSession: true,
             skipFinalReload: true,
             useEmptyPassphrase: device.useEmptyPassphrase,
+            derivationType: value,
         });
 
         TrezorConnect.off(UI.BUNDLE_PROGRESS, onBundleProgress);
