@@ -11,6 +11,7 @@ import { useActions, useSelector } from '@suite-hooks';
 
 // Sub components
 import CustomBlockbookUrls from './components/CustomBlockbookUrls';
+import CardanoDerivationSettings from './components/CardanoDerivationSettings';
 import ConnectionInfo from './components/ConnectionInfo';
 // import CustomExplorerUrl from './components/CustomExplorerUrl';
 // import AccountUnits from './components/AccountUnits';
@@ -33,18 +34,22 @@ interface Props {
 }
 
 const AdvancedCoinSettings = ({ coin, onCancel }: Props) => {
-    const { addBlockbookUrl, removeBlockbookUrl } = useActions({
+    const { addBlockbookUrl, removeBlockbookUrl, setBlockfrostCardanoDerivationType } = useActions({
         addBlockbookUrl: walletSettingsActions.addBlockbookUrl,
         removeBlockbookUrl: walletSettingsActions.removeBlockbookUrl,
+        setBlockfrostCardanoDerivationType:
+            walletSettingsActions.setBlockfrostCardanoDerivationType,
     });
-    const { blockbookUrls, blockchain } = useSelector(state => ({
+    const { blockbookUrls, blockchain, blockfrostCardanoDerivationType } = useSelector(state => ({
         blockbookUrls: state.wallet.settings.blockbookUrls,
         blockchain: state.wallet.blockchain,
+        blockfrostCardanoDerivationType: state.wallet.settings.blockfrostCardanoDerivationType,
     }));
 
     const network = NETWORKS.find(n => n.symbol === coin);
     const [coinInfo, setCoinInfo] = useState<CoinInfo>();
     const isBlockbook = coinInfo?.blockchainLink?.type === 'blockbook';
+    const isBlockfrost = coinInfo?.blockchainLink?.type === 'blockfrost';
 
     useEffect(() => {
         TrezorConnect.getCoinInfo({ coin }).then(result => {
@@ -75,7 +80,6 @@ const AdvancedCoinSettings = ({ coin, onCancel }: Props) => {
                     <Loader size={32} />
                 </LoaderWrapper>
             )}
-
             {/* <AccountUnits /> */}
             {coinInfo && isBlockbook && (
                 <Section>
@@ -85,6 +89,14 @@ const AdvancedCoinSettings = ({ coin, onCancel }: Props) => {
                         blockbookUrls={blockbookUrls}
                         addBlockbookUrl={addBlockbookUrl}
                         removeBlockbookUrl={removeBlockbookUrl}
+                    />
+                </Section>
+            )}
+            {coinInfo && isBlockfrost && (
+                <Section>
+                    <CardanoDerivationSettings
+                        setBlockfrostCardanoDerivationType={setBlockfrostCardanoDerivationType}
+                        blockfrostCardanoDerivationType={blockfrostCardanoDerivationType}
                     />
                 </Section>
             )}

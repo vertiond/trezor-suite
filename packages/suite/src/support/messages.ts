@@ -6733,4 +6733,12 @@ export default defineMessages({
         id: 'TR_STAKE_DEREGISTERED',
         defaultMessage: 'Deregistration of a stake address',
     },
+    SETTINGS_ADV_CARDANO_DERIVATION_TITLE: {
+        id: 'SETTINGS_ADV_CARDANO_DERIVATION_TITLE',
+        defaultMessage: 'Cardano derivation type',
+    },
+    SETTINGS_ADV_CARDANO_DERIVATION_DESCRIPTION: {
+        id: 'SETTINGS_ADV_CARDANO_DERIVATION_DESCRIPTION',
+        defaultMessage: 'Cardano derivation type description',
+    },
 });

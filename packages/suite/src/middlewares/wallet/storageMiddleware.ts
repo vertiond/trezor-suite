@@ -120,6 +120,7 @@ const storageMiddleware =
             case WALLET_SETTINGS.SET_LOCAL_CURRENCY:
             case WALLET_SETTINGS.SET_LAST_USED_FEE_LEVEL:
             case WALLET_SETTINGS.SET_BLOCKBOOK_URLS:
+            case WALLET_SETTINGS.SET_BLOCKFROST_CARDANO_DERIVATION_TYPE:
             case WALLET_SETTINGS.REMOVE_BLOCKBOOK_URL:
             case WALLET_SETTINGS.CLEAR_TOR_BLOCKBOOK_URLS:
                 api.dispatch(storageActions.saveWalletSettings());
