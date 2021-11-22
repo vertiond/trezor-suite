@@ -5,7 +5,9 @@
     "scripts": {
         "test:components-storybook": "npx cypress run --project ./projects/components-storybook",
         "test:components-storybook:local": "CYPRESS_baseUrl='http://192.168.88.252:9001' npx cypress open --project ./projects/components-storybook",
-        "lint": "eslint '**/*{.ts,.tsx}'"
+        "lint": "eslint '**/*{.ts,.tsx}'",
+        "test:desktop": "xvfb-maybe -- playwright test ./projects/suite-desktop/tests/example.spec.js"
+
     },
     "dependencies": {
         "cypress": "8.3.0",
@@ -21,6 +23,9 @@
         "chrome-remote-interface": "^0.31.0",
         "shelljs": "^0.8.4",
         "wait-on": "^5.3.0",
-        "ws": "^7.5.5"
+        "ws": "^7.5.5",
+        "@playwright/test": "^1.16.3",
+        "playwright": "^1.16.3",
+        "xvfb-maybe": "^0.2.1"
     }
 }
