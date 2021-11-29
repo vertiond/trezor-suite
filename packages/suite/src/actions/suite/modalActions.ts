@@ -3,11 +3,13 @@ import { MODAL, SUITE } from '@suite-actions/constants';
 import { Route, Dispatch, GetState, TrezorDevice } from '@suite-types';
 import { Account, WalletAccountTransaction } from '@wallet-types';
 import { createDeferred, Deferred, DeferredResponse } from '@suite-utils/deferred';
+import type { getProtocolInfo } from '@suite-utils/parseUri';
 
 export type UserContextPayload =
     | {
           type: 'qr-reader';
-          decision: Deferred<{ address: string; amount?: string }>;
+          decision: Deferred<ReturnType<typeof getProtocolInfo>>;
+          allowPaste?: boolean;
       }
     | {
           type: 'unverified-address';

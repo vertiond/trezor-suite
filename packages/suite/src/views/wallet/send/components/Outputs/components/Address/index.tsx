@@ -15,6 +15,7 @@ import {
 } from '@wallet-utils/validation';
 import { getInputState } from '@wallet-utils/sendFormUtils';
 import { MAX_LENGTH } from '@suite-constants/inputs';
+import { PROTOCOL_SCHEME } from '@suite-constants/protocol';
 import ConvertAddress from './components/Convert';
 import { Output } from '@wallet-types/sendForm';
 
@@ -92,7 +93,7 @@ const Address = ({ output, outputId, outputsCount }: Props) => {
                     icon="QR"
                     onClick={async () => {
                         const result = await openQrModal();
-                        if (result) {
+                        if (result?.scheme === PROTOCOL_SCHEME.BITCOIN) {
                             setValue(inputName, result.address, { shouldValidate: true });
                             if (result.amount) {
                                 setValue(`outputs[${outputId}].amount`, result.amount, {
