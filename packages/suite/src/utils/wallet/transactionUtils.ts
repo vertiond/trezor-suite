@@ -62,9 +62,13 @@ export const sumTransactions = (transactions: WalletAccountTransaction[]) => {
     transactions.forEach(tx => {
         if (tx.type === 'sent' || tx.type === 'self') {
             totalAmount = totalAmount.minus(tx.amount);
+            totalAmount = totalAmount.minus(tx.fee);
         }
         if (tx.type === 'recv') {
             totalAmount = totalAmount.plus(tx.amount);
+        }
+        if (tx.type === 'failed') {
+            totalAmount = totalAmount.minus(tx.fee);
         }
     });
     return totalAmount;
@@ -80,10 +84,18 @@ export const sumTransactionsFiat = (
             totalAmount = totalAmount.minus(
                 toFiatCurrency(tx.amount, fiatCurrency, tx.rates, -1) ?? 0,
             );
+            totalAmount = totalAmount.minus(
+                toFiatCurrency(tx.fee, fiatCurrency, tx.rates, -1) ?? 0,
+            );
         }
         if (tx.type === 'recv') {
             totalAmount = totalAmount.plus(
                 toFiatCurrency(tx.amount, fiatCurrency, tx.rates, -1) ?? 0,
+            );
+        }
+        if (tx.type === 'failed') {
+            totalAmount = totalAmount.minus(
+                toFiatCurrency(tx.fee, fiatCurrency, tx.rates, -1) ?? 0,
             );
         }
     });
@@ -259,7 +271,9 @@ export const analyzeTransactions = (
     });
 };
 
-export const getTxOperation = (tx: WalletAccountTransaction) => {
+// getTxOperation is used with types WalletAccountTransaction and ArrayElement<WalletAccountTransaction['tokens']
+// the only interesting field is 'type', which has compatible string literal union in both types
+export const getTxOperation = (tx: { type: WalletAccountTransaction['type'] }) => {
     if (tx.type === 'sent' || tx.type === 'self' || tx.type === 'failed') {
         return 'neg';
     }

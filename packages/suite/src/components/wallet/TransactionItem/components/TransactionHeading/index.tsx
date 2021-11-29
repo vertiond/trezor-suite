@@ -86,7 +86,9 @@ const TransactionHeading = ({
             !isSingleTokenTransaction || transaction.type === 'self'
                 ? getTargetAmount(target, transaction)
                 : transfer.amount;
-        const operation = getTxOperation(transaction);
+        const operation = !isTokenTransaction
+            ? getTxOperation(transaction)
+            : getTxOperation(transfer);
         amount = (
             <CryptoAmount>
                 {targetAmount && (

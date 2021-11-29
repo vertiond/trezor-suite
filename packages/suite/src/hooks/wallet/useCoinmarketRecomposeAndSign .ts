@@ -27,6 +27,9 @@ export const useCoinmarketRecomposeAndSign = () => {
             address: string,
             amount: string,
             destinationTag?: string,
+            ethereumDataHex?: string,
+            recalcCustomLimit?: boolean,
+            ethereumAdjustGasLimit?: string,
         ) => {
             const { account, network } = selectedAccount;
 
@@ -46,7 +49,7 @@ export const useCoinmarketRecomposeAndSign = () => {
                         ...DEFAULT_PAYMENT,
                         address,
                         amount,
-                        token: composed.token?.address || null,
+                        token: ethereumDataHex ? null : composed.token?.address || null, // if we pass ethereumDataHex, do not use the token, the details are in the ethereumDataHex
                     },
                 ],
                 selectedFee,
@@ -55,6 +58,8 @@ export const useCoinmarketRecomposeAndSign = () => {
                 estimatedFeeLimit: composed.estimatedFeeLimit,
                 options: ['broadcast'],
                 rippleDestinationTag: destinationTag,
+                ethereumDataHex,
+                ethereumAdjustGasLimit,
             };
 
             // prepare form state for composeAction
@@ -63,12 +68,47 @@ export const useCoinmarketRecomposeAndSign = () => {
             const feeInfo = { ...coinFees, levels };
             const formState = { account, network, feeInfo };
 
+            // recalcCustomLimit is used in case of custom fee level, when we want to keep the feePerUnit defined by the user
+            // but recompute the feeLimit based on a different transaction data (for example from ethereumDataHex)
+            if (recalcCustomLimit && selectedFee === 'custom') {
+                const normalLevels = await composeAction(
+                    { ...formValues, selectedFee: 'normal' },
+                    formState as UseSendFormState,
+                );
+                if (
+                    !normalLevels ||
+                    !normalLevels.normal ||
+                    normalLevels.normal.type !== 'final' ||
+                    !normalLevels.normal.feeLimit
+                ) {
+                    let errorMessage: string | undefined;
+                    if (
+                        normalLevels?.normal?.type === 'error' &&
+                        normalLevels?.normal?.errorMessage
+                    ) {
+                        errorMessage = translationString(
+                            normalLevels.normal.errorMessage.id,
+                            normalLevels.normal.errorMessage.values as { [key: string]: any },
+                        );
+                    }
+                    if (!errorMessage) {
+                        errorMessage = 'Missing fee level';
+                    }
+                    addNotification({
+                        type: 'sign-tx-error',
+                        error: errorMessage,
+                    });
+                    return;
+                }
+                formValues.feeLimit = normalLevels.normal.feeLimit;
+            }
+
             // compose transaction again to recalculate fees based on real account values
             const composedLevels = await composeAction(formValues, formState as UseSendFormState);
             if (!selectedFee || !composedLevels) {
                 addNotification({
                     type: 'sign-tx-error',
-                    error: 'Missing level',
+                    error: 'Missing fee level',
                 });
                 return;
             }

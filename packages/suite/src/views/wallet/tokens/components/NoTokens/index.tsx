@@ -31,7 +31,7 @@ const NoTokens = () => {
     return (
         <AccountExceptionLayout
             title={<Translation id="TR_TOKENS_EMPTY" />}
-            image="EMPTY_WALLET_NEUE"
+            image="CLOUDY"
             actionComponent={account.networkType !== 'cardano' ? addButton : undefined}
         />
     );

@@ -72,7 +72,7 @@ export default defineMessages({
     },
     TR_ACCOUNT_EXCEPTION_DISCOVERY_EMPTY_DESC: {
         defaultMessage:
-            'It’s so empty here. Can’t even describe the emptiness I’m feelin’ here… You can either add new account (that will enable selected coin) or enable any coin in Settings.',
+            'All coins are currently disabled in Settings. Please add a new account or enable some coins in Settings. ',
         id: 'TR_ACCOUNT_EXCEPTION_DISCOVERY_EMPTY_DESC',
     },
     TR_ACCOUNT_EXCEPTION_DISCOVERY_ERROR: {
@@ -222,18 +222,6 @@ export default defineMessages({
         defaultMessage: 'Loading',
         id: 'TR_EXCHANGE_LOADING',
     },
-    TR_EXCHANGE_OTHER_COINS: {
-        defaultMessage: 'All other coins',
-        id: 'TR_EXCHANGE_OTHER_COINS',
-    },
-    TR_EXCHANGE_POPULAR_COINS: {
-        defaultMessage: 'Popular coins',
-        id: 'TR_EXCHANGE_POPULAR_COINS',
-    },
-    TR_EXCHANGE_STABLE_COINS: {
-        defaultMessage: 'Stablecoins',
-        id: 'TR_EXCHANGE_STABLE_COINS',
-    },
     TR_EXCHANGE_NO_PROVIDERS: {
         defaultMessage: 'No providers',
         id: 'TR_EXCHANGE_NO_PROVIDERS',
@@ -272,6 +260,39 @@ export default defineMessages({
         id: 'TR_EXCHANGE_FLOAT_OFFERS_INFO',
         defaultMessage:
             "Floating rates mean that the final amount you'll get may change slightly due to fluctuations in the market between when you select the rate and when your transaction is complete. These rates are usually higher, meaning you could end up with more crypto in the end.",
+    },
+    TR_EXCHANGE_DEX_OFFERS: {
+        id: 'TR_EXCHANGE_DEX_OFFERS',
+        defaultMessage: 'Decentralized exchange offers',
+    },
+    TR_EXCHANGE_DEX_OFFERS_INFO: {
+        id: 'TR_EXCHANGE_DEX_OFFERS_INFO',
+        defaultMessage:
+            'Decentralized exchange (DEX) swaps are performed via smart contracts running on the blockchain. They may be faster and offer better rates, especially for large amounts.',
+    },
+    TR_EXCHANGE_DEX_OFFER_NO_FUNDS_FEES: {
+        id: 'TR_EXCHANGE_DEX_OFFER_NO_FUNDS_FEES',
+        defaultMessage:
+            'No funds remaining for the transaction fees. Please lower the exchange amount to max {symbol} {max}',
+    },
+    TR_EXCHANGE_DEX_OFFER_FEE_INFO: {
+        defaultMessage:
+            'The fees to perform this swap are estimated at {symbol} {approvalFee} ({approvalFeeFiat}) for approval (if required) and {symbol} {swapFee} ({swapFeeFiat}) for the swap.',
+        id: 'TR_EXCHANGE_DEX_FEE_INFO',
+    },
+    TR_EXCHANGE_FEES_INFO: {
+        id: 'TR_EXCHANGE_FEES_INFO',
+        defaultMessage:
+            'All fees included; the transaction fee is estimated at {feeAmount} ({feeAmountFiat}).',
+    },
+    TR_EXCHANGE_DEX_FEES_INFO: {
+        id: 'TR_EXCHANGE_FEES_INFO',
+        defaultMessage: 'See info about fees in each DEX offer.',
+    },
+    TR_EXCHANGE_DEX_FEES_INFO_TOOLTIP: {
+        id: 'TR_EXCHANGE_DEX_FEES_INFO_TOOLTIP',
+        defaultMessage:
+            'To perform a DEX swap, it may be necessary to perform two blockchain transactions: an approval transaction and a swap transaction. Each transaction has a different fee.',
     },
     TR_EXCHANGE_FEES_INCLUDED: {
         id: 'TR_EXCHANGE_FEES_INCLUDED',
@@ -343,6 +364,11 @@ export default defineMessages({
             'You understand that cryptocurrency transactions are irreversible and you won’t be able to receive a refund for your purchase.',
         id: 'TR_EXCHANGE_TERMS_5',
     },
+    TR_EXCHANGE_DEX_TERMS_1: {
+        defaultMessage:
+            "You're here to exchange cryptocurrency using DEX (Decentralized Exchange) by using {provider}'s contract.",
+        id: 'TR_EXCHANGE_DEX_TERMS_1',
+    },
     TR_EXCHANGE_STATUS_ERROR: {
         defaultMessage: 'Rejected',
         id: 'TR_EXCHANGE_STATUS_ERROR',
@@ -398,7 +424,7 @@ export default defineMessages({
     },
     TR_EXCHANGE_DETAIL_ERROR_SUPPORT: {
         defaultMessage: "Open partner's support site",
-        id: 'TR_BUY_DETAIL_ERROR_SUPPORT',
+        id: 'TR_EXCHANGE_DETAIL_ERROR_SUPPORT',
     },
     TR_EXCHANGE_DETAIL_ERROR_BUTTON: {
         defaultMessage: 'Back to Account',
@@ -453,6 +479,10 @@ export default defineMessages({
         defaultMessage: 'Confirm & Send',
         id: 'TR_EXCHANGE_CONFIRM_SEND_STEP',
     },
+    TR_EXCHANGE_CREATE_APPROVAL_STEP: {
+        defaultMessage: 'Create approval',
+        id: 'TR_EXCHANGE_CREATE_APPROVAL_STEP',
+    },
     TR_EXCHANGE_SEND_FROM: {
         defaultMessage: 'Sending account',
         id: 'TR_EXCHANGE_SEND_FROM',
@@ -460,6 +490,130 @@ export default defineMessages({
     TR_EXCHANGE_SEND_TO: {
         defaultMessage: '{providerName}’s address',
         id: 'TR_EXCHANGE_SEND_TO',
+    },
+    TR_EXCHANGE_APPROVAL_SEND_TO: {
+        defaultMessage: '{send} contract',
+        id: 'TR_EXCHANGE_SEND_TO',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE: {
+        defaultMessage: 'Approval value',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_MINIMAL: {
+        defaultMessage: 'Necessary value of {value} {send}',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_MINIMAL',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_MINIMAL_INFO: {
+        defaultMessage:
+            'Approve only the exact amount required for this swap. You will need to pay an additional fee if you want to make a similar swap again.',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_MINIMAL_INFO',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_INFINITE: {
+        defaultMessage: 'Infinite value',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_INFINITE',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_INFINITE_INFO: {
+        defaultMessage:
+            'Create a single approval transaction to simplify multiple exchanges of {send} with {provider}. This saves on fees but carries a risk to your funds in the unlikely case of a flaw in {provider}’s contract.',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_INFINITE_INFO',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_ZERO: {
+        defaultMessage: 'Revoke previous approval',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_ZERO',
+    },
+    TR_EXCHANGE_APPROVAL_VALUE_ZERO_INFO: {
+        defaultMessage:
+            'Perform a transaction that will remove previous approval of contract with {provider}.',
+        id: 'TR_EXCHANGE_APPROVAL_VALUE_ZERO_INFO',
+    },
+    TR_EXCHANGE_APPROVAL_DATA: {
+        defaultMessage: 'Approval transaction data',
+        id: 'TR_EXCHANGE_APPROVAL_DATA',
+    },
+    TR_EXCHANGE_APPROVAL_TXID: {
+        defaultMessage: 'Approval transaction ID',
+        id: 'TR_EXCHANGE_APPROVAL_TXID',
+    },
+    TR_EXCHANGE_APPROVAL_CONFIRMING: {
+        defaultMessage: 'Waiting for the blockchain to confirm the approval transaction.',
+        id: 'TR_EXCHANGE_APPROVAL_CONFIRMING',
+    },
+    TR_EXCHANGE_APPROVAL_FAILED: {
+        defaultMessage: 'The approval transaction failed.',
+        id: 'TR_EXCHANGE_APPROVAL_FAILED',
+    },
+    TR_EXCHANGE_APPROVAL_SUCCESS: {
+        defaultMessage: 'The approval transaction is confirmed.',
+        id: 'TR_EXCHANGE_APPROVAL_SUCCESS',
+    },
+    TR_EXCHANGE_APPROVAL_NOT_REQUIRED: {
+        defaultMessage: 'No approval transaction needed for {send}.',
+        id: 'TR_EXCHANGE_APPROVAL_NOT_REQUIRED',
+    },
+    TR_EXCHANGE_APPROVAL_PREAPPROVED: {
+        defaultMessage: 'Contract already approved',
+        id: 'TR_EXCHANGE_APPROVAL_PREAPPROVED',
+    },
+    TR_EXCHANGE_APPROVAL_PROCEED: {
+        defaultMessage: 'Proceed to swap, no approval transaction needed.',
+        id: 'TR_EXCHANGE_APPROVAL_PROCEED',
+    },
+    TR_EXCHANGE_APPROVAL_TO_SWAP_BUTTON: {
+        defaultMessage: 'Proceed to swap',
+        id: 'TR_EXCHANGE_APPROVAL_TO_SWAP_BUTTON',
+    },
+    TR_EXCHANGE_SWAP_SEND_TO: {
+        defaultMessage: "{provider}'s contract",
+        id: 'TR_EXCHANGE_SWAP_SEND_TO',
+    },
+    TR_EXCHANGE_SWAP_DATA: {
+        defaultMessage: 'Swap transaction data',
+        id: 'TR_EXCHANGE_SWAP_DATA',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE: {
+        defaultMessage: 'Slippage',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_TOLERANCE: {
+        defaultMessage: 'Slippage tolerance',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_TOLERANCE',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_SUMMARY: {
+        defaultMessage: 'Slippage summary',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_SUMMARY',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_OFFERED: {
+        defaultMessage: 'Swap offer amount',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_OFFERED',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_AMOUNT: {
+        defaultMessage: 'Maximum slippage amount',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_AMOUNT',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_MINIMUM: {
+        defaultMessage: 'Minimum received amount',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_MINIMUM',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_INFO: {
+        defaultMessage:
+            "Exchange rates shift constantly, so the amount you accept in this offer and the amount ultimately confirmed on the blockchain may differ; this is slippage. Slippage tolerance sets the percentage of your transaction you may lose due to slippage; in other words, you set the minimum amount you are willing to accept in the end. If slippage tolerance is too high, you may receive a lot less than offered. If slippage tolerance is too low, your transaction may fail (revert) and you'll still pay the transaction fee.",
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_INFO',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_CUSTOM: {
+        defaultMessage: 'Custom',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_CUSTOM',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_NOT_SET: {
+        defaultMessage: 'Enter your desired slippage.',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_NOT_SET',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_NOT_NUMBER: {
+        defaultMessage: 'Please enter a number.',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_NOT_NUMBER',
+    },
+    TR_EXCHANGE_SWAP_SLIPPAGE_NOT_IN_RANGE: {
+        defaultMessage: 'Slippage must be in range 0.01% - 50%',
+        id: 'TR_EXCHANGE_SWAP_SLIPPAGE_NOT_IN_RANGE',
     },
     TR_EXCHANGE_CONFIRM_ON_TREZOR_SEND: {
         defaultMessage: 'Confirm on Trezor & send',
@@ -554,6 +708,10 @@ export default defineMessages({
     TR_EXCHANGE_FLOAT: {
         defaultMessage: 'Floating-rate offer',
         id: 'TR_EXCHANGE_FLOAT',
+    },
+    TR_EXCHANGE_DEX: {
+        defaultMessage: 'Decentralized exchange offer',
+        id: 'TR_EXCHANGE_DEX',
     },
     TR_SELL_STATUS_ERROR: {
         defaultMessage: 'Rejected',
@@ -762,7 +920,7 @@ export default defineMessages({
     },
     TR_SELL_DETAIL_ERROR_SUPPORT: {
         defaultMessage: "Open partner's support site",
-        id: 'TR_BUY_DETAIL_ERROR_SUPPORT',
+        id: 'TR_SELL_DETAIL_ERROR_SUPPORT',
     },
     TR_SELL_DETAIL_ERROR_BUTTON: {
         defaultMessage: 'Back to Account',
@@ -1073,6 +1231,32 @@ export default defineMessages({
     TR_BUY_DETAIL_WAITING_FOR_USER_GATE: {
         defaultMessage: "Go to provider's site",
         id: 'TR_BUY_DETAIL_WAITING_FOR_USER_GATE',
+    },
+    TR_COINMARKET_NO_OFFERS_AUTORELOADING_IN: {
+        defaultMessage: 'Autoreloading in',
+        id: 'TR_COINMARKET_NO_OFFERS_AUTORELOADING_IN',
+    },
+    TR_COINMARKET_NO_OFFERS_HEADER: {
+        defaultMessage: 'No offers',
+        id: 'TR_COINMARKET_NO_OFFERS_HEADER',
+    },
+    TR_COINMARKET_NO_OFFERS_MESSAGE: {
+        defaultMessage:
+            "Sorry, we don't have any offers at the moment. Try to reload the page or change your query.",
+        id: 'TR_COINMARKET_NO_OFFERS_MESSAGE',
+    },
+    TR_COINMARKET_NO_OFFERS_LOADING_FAILED_MESSAGE: {
+        defaultMessage:
+            "Sorry, we don't have any offers at the moment due to server connectivity issue.",
+        id: 'TR_COINMARKET_NO_OFFERS_LOADING_FAILED_MESSAGE',
+    },
+    TR_COINMARKET_NO_OFFERS_BACK_BUTTON: {
+        defaultMessage: 'Back to Trade',
+        id: 'TR_COINMARKET_NO_OFFERS_BACK_BUTTON',
+    },
+    TR_COINMARKET_NO_OFFERS_RELOAD_PAGE_BUTTON: {
+        defaultMessage: 'Reload page',
+        id: 'TR_COINMARKET_NO_OFFERS_RELOAD_PAGE_BUTTON',
     },
     TR_ADDRESS_MODAL_CHECK_ON_TREZOR_DESC: {
         defaultMessage:
@@ -2115,9 +2299,13 @@ export default defineMessages({
         defaultMessage: 'Suite Guide',
         id: 'TR_LEARN_AND_DISCOVER',
     },
-    TR_SEGWIT_ACCOUNTS: {
-        defaultMessage: 'Segwit accounts',
-        id: 'TR_SEGWIT_ACCOUNTS',
+    TR_TAPROOT_ACCOUNTS: {
+        defaultMessage: 'Taproot accounts',
+        id: 'TR_TAPROOT_ACCOUNTS',
+    },
+    TR_LEGACY_SEGWIT_ACCOUNTS: {
+        defaultMessage: 'Legacy SegWit accounts',
+        id: 'TR_LEGACY_SEGWIT_ACCOUNTS',
     },
     TR_LEGACY_ACCOUNTS: {
         defaultMessage: 'Legacy accounts',
@@ -2516,6 +2704,19 @@ export default defineMessages({
             'Efficient technology = <strong>pay up to 25% lower transactions fees</strong>',
         id: 'TR_BECH32_BANNER_POINT_2',
     },
+    TR_TAPROOT_BANNER_TITLE: {
+        defaultMessage: 'New to Trezor Suite: BTC Taproot accounts!',
+        id: 'TR_TAPROOT_BANNER_TITLE',
+    },
+    TR_TAPROOT_BANNER_POINT_1: {
+        defaultMessage:
+            'Lowercase letters only = <strong>lower chance of any reviewing errors</strong>',
+        id: 'TR_TAPROOT_BANNER_POINT_1',
+    },
+    TR_TAPROOT_BANNER_POINT_2: {
+        defaultMessage: 'Improved privacy for all Bitcoin transactions',
+        id: 'TR_TAPROOT_BANNER_POINT_2',
+    },
     TR_GOT_IT: {
         defaultMessage: 'Got it!',
         id: 'TR_GOT_IT',
@@ -2872,6 +3073,14 @@ export default defineMessages({
             'To prevent phishing attacks, you should verify the address on your Trezor. {claim}',
         id: 'TR_TO_PREVENT_PHISHING_ATTACKS_COMMA',
     },
+    TR_TOO_LONG: {
+        id: 'TR_TOO_LONG',
+        defaultMessage: 'Message is too long',
+    },
+    TR_ASCII_ONLY: {
+        id: 'TR_ASCII_ONLY',
+        defaultMessage: 'Only ASCII characters are allowed',
+    },
     TR_TOS_INFORMATION: {
         defaultMessage: 'By clicking Continue you agree to our {TR_TOS_LINK}',
         id: 'TR_TOS_INFORMATION',
@@ -3168,6 +3377,14 @@ export default defineMessages({
         defaultMessage: 'Version {version} is available.',
         id: 'TR_YOUR_NEW_VERSION',
     },
+    TR_YOUR_NEW_VERSION_IS_DOWNLOADING: {
+        defaultMessage: 'Version {version} is downloading.',
+        id: 'TR_YOUR_NEW_VERSION_IS_DOWNLOADING',
+    },
+    TR_YOUR_NEW_VERSION_IS_READY: {
+        defaultMessage: 'Version {version} has been downloaded and is ready for installation.',
+        id: 'TR_YOUR_NEW_VERSION_IS_READY',
+    },
     TR_YOUR_TREZOR_IS_NOT_BACKED_UP: {
         defaultMessage: 'Your Trezor wallet is not backed up.',
         id: 'TR_YOUR_TREZOR_IS_NOT_BACKED_UP',
@@ -3250,18 +3467,23 @@ export default defineMessages({
         id: 'TR_ACCOUNT_DETAILS_TYPE_HEADER',
         defaultMessage: 'Account type',
     },
-    TR_ACCOUNT_DETAILS_TYPE_BECH32: {
-        id: 'TR_ACCOUNT_DETAILS_TYPE_BECH32',
+    TR_ACCOUNT_TYPE_BIP84_DESC: {
+        id: 'TR_ACCOUNT_TYPE_BIP84_DESC',
         defaultMessage:
             'Bech32 uses the most modern addresses for smallest transaction fees. Be aware that it may not be compatible with old services.',
     },
-    TR_ACCOUNT_DETAILS_TYPE_P2SH: {
-        id: 'TR_ACCOUNT_DETAILS_TYPE_P2SH',
+    TR_ACCOUNT_TYPE_BIP86_DESC: {
+        id: 'TR_ACCOUNT_TYPE_BIP86_DESC',
+        defaultMessage:
+            'Taproot uses the most modern addresses for enhanced privacy and better network efficiency. Be aware that it may not be compatible with old services.',
+    },
+    TR_ACCOUNT_TYPE_BIP49_DESC: {
+        id: 'TR_ACCOUNT_TYPE_BIP49_DESC',
         defaultMessage:
             'Pay to script hash (P2SH) is an advanced type of transaction used in Bitcoin and other similar crypto currencies. Unlike P2PKH, it allows sender to commit funds to a hash of an arbitrary valid script.',
     },
-    TR_ACCOUNT_DETAILS_TYPE_P2PKH: {
-        id: 'TR_ACCOUNT_DETAILS_TYPE_P2PKH',
+    TR_ACCOUNT_TYPE_BIP44_DESC: {
+        id: 'TR_ACCOUNT_TYPE_BIP44_DESC',
         defaultMessage:
             'Legacy Pay-to-Public-Key-Hash (P2PKH) is the basic type of transaction used in Bitcoin and other similar crypto currencies.',
     },
@@ -3278,29 +3500,42 @@ export default defineMessages({
         id: 'TR_ACCOUNT_DETAILS_XPUB_BUTTON',
         defaultMessage: 'Show public key',
     },
-    TR_ACCOUNT_TYPE_NATIVE_SEGWIT: {
-        id: 'TR_ACCOUNT_TYPE_NATIVE_SEGWIT',
-        defaultMessage: 'Native SegWit',
+    TR_ACCOUNT_TYPE_BIP86_NOT_SUPPORTED: {
+        id: 'TR_ACCOUNT_TYPE_BIP86_NOT_SUPPORTED',
+        defaultMessage:
+            'Firmware installed does not support Taproot. Please upgrade device firmware to enable this feature',
     },
-    TR_ACCOUNT_TYPE_SEGWIT: {
-        id: 'TR_ACCOUNT_TYPE_SEGWIT',
+    TR_ACCOUNT_TYPE_BIP86_NAME: {
+        id: 'TR_ACCOUNT_TYPE_BIP86_NAME',
+        defaultMessage: 'Taproot',
+    },
+    TR_ACCOUNT_TYPE_BIP84_NAME: {
+        id: 'TR_ACCOUNT_TYPE_BIP84_NAME',
         defaultMessage: 'SegWit',
     },
-    TR_ACCOUNT_TYPE_LEGACY: {
-        id: 'TR_ACCOUNT_TYPE_LEGACY',
+    TR_ACCOUNT_TYPE_BIP49_NAME: {
+        id: 'TR_ACCOUNT_TYPE_BIP49_NAME',
+        defaultMessage: 'Legacy SegWit',
+    },
+    TR_ACCOUNT_TYPE_BIP44_NAME: {
+        id: 'TR_ACCOUNT_TYPE_BIP44_NAME',
         defaultMessage: 'Legacy',
     },
-    TR_ACCOUNT_TYPE_BECH32: {
-        id: 'TR_ACCOUNT_TYPE_BECH32',
-        defaultMessage: 'Bech32',
+    TR_ACCOUNT_TYPE_BIP84_TECH: {
+        id: 'TR_ACCOUNT_TYPE_BIP84_TECH',
+        defaultMessage: 'BIP84, P2WPKH, Bech32',
     },
-    TR_ACCOUNT_TYPE_P2SH: {
-        id: 'TR_ACCOUNT_TYPE_P2SH',
-        defaultMessage: 'P2SH',
+    TR_ACCOUNT_TYPE_BIP86_TECH: {
+        id: 'TR_ACCOUNT_TYPE_BIP86_TECH',
+        defaultMessage: 'BIP86, P2TR, Bech32m',
     },
-    TR_ACCOUNT_TYPE_P2PKH: {
-        id: 'TR_ACCOUNT_TYPE_P2PKH',
-        defaultMessage: 'P2PKH',
+    TR_ACCOUNT_TYPE_BIP49_TECH: {
+        id: 'TR_ACCOUNT_TYPE_BIP49_TECH',
+        defaultMessage: 'BIP49, P2SH-P2WPKH, Base58',
+    },
+    TR_ACCOUNT_TYPE_BIP44_TECH: {
+        id: 'TR_ACCOUNT_TYPE_BIP44_TECH',
+        defaultMessage: 'BIP44, P2PKH, Base58',
     },
     TOAST_COIN_SCHEME_PROTOCOL: {
         id: 'TOAST_COIN_SCHEME_PROTOCOL',
@@ -3561,7 +3796,7 @@ export default defineMessages({
     },
     TR_WIPE_DEVICE_HEADING: {
         id: 'TR_WIPE_DEVICE_HEADING',
-        defaultMessage: 'Before you wipe your device..',
+        defaultMessage: 'Before you wipe your device...',
     },
     TR_WIPE_DEVICE_TEXT: {
         id: 'TR_WIPE_DEVICE_TEXT',
@@ -4792,7 +5027,7 @@ export default defineMessages({
     BACKUP_BACKUP_ALREADY_FINISHED_DESCRIPTION: {
         id: 'BACKUP_BACKUP_ALREADY_FINISHED_DESCRIPTION',
         defaultMessage:
-            'Connected device as backup already finished. You should have a recovery seed written down and hidden in a safe place.',
+            'Connected device has already been backed up. You should have a recovery seed written down and hidden in a safe place.',
     },
     BACKUP_BACKUP_ALREADY_FAILED_HEADING: {
         id: 'BACKUP_BACKUP_ALREADY_FAILED_HEADING',
@@ -4978,6 +5213,10 @@ export default defineMessages({
     RECIPIENT_IS_NOT_SUPPORTED: {
         defaultMessage: 'Unsupported address format.',
         id: 'RECIPIENT_IS_NOT_SUPPORTED',
+    },
+    RECIPIENT_REQUIRES_UPDATE: {
+        defaultMessage: 'Please upgrade device firmware to enable this feature.',
+        id: 'RECIPIENT_REQUIRES_UPDATE',
     },
     RECIPIENT_FORMAT_DEPRECATED: {
         defaultMessage: 'Unsupported address format. {TR_LEARN_MORE}',
@@ -5414,7 +5653,7 @@ export default defineMessages({
     },
     TR_CUSTOM_FIRMWARE_BUTTON_DOWNLOAD: {
         id: 'TR_CUSTOM_FIRMWARE_BUTTON_DOWNLOAD',
-        defaultMessage: 'Download on Trezor.io',
+        defaultMessage: 'Download on github.com',
     },
     TR_CUSTOM_FIRMWARE_BUTTON_INSTALL: {
         id: 'TR_CUSTOM_FIRMWARE_BUTTON_INSTALL',
@@ -5667,7 +5906,7 @@ export default defineMessages({
     FIRMWARE_CONNECT_IN_NORMAL_MODEL_2: {
         id: 'FIRMWARE_CONNECT_IN_NORMAL_MODEL_2',
         defaultMessage:
-            'Please make sure you are not holding any buttons while connecting your device.',
+            'Please make sure you are not swiping the touchscreen while connecting your device.',
     },
     FIRMWARE_UPDATE_TO_VERSION: {
         id: 'FIRMWARE_UPDATE_TO_VERSION',

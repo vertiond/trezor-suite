@@ -2,7 +2,7 @@ import produce from 'immer';
 import { TRANSPORT, TransportInfo } from 'trezor-connect';
 import { SUITE, STORAGE } from '@suite-actions/constants';
 import { DISCOVERY } from '@wallet-actions/constants';
-import { Action, TrezorDevice, Lock, SuiteThemeVariant, SuiteThemeColors } from '@suite-types';
+import { Action, TrezorDevice, Lock, SuiteThemeColors } from '@suite-types';
 import type { Locale } from '@suite-config/languages';
 import { isWeb } from '@suite-utils/env';
 import { ensureLocale } from '@suite-utils/l10n';
@@ -25,6 +25,7 @@ interface Flags {
     // pinCompleted: boolean;
     // passphraseCompleted: boolean;
     bech32BannerClosed: boolean; // banner in account view informing about advantages of using Bech32
+    taprootBannerClosed: boolean; // banner in account view informing about advantages of using Taproot
     discreetModeCompleted: boolean; // dashboard UI, user tried discreet mode
     securityStepsHidden: boolean; // dashboard UI
     dashboardGraphHidden: boolean; // dashboard UI
@@ -73,6 +74,7 @@ const initialState: SuiteState = {
         // passphraseCompleted: false;
         discreetModeCompleted: false,
         bech32BannerClosed: false,
+        taprootBannerClosed: false,
         securityStepsHidden: false,
         dashboardGraphHidden: false,
         dashboardAssetsGridMode: false,

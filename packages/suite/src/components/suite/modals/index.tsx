@@ -8,6 +8,7 @@ import * as allModalActions from '@suite-actions/modalActions';
 import * as routerActions from '@suite-actions/routerActions';
 import { MODAL } from '@suite-actions/constants';
 import { AppState, Dispatch, AcquiredDevice } from '@suite-types';
+import { useSelector } from '@suite-hooks';
 
 import Pin from './Pin';
 import PinInvalid from './PinInvalid';
@@ -21,6 +22,7 @@ import ConfirmFingerPrint from './confirm/Fingerprint';
 import CoinmarketBuyTerms from './confirm/CoinmarketBuyTerms';
 import CoinmarketSellTerms from './confirm/CoinmarketSellTerms';
 import CoinmarketExchangeTerms from './confirm/CoinmarketExchangeTerms';
+import CoinmarketExchangeDexTerms from './confirm/CoinmarketExchangeDexTerms';
 import CoinmarketLeaveSpend from './confirm/CoinmarketLeaveSpend';
 import Word from './Word';
 import WordAdvanced from './WordAdvanced';
@@ -213,6 +215,14 @@ const getUserContextModal = (props: Props) => {
                     decision={payload.decision}
                 />
             );
+        case 'coinmarket-exchange-dex-terms':
+            return (
+                <CoinmarketExchangeDexTerms
+                    provider={payload.provider}
+                    onCancel={modalActions.onCancel}
+                    decision={payload.decision}
+                />
+            );
         case 'import-transaction':
             return <ImportTransaction {...payload} onCancel={modalActions.onCancel} />;
         case 'pin-mismatch':
@@ -240,6 +250,10 @@ const getUserContextModal = (props: Props) => {
 const Modal = (props: Props) => {
     const { modal } = props;
 
+    const { guideOpen } = useSelector(state => ({
+        guideOpen: state.guide.open,
+    }));
+
     let modalComponent;
 
     switch (modal.context) {
@@ -260,7 +274,11 @@ const Modal = (props: Props) => {
 
     const useBackground = props.background ?? true;
     if (useBackground) {
-        return <FocusLock autoFocus={false}>{modalComponent}</FocusLock>;
+        return (
+            <FocusLock disabled={guideOpen} autoFocus={false}>
+                {modalComponent}
+            </FocusLock>
+        );
     }
 
     return React.cloneElement(modalComponent, {

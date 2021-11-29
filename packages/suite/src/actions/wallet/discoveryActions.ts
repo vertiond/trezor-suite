@@ -164,8 +164,20 @@ const handleProgress =
         );
     };
 
+const filterUnavailableNetworks = (
+    enabledNetworks: Account['symbol'][],
+    unavailableCapabilities: TrezorDevice['unavailableCapabilities'] = {},
+) =>
+    NETWORKS.filter(
+        n =>
+            enabledNetworks.includes(n.symbol) &&
+            !n.isHidden &&
+            !unavailableCapabilities[n.accountType!] && // exclude by account types (ex: taproot)
+            !unavailableCapabilities[n.symbol], // exclude by network symbol (ex: xrp on T1)
+    );
+
 const getBundle =
-    (discovery: Discovery) =>
+    (discovery: Discovery, unavailableCapabilities: TrezorDevice['unavailableCapabilities']) =>
     (_d: Dispatch, getState: GetState): DiscoveryItem[] => {
         const bundle: DiscoveryItem[] = [];
         // find all accounts
@@ -183,7 +195,8 @@ const getBundle =
         ) {
             return bundle;
         }
-        const networks = NETWORKS.filter(n => discovery.networks.includes(n.symbol));
+
+        const networks = filterUnavailableNetworks(discovery.networks, unavailableCapabilities);
         networks.forEach(configNetwork => {
             // find all existed accounts
             const accountType = configNetwork.accountType || 'normal';
@@ -206,7 +219,7 @@ const getBundle =
             if (!hasEmptyAccount && !failed) {
                 const index = prevAccounts[0] ? prevAccounts[0].index + 1 : 0;
                 bundle.push({
-                    path: configNetwork.bip44.replace('i', index.toString()),
+                    path: configNetwork.bip43Path.replace('i', index.toString()),
                     coin: configNetwork.symbol,
                     details: 'txs',
                     index,
@@ -224,13 +237,9 @@ export const updateNetworkSettings = () => (dispatch: Dispatch, getState: GetSta
     const { discovery } = getState().wallet;
     discovery.forEach(d => {
         const device = getState().devices.find(dev => dev.state === d.deviceState);
-        const unavailableCapabilities =
-            device && device.features ? device.unavailableCapabilities : {};
-        const networks = NETWORKS.filter(
-            n =>
-                enabledNetworks.includes(n.symbol) &&
-                !n.isHidden &&
-                !unavailableCapabilities[n.symbol],
+        const networks = filterUnavailableNetworks(
+            enabledNetworks,
+            device?.unavailableCapabilities,
         ).map(n => n.symbol);
         const progress = dispatch(
             calculateProgress({
@@ -252,12 +261,9 @@ export const updateNetworkSettings = () => (dispatch: Dispatch, getState: GetSta
 export const create =
     (deviceState: string, device: TrezorDevice) => (dispatch: Dispatch, getState: GetState) => {
         const { enabledNetworks } = getState().wallet.settings;
-        const unavailableCapabilities = device.features ? device.unavailableCapabilities : {};
-        const networks = NETWORKS.filter(
-            n =>
-                enabledNetworks.includes(n.symbol) &&
-                !n.isHidden &&
-                !unavailableCapabilities[n.symbol],
+        const networks = filterUnavailableNetworks(
+            enabledNetworks,
+            device?.unavailableCapabilities,
         ).map(n => n.symbol);
         dispatch({
             type: DISCOVERY.CREATE,
@@ -328,8 +334,8 @@ export const start =
             });
         }
 
-        // prepare bundle of accounts to discover
-        const bundle = dispatch(getBundle(discovery));
+        // prepare bundle of accounts to discover, exclude unsupported account types
+        const bundle = dispatch(getBundle(discovery, device.unavailableCapabilities));
 
         // discovery process complete
         if (bundle.length === 0) {

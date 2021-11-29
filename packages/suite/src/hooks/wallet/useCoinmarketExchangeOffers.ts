@@ -1,18 +1,19 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import invityAPI from '@suite-services/invityAPI';
 import { useActions, useSelector, useDevice } from '@suite-hooks';
 import { useTimer } from '@suite-hooks/useTimeInterval';
 import { ExchangeCoinInfo, ExchangeTrade } from 'invity-api';
 import * as coinmarketCommonActions from '@wallet-actions/coinmarket/coinmarketCommonActions';
 import * as coinmarketExchangeActions from '@wallet-actions/coinmarketExchangeActions';
-import * as routerActions from '@suite-actions/routerActions';
 import { Account } from '@wallet-types';
 import { Props, ContextValues, ExchangeStep } from '@wallet-types/coinmarketExchangeOffers';
 import * as notificationActions from '@suite-actions/notificationActions';
-import { splitToFixedFloatQuotes } from '@wallet-utils/coinmarket/exchangeUtils';
+import { splitToQuoteCategories } from '@wallet-utils/coinmarket/exchangeUtils';
 import networks from '@wallet-config/networks';
 import { getUnusedAddressFromAccount } from '@wallet-utils/coinmarket/coinmarketUtils';
 import { useCoinmarketRecomposeAndSign } from './useCoinmarketRecomposeAndSign ';
+import { useCoinmarketNavigation } from '@wallet-hooks/useCoinmarketNavigation';
+import { InvityAPIReloadQuotesAfterSeconds } from '@wallet-constants/coinmarket/metadata';
 
 const getReceiveAccountSymbol = (
     symbol?: string,
@@ -32,12 +33,12 @@ const getReceiveAccountSymbol = (
 
 export const useOffers = (props: Props) => {
     const timer = useTimer();
-    const REFETCH_INTERVAL_IN_SECONDS = 30;
     const {
         selectedAccount,
         quotesRequest,
         fixedQuotes,
         floatQuotes,
+        dexQuotes,
         exchangeInfo,
         device,
         addressVerified,
@@ -50,18 +51,22 @@ export const useOffers = (props: Props) => {
     const [receiveAccount, setReceiveAccount] = useState<Account | undefined>();
     const [suiteReceiveAccounts, setSuiteReceiveAccounts] =
         useState<ContextValues['suiteReceiveAccounts']>();
-    const [innerFixedQuotes, setInnerFixedQuotes] = useState<ExchangeTrade[]>(fixedQuotes);
-    const [innerFloatQuotes, setInnerFloatQuotes] = useState<ExchangeTrade[]>(floatQuotes);
+    const [innerFixedQuotes, setInnerFixedQuotes] = useState<ExchangeTrade[] | undefined>(
+        fixedQuotes,
+    );
+    const [innerFloatQuotes, setInnerFloatQuotes] = useState<ExchangeTrade[] | undefined>(
+        floatQuotes,
+    );
+    const [innerDexQuotes, setInnerDexQuotes] = useState<ExchangeTrade[] | undefined>(dexQuotes);
     const [exchangeStep, setExchangeStep] = useState<ExchangeStep>('RECEIVING_ADDRESS');
+    const { navigateToExchangeForm, navigateToExchangeDetail } = useCoinmarketNavigation(account);
     const {
-        goto,
         saveTrade,
         openCoinmarketExchangeConfirmModal,
         saveTransactionId,
         addNotification,
         verifyAddress,
     } = useActions({
-        goto: routerActions.goto,
         saveTrade: coinmarketExchangeActions.saveTrade,
         openCoinmarketExchangeConfirmModal:
             coinmarketExchangeActions.openCoinmarketExchangeConfirmModal,
@@ -82,36 +87,44 @@ export const useOffers = (props: Props) => {
         invityAPI.setInvityAPIServer(invityAPIUrl);
     }
 
-    useEffect(() => {
-        if (!quotesRequest) {
-            goto('wallet-coinmarket-exchange', {
-                symbol: account.symbol,
-                accountIndex: account.index,
-                accountType: account.accountType,
-            });
-            return;
-        }
-
-        const getQuotes = async () => {
-            if (!selectedQuote) {
-                invityAPI.createInvityAPIKey(account.descriptor);
-                setCallInProgress(true);
-                const allQuotes = await invityAPI.getExchangeQuotes(quotesRequest);
-                setCallInProgress(false);
-                const [fixedQuotes, floatQuotes] = splitToFixedFloatQuotes(allQuotes, exchangeInfo);
+    const getQuotes = useCallback(async () => {
+        if (!selectedQuote && quotesRequest) {
+            timer.loading();
+            invityAPI.createInvityAPIKey(account.descriptor);
+            const allQuotes = await invityAPI.getExchangeQuotes(quotesRequest);
+            if (Array.isArray(allQuotes)) {
+                if (allQuotes.length === 0) {
+                    timer.stop();
+                    return;
+                }
+                const [fixedQuotes, floatQuotes, dexQuotes] = splitToQuoteCategories(
+                    allQuotes,
+                    exchangeInfo,
+                );
                 setInnerFixedQuotes(fixedQuotes);
                 setInnerFloatQuotes(floatQuotes);
-                timer.reset();
+                setInnerDexQuotes(dexQuotes);
+            } else {
+                setInnerFixedQuotes(undefined);
+                setInnerFloatQuotes(undefined);
+                setInnerDexQuotes(undefined);
             }
-        };
+            timer.reset();
+        }
+    }, [account.descriptor, exchangeInfo, quotesRequest, selectedQuote, timer]);
+
+    useEffect(() => {
+        if (!quotesRequest) {
+            navigateToExchangeForm();
+            return;
+        }
 
         if (!timer.isLoading && !timer.isStopped) {
             if (timer.resetCount >= 40) {
                 timer.stop();
             }
 
-            if (timer.timeSpend.seconds === REFETCH_INTERVAL_IN_SECONDS) {
-                timer.loading();
+            if (timer.timeSpend.seconds === InvityAPIReloadQuotesAfterSeconds) {
                 getQuotes();
             }
         }
@@ -123,7 +136,10 @@ export const useOffers = (props: Props) => {
                 ? exchangeInfo?.providerInfos[quote.exchange]
                 : null;
         if (quotesRequest) {
-            const result = await openCoinmarketExchangeConfirmModal(provider?.companyName);
+            const result = await openCoinmarketExchangeConfirmModal(
+                provider?.companyName,
+                quote.isDex,
+            );
             if (result) {
                 setSelectedQuote(quote);
                 timer.stop();
@@ -158,12 +174,21 @@ export const useOffers = (props: Props) => {
         setSuiteReceiveAccounts(undefined);
     }, [accounts, device, exchangeStep, receiveSymbol, selectedQuote]);
 
-    const confirmTrade = async (address: string, extraField?: string) => {
+    const confirmTrade = async (address: string, extraField?: string, trade?: ExchangeTrade) => {
+        let ok = false;
         const { address: refundAddress } = getUnusedAddressFromAccount(account);
-        if (!selectedQuote || !refundAddress) return;
+        if (!trade) {
+            trade = selectedQuote;
+        }
+        if (!trade || !refundAddress) return false;
+
+        if (trade.isDex && !trade.fromAddress) {
+            trade = { ...trade, fromAddress: refundAddress };
+        }
+
         setCallInProgress(true);
         const response = await invityAPI.doExchangeTrade({
-            trade: selectedQuote,
+            trade,
             receiveAddress: address,
             refundAddress,
             extraField,
@@ -173,19 +198,91 @@ export const useOffers = (props: Props) => {
                 type: 'error',
                 error: 'No response from the server',
             });
-        } else if (response.error || !response.status || !response.orderId) {
+        } else if (
+            response.error ||
+            !response.status ||
+            !response.orderId ||
+            response.status === 'ERROR'
+        ) {
             addNotification({
                 type: 'error',
-                error: response.error || 'Invalid response from the server',
+                error: response.error || 'Error response from the server',
             });
-        } else {
-            setExchangeStep('SEND_TRANSACTION');
             setSelectedQuote(response);
+        } else if (response.status === 'APPROVAL_REQ' || response.status === 'APPROVAL_PENDING') {
+            setSelectedQuote(response);
+            setExchangeStep('SEND_APPROVAL_TRANSACTION');
+            ok = true;
+        } else if (response.status === 'CONFIRM') {
+            setSelectedQuote(response);
+            if (response.isDex) {
+                if (exchangeStep === 'RECEIVING_ADDRESS' || trade.approvalType === 'ZERO') {
+                    setExchangeStep('SEND_APPROVAL_TRANSACTION');
+                } else {
+                    setExchangeStep('SEND_TRANSACTION');
+                }
+            } else {
+                setExchangeStep('SEND_TRANSACTION');
+            }
+            ok = true;
+        } else {
+            // CONFIRMING, SUCCESS
+            await saveTrade(response, account, new Date().toISOString());
+            await saveTransactionId(response.orderId);
+            ok = true;
+            navigateToExchangeDetail();
         }
         setCallInProgress(false);
+        return ok;
+    };
+
+    const sendDexTransaction = async () => {
+        if (
+            selectedQuote &&
+            selectedQuote.dexTx &&
+            (selectedQuote.status === 'APPROVAL_REQ' || selectedQuote.status === 'CONFIRM')
+        ) {
+            // after discussion with 1inch, adjust the gas limit by the factor of 1.25
+            // swap can use different swap paths when mining tx than when estimating tx
+            // the geth gas estimate may be too low
+            const result = await recomposeAndSign(
+                selectedAccount,
+                selectedQuote.dexTx.to,
+                selectedQuote.dexTx.value,
+                selectedQuote.partnerPaymentExtraId,
+                selectedQuote.dexTx.data,
+                true,
+                selectedQuote.status === 'CONFIRM' ? '1.25' : undefined,
+            );
+
+            // in case of not success, recomposeAndSign shows notification
+            if (result?.success) {
+                const { txid } = result.payload;
+                const quote = { ...selectedQuote };
+                if (selectedQuote.status === 'CONFIRM' && selectedQuote.approvalType !== 'ZERO') {
+                    quote.receiveTxHash = txid;
+                    quote.status = 'CONFIRMING';
+                    await saveTrade(quote, account, new Date().toISOString());
+                    confirmTrade(quote.receiveAddress || '', undefined, quote);
+                } else {
+                    quote.approvalSendTxHash = txid;
+                    quote.status = 'APPROVAL_PENDING';
+                    confirmTrade(quote.receiveAddress || '', undefined, quote);
+                }
+            }
+        } else {
+            addNotification({
+                type: 'error',
+                error: 'Cannot send transaction, missing data',
+            });
+        }
     };
 
     const sendTransaction = async () => {
+        if (selectedQuote?.isDex) {
+            sendDexTransaction();
+            return;
+        }
         if (
             selectedQuote &&
             selectedQuote.orderId &&
@@ -202,11 +299,7 @@ export const useOffers = (props: Props) => {
             if (result?.success) {
                 await saveTrade(selectedQuote, account, new Date().toISOString());
                 await saveTransactionId(selectedQuote.orderId);
-                goto('wallet-coinmarket-exchange-detail', {
-                    symbol: account.symbol,
-                    accountIndex: account.index,
-                    accountType: account.accountType,
-                });
+                navigateToExchangeDetail();
             }
         } else {
             addNotification({
@@ -221,6 +314,7 @@ export const useOffers = (props: Props) => {
         confirmTrade,
         sendTransaction,
         selectedQuote,
+        setSelectedQuote,
         suiteReceiveAccounts,
         verifyAddress,
         device,
@@ -233,12 +327,13 @@ export const useOffers = (props: Props) => {
         addressVerified,
         fixedQuotes: innerFixedQuotes,
         floatQuotes: innerFloatQuotes,
+        dexQuotes: innerDexQuotes,
         selectQuote,
         account,
-        REFETCH_INTERVAL_IN_SECONDS,
         receiveSymbol,
         receiveAccount,
         setReceiveAccount,
+        getQuotes,
     };
 };
 

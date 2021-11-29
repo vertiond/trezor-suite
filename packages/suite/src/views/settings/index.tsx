@@ -29,11 +29,24 @@ import * as desktopUpdateActions from '@suite-actions/desktopUpdateActions';
 import { getReleaseUrl } from '@suite/services/github';
 import { isDesktop, isWeb } from '@suite-utils/env';
 import { isDev } from '@suite-utils/build';
+import { UpdateState } from '@suite-reducers/desktopUpdateReducer';
 
 const buildCurrencyOption = (currency: string) => ({
     value: currency,
     label: currency.toUpperCase(),
 });
+
+const getUpdateStateMessage = (state: UpdateState) => {
+    switch (state) {
+        case UpdateState.Downloading:
+            return 'TR_YOUR_NEW_VERSION_IS_DOWNLOADING';
+        case UpdateState.Ready:
+            return 'TR_YOUR_NEW_VERSION_IS_READY';
+        case UpdateState.Available:
+        default:
+            return 'TR_YOUR_NEW_VERSION';
+    }
+};
 
 const GithubWrapper = styled.div`
     display: flex;
@@ -382,12 +395,16 @@ const Settings = () => {
                                         ),
                                     }}
                                 />
-                                {!['checking', 'not-available'].includes(desktopUpdate.state) &&
+                                {[
+                                    UpdateState.Available,
+                                    UpdateState.Downloading,
+                                    UpdateState.Ready,
+                                ].includes(desktopUpdate.state) &&
                                     desktopUpdate.latest && (
                                         <>
                                             &nbsp;
                                             <Translation
-                                                id="TR_YOUR_NEW_VERSION"
+                                                id={getUpdateStateMessage(desktopUpdate.state)}
                                                 values={{
                                                     version: (
                                                         <VersionWithGithubTooltip
@@ -405,27 +422,27 @@ const Settings = () => {
                     />
                     {desktopUpdate.enabled && (
                         <ActionColumn>
-                            {desktopUpdate.state === 'checking' && (
+                            {desktopUpdate.state === UpdateState.Checking && (
                                 <ActionButton isDisabled variant="secondary">
                                     <Translation id="SETTINGS_UPDATE_CHECKING" />
                                 </ActionButton>
                             )}
-                            {desktopUpdate.state === 'not-available' && (
+                            {desktopUpdate.state === UpdateState.NotAvailable && (
                                 <ActionButton onClick={checkForUpdates} variant="secondary">
                                     <Translation id="SETTINGS_UPDATE_CHECK" />
                                 </ActionButton>
                             )}
-                            {desktopUpdate.state === 'available' && (
+                            {desktopUpdate.state === UpdateState.Available && (
                                 <ActionButton onClick={maximizeUpdater} variant="secondary">
                                     <Translation id="SETTINGS_UPDATE_AVAILABLE" />
                                 </ActionButton>
                             )}
-                            {desktopUpdate.state === 'downloading' && (
+                            {desktopUpdate.state === UpdateState.Downloading && (
                                 <ActionButton onClick={maximizeUpdater} variant="secondary">
                                     <Translation id="SETTINGS_UPDATE_DOWNLOADING" />
                                 </ActionButton>
                             )}
-                            {desktopUpdate.state === 'ready' && (
+                            {desktopUpdate.state === UpdateState.Ready && (
                                 <ActionButton onClick={installRestart} variant="secondary">
                                     <Translation id="SETTINGS_UPDATE_READY" />
                                 </ActionButton>

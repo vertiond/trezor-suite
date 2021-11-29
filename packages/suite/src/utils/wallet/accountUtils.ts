@@ -7,6 +7,12 @@ import { PrecomposedTransactionFinal } from '@wallet-types/sendForm';
 import { AppState } from '@suite-types';
 import { NETWORKS } from '@wallet-config';
 import { toFiatCurrency } from './fiatConverterUtils';
+import {
+    WIKI_ACCOUNT_BIP84_URL,
+    WIKI_ACCOUNT_BIP86_URL,
+    WIKI_ACCOUNT_BIP49_URL,
+    WIKI_ACCOUNT_BIP44_URL,
+} from '@suite-constants/urls';
 
 export const isUtxoBased = (account: Account) =>
     account.networkType === 'bitcoin' || account.networkType === 'cardano';
@@ -83,17 +89,19 @@ export const getTitleForNetwork = (symbol: Account['symbol']) => {
     }
 };
 
-export const getBip43Shortcut = (path: string) => {
+export const getBip43Type = (path: string) => {
     if (typeof path !== 'string') return 'unknown';
     // https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki
     const bip43 = path.split('/')[1];
     switch (bip43) {
+        case `86'`:
+            return 'bip86';
         case `84'`:
-            return 'bech32';
+            return 'bip84';
         case `49'`:
-            return 'p2sh';
+            return 'bip49';
         case `44'`:
-            return 'p2pkh';
+            return 'bip44';
         case `1852'`:
             return 'shelley';
         default:
@@ -101,20 +109,37 @@ export const getBip43Shortcut = (path: string) => {
     }
 };
 
-export const getAccountTypeIntl = (path: string) => {
-    const bip43 = getBip43Shortcut(path);
-    if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_NATIVE_SEGWIT';
-    if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_SEGWIT';
+export const getAccountTypeName = (path: string) => {
+    const bip43 = getBip43Type(path);
+    if (bip43 === 'bip86') return 'TR_ACCOUNT_TYPE_BIP86_NAME';
+    if (bip43 === 'bip84') return 'TR_ACCOUNT_TYPE_BIP84_NAME';
+    if (bip43 === 'bip49') return 'TR_ACCOUNT_TYPE_BIP49_NAME';
     if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
-    return 'TR_ACCOUNT_TYPE_LEGACY';
+    return 'TR_ACCOUNT_TYPE_BIP44_NAME';
 };
 
-export const getBip43Intl = (path: string) => {
-    const bip43 = getBip43Shortcut(path);
-    if (bip43 === 'bech32') return 'TR_ACCOUNT_TYPE_BECH32';
-    if (bip43 === 'p2sh') return 'TR_ACCOUNT_TYPE_P2SH';
-    if (bip43 === 'shelley') return 'TR_ACCOUNT_TYPE_SHELLEY';
-    return 'TR_ACCOUNT_TYPE_P2PKH';
+export const getAccountTypeTech = (path: string) => {
+    const bip43 = getBip43Type(path);
+    if (bip43 === 'bip86') return 'TR_ACCOUNT_TYPE_BIP86_TECH';
+    if (bip43 === 'bip84') return 'TR_ACCOUNT_TYPE_BIP84_TECH';
+    if (bip43 === 'bip49') return 'TR_ACCOUNT_TYPE_BIP49_TECH';
+    return 'TR_ACCOUNT_TYPE_BIP44_TECH';
+};
+
+export const getAccountTypeDesc = (path: string) => {
+    const bip43 = getBip43Type(path);
+    if (bip43 === 'bip86') return 'TR_ACCOUNT_TYPE_BIP86_DESC';
+    if (bip43 === 'bip84') return 'TR_ACCOUNT_TYPE_BIP84_DESC';
+    if (bip43 === 'bip49') return 'TR_ACCOUNT_TYPE_BIP49_DESC';
+    return 'TR_ACCOUNT_TYPE_BIP44_DESC';
+};
+
+export const getAccountTypeUrl = (path: string) => {
+    const bip43 = getBip43Type(path);
+    if (bip43 === 'bip86') return WIKI_ACCOUNT_BIP86_URL;
+    if (bip43 === 'bip84') return WIKI_ACCOUNT_BIP84_URL;
+    if (bip43 === 'bip49') return WIKI_ACCOUNT_BIP49_URL;
+    return WIKI_ACCOUNT_BIP44_URL;
 };
 
 export const stripNetworkAmount = (amount: string, decimals: number) =>

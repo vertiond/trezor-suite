@@ -7,7 +7,7 @@ const networks = [
         name: 'Bitcoin',
         networkType: 'bitcoin',
         symbol: 'btc',
-        bip44: "m/84'/0'/i'",
+        bip43Path: "m/84'/0'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://btc1.trezor.io/tx/',
@@ -16,11 +16,24 @@ const networks = [
         features: ['rbf', 'sign-verify'],
     },
     {
-        name: 'Bitcoin (segwit)',
+        name: 'Bitcoin (Taproot)',
+        networkType: 'bitcoin',
+        accountType: 'taproot',
+        symbol: 'btc',
+        bip43Path: "m/86'/0'/i'",
+        decimals: 8,
+        explorer: {
+            tx: 'https://btc1.trezor.io/tx/',
+            account: 'https://btc1.trezor.io/xpub/',
+        },
+        features: ['rbf'],
+    },
+    {
+        name: 'Bitcoin (Legacy Segwit)',
         networkType: 'bitcoin',
         accountType: 'segwit',
         symbol: 'btc',
-        bip44: "m/49'/0'/i'",
+        bip43Path: "m/49'/0'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://btc1.trezor.io/tx/',
@@ -29,11 +42,11 @@ const networks = [
         features: ['rbf', 'sign-verify'],
     },
     {
-        name: 'Bitcoin (legacy)',
+        name: 'Bitcoin (Legacy)',
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'btc',
-        bip44: "m/44'/0'/i'",
+        bip43Path: "m/44'/0'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://btc1.trezor.io/tx/',
@@ -46,7 +59,7 @@ const networks = [
         name: 'Litecoin',
         networkType: 'bitcoin',
         symbol: 'ltc',
-        bip44: "m/84'/2'/i'",
+        bip43Path: "m/84'/2'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://ltc1.trezor.io/tx/',
@@ -59,7 +72,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'segwit',
         symbol: 'ltc',
-        bip44: "m/49'/2'/i'",
+        bip43Path: "m/49'/2'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://ltc1.trezor.io/tx/',
@@ -72,7 +85,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'ltc',
-        bip44: "m/44'/2'/i'",
+        bip43Path: "m/44'/2'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://ltc1.trezor.io/tx/',
@@ -86,7 +99,7 @@ const networks = [
         networkType: 'ethereum',
         symbol: 'eth',
         chainId: 1,
-        bip44: "m/44'/60'/0'/0/i",
+        bip43Path: "m/44'/60'/0'/0/i",
         decimals: 18,
         explorer: {
             tx: 'https://eth1.trezor.io/tx/',
@@ -101,7 +114,7 @@ const networks = [
         networkType: 'ethereum',
         symbol: 'etc',
         chainId: 61,
-        bip44: "m/44'/61'/0'/0/i",
+        bip43Path: "m/44'/61'/0'/0/i",
         decimals: 18,
         explorer: {
             tx: 'https://etc1.trezor.io/tx/',
@@ -114,7 +127,7 @@ const networks = [
         name: 'XRP',
         networkType: 'ripple',
         symbol: 'xrp',
-        bip44: "m/44'/144'/i'/0/0",
+        bip43Path: "m/44'/144'/i'/0/0",
         decimals: 6,
         explorer: {
             tx: 'https://xrpscan.com/tx/',
@@ -125,7 +138,7 @@ const networks = [
         name: 'Bitcoin Cash',
         networkType: 'bitcoin',
         symbol: 'bch',
-        bip44: "m/44'/145'/i'",
+        bip43Path: "m/44'/145'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://bch1.trezor.io/tx/',
@@ -137,7 +150,7 @@ const networks = [
         name: 'Bitcoin Gold',
         networkType: 'bitcoin',
         symbol: 'btg',
-        bip44: "m/49'/156'/i'",
+        bip43Path: "m/49'/156'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://btg1.trezor.io/tx/',
@@ -150,7 +163,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'btg',
-        bip44: "m/44'/156'/i'",
+        bip43Path: "m/44'/156'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://btg1.trezor.io/tx/',
@@ -162,7 +175,7 @@ const networks = [
         name: 'Dash',
         networkType: 'bitcoin',
         symbol: 'dash',
-        bip44: "m/44'/5'/i'",
+        bip43Path: "m/44'/5'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://dash1.trezor.io/tx/',
@@ -174,7 +187,7 @@ const networks = [
         name: 'DigiByte',
         networkType: 'bitcoin',
         symbol: 'dgb',
-        bip44: "m/49'/20'/i'",
+        bip43Path: "m/49'/20'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://dgb1.trezor.io/tx/',
@@ -187,7 +200,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'dgb',
-        bip44: "m/44'/20'/i'",
+        bip43Path: "m/44'/20'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://dgb1.trezor.io/tx/',
@@ -199,7 +212,7 @@ const networks = [
         name: 'Dogecoin',
         networkType: 'bitcoin',
         symbol: 'doge',
-        bip44: "m/44'/3'/i'",
+        bip43Path: "m/44'/3'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://doge1.trezor.io/tx/',
@@ -211,7 +224,7 @@ const networks = [
         name: 'Namecoin',
         networkType: 'bitcoin',
         symbol: 'nmc',
-        bip44: "m/44'/7'/i'",
+        bip43Path: "m/44'/7'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://nmc1.trezor.io/tx/',
@@ -223,7 +236,7 @@ const networks = [
         name: 'Vertcoin',
         networkType: 'bitcoin',
         symbol: 'vtc',
-        bip44: "m/49'/28'/i'",
+        bip43Path: "m/49'/28'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://vtc1.trezor.io/tx/',
@@ -236,7 +249,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'vtc',
-        bip44: "m/44'/28'/i'",
+        bip43Path: "m/44'/28'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://vtc1.trezor.io/tx/',
@@ -248,7 +261,7 @@ const networks = [
         name: 'Zcash',
         networkType: 'bitcoin',
         symbol: 'zec',
-        bip44: "m/44'/133'/i'",
+        bip43Path: "m/44'/133'/i'",
         decimals: 8,
         explorer: {
             tx: 'https://zec1.trezor.io/tx/',
@@ -261,7 +274,7 @@ const networks = [
         name: 'Bitcoin Testnet',
         networkType: 'bitcoin',
         symbol: 'test',
-        bip44: "m/84'/1'/i'",
+        bip43Path: "m/84'/1'/i'",
         decimals: 8,
         testnet: true,
         label: 'TR_TESTNET_COINS_LABEL',
@@ -272,11 +285,26 @@ const networks = [
         features: ['rbf', 'sign-verify'],
     },
     {
+        name: 'Bitcoin Testnet (taproot)',
+        networkType: 'bitcoin',
+        accountType: 'taproot',
+        symbol: 'test',
+        bip43Path: "m/86'/1'/i'",
+        decimals: 8,
+        testnet: true,
+        label: 'TR_TESTNET_COINS_LABEL',
+        explorer: {
+            tx: 'https://tbtc1.trezor.io/tx/',
+            account: 'https://tbtc1.trezor.io/xpub/',
+        },
+        features: ['rbf'],
+    },
+    {
         name: 'Bitcoin Testnet (segwit)',
         networkType: 'bitcoin',
         accountType: 'segwit',
         symbol: 'test',
-        bip44: "m/49'/1'/i'",
+        bip43Path: "m/49'/1'/i'",
         decimals: 8,
         testnet: true,
         label: 'TR_TESTNET_COINS_LABEL',
@@ -291,7 +319,7 @@ const networks = [
         networkType: 'bitcoin',
         accountType: 'legacy',
         symbol: 'test',
-        bip44: "m/44'/1'/i'",
+        bip43Path: "m/44'/1'/i'",
         decimals: 8,
         testnet: true,
         label: 'TR_TESTNET_COINS_LABEL',
@@ -305,7 +333,7 @@ const networks = [
         name: 'Ethereum Ropsten',
         networkType: 'ethereum',
         symbol: 'trop',
-        bip44: "m/44'/1'/0'/0/i",
+        bip43Path: "m/44'/1'/0'/0/i",
         chainId: 3,
         decimals: 18,
         testnet: true,
@@ -320,7 +348,7 @@ const networks = [
         name: 'XRP Testnet',
         networkType: 'ripple',
         symbol: 'txrp',
-        bip44: "m/44'/144'/i'/0/0",
+        bip43Path: "m/44'/144'/i'/0/0",
         decimals: 6,
         testnet: true,
         label: 'TR_TESTNET_COINS_LABEL',
@@ -372,7 +400,7 @@ const networks = [
 ] as const;
 
 type Network = {
-    accountType?: 'normal' | 'legacy' | 'segwit';
+    accountType?: 'normal' | 'legacy' | 'segwit' | 'taproot';
     testnet?: boolean;
     isHidden?: boolean;
     chainId?: number;

@@ -98,8 +98,8 @@ const ExpandButton = styled(Button)`
     align-self: flex-start;
 `;
 
-const StyledFeeRow = styled(FeeRow)`
-    margin-top: 20px;
+const StyledFeeRow = styled(FeeRow)<{ isFailed?: boolean }>`
+    margin-top: ${props => (props.isFailed ? '20px' : '0px')};
 `;
 
 const DEFAULT_LIMIT = 3;
@@ -128,6 +128,8 @@ const TransactionItem = React.memo((props: Props) => {
         type !== 'recv' &&
         type !== 'self' &&
         transaction.fee !== '0';
+    const hasSingleTargetOrTransfer = !isUnknown && targets.length + tokens.length === 1;
+
     const [txItemIsHovered, setTxItemIsHovered] = useState(false);
     const [nestedItemIsHovered, setNestedItemIsHovered] = useState(false);
 
@@ -174,7 +176,10 @@ const TransactionItem = React.memo((props: Props) => {
                 onMouseLeave={() => setNestedItemIsHovered(false)}
                 onClick={() => openTxDetailsModal()}
             >
-                <TransactionTypeIcon type={type} isPending={props.isPending} />
+                <TransactionTypeIcon
+                    type={transaction.tokens.length ? transaction.tokens[0].type : type}
+                    isPending={props.isPending}
+                />
             </TxTypeIconWrapper>
 
             <Content>
@@ -197,7 +202,7 @@ const TransactionItem = React.memo((props: Props) => {
                         <TransactionTimestamp transaction={transaction} />
                     </TimestampWrapper>
                     <TargetsWrapper>
-                        {!isUnknown && type !== 'failed' && (
+                        {!isUnknown && type !== 'failed' && previewTargets.length ? (
                             <>
                                 {previewTargets.map((t, i) => (
                                     <React.Fragment key={i}>
@@ -274,9 +279,9 @@ const TransactionItem = React.memo((props: Props) => {
                                             ))}
                                 </AnimatePresence>
                             </>
-                        )}
-                        {/* 
-                        {!isUnknown && isTokenTransaction && (
+                        ) : null}
+
+                        {!isUnknown && tokens.length ? (
                             <>
                                 {tokens.slice(0, DEFAULT_LIMIT).map((t, i) => (
                                     <TokenTransfer
@@ -303,12 +308,13 @@ const TransactionItem = React.memo((props: Props) => {
                                             ))}
                                 </AnimatePresence>
                             </>
-                        )} */}
+                        ) : null}
 
                         {showFeeRow && (
                             <StyledFeeRow
                                 transaction={transaction}
                                 useFiatValues={useFiatValues}
+                                isFailed={type !== 'failed'}
                                 isFirst
                                 isLast
                             />

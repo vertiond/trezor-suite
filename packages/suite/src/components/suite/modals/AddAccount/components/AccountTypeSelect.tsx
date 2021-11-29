@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Select, variables } from '@trezor/components';
+import { P, Select, variables } from '@trezor/components';
 import { Translation } from '@suite-components/Translation';
-import { Network } from '@wallet-types';
-import { getAccountTypeIntl, getBip43Intl } from '@wallet-utils/accountUtils';
+import { getAccountTypeName, getAccountTypeTech } from '@wallet-utils/accountUtils';
 import { AccountTypeDescription } from './AccountTypeDescription';
+import type { UnavailableCapabilities } from 'trezor-connect';
+import type { Network } from '@wallet-types';
 
 const LabelWrapper = styled.div`
     display: flex;
@@ -21,6 +22,11 @@ const TypeInfo = styled.div`
     margin-left: 1ch;
 `;
 
+const UnavailableInfo = styled(P)`
+    color: ${props => props.theme.TYPE_LIGHT_GREY};
+    margin: 20px 0;
+`;
+
 const buildAccountTypeOption = (network: Network) =>
     ({
         value: network,
@@ -31,9 +37,9 @@ type Option = ReturnType<typeof buildAccountTypeOption>;
 
 const formatLabel = (option: Option) => (
     <LabelWrapper>
-        <Translation id={getAccountTypeIntl(option.value.bip44)} />
+        <Translation id={getAccountTypeName(option.value.bip43Path)} />
         <TypeInfo>
-            <Translation id={getBip43Intl(option.value.bip44)} />
+            <Translation id={getAccountTypeTech(option.value.bip43Path)} />
         </TypeInfo>
     </LabelWrapper>
 );
@@ -42,9 +48,15 @@ interface Props {
     network: Network;
     accountTypes: Network[];
     onSelectAccountType: (network: Network) => void;
+    unavailableCapabilities?: UnavailableCapabilities;
 }
 
-export const AccountTypeSelect = ({ network, accountTypes, onSelectAccountType }: Props) => {
+export const AccountTypeSelect = ({
+    network,
+    accountTypes,
+    onSelectAccountType,
+    unavailableCapabilities,
+}: Props) => {
     const options = accountTypes.map(buildAccountTypeOption);
     return (
         <>
@@ -57,7 +69,13 @@ export const AccountTypeSelect = ({ network, accountTypes, onSelectAccountType }
                 formatOptionLabel={formatLabel}
                 onChange={(option: Option) => onSelectAccountType(option.value)}
             />
-            <AccountTypeDescription network={network} accountTypes={accountTypes} />
+            {unavailableCapabilities && unavailableCapabilities[network.accountType!] ? (
+                <UnavailableInfo size="small" textAlign="left">
+                    <Translation id="TR_ACCOUNT_TYPE_BIP86_NOT_SUPPORTED" />
+                </UnavailableInfo>
+            ) : (
+                <AccountTypeDescription network={network} accountTypes={accountTypes} />
+            )}
         </>
     );
 };

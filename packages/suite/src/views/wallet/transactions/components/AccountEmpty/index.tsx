@@ -7,7 +7,8 @@ import { Account } from '@wallet-types';
 import * as suiteActions from '@suite-actions/suiteActions';
 import * as routerActions from '@suite-actions/routerActions';
 import Bech32Banner from './components/Bech32Banner';
-import { getBip43Shortcut } from '@wallet-utils/accountUtils';
+import TaprootBanner from './components/TaprootBanner';
+import { getBip43Type } from '@wallet-utils/accountUtils';
 
 const Wrapper = styled.div`
     display: flex;
@@ -67,26 +68,33 @@ interface Props {
 }
 
 const AccountEmpty = (props: Props) => {
-    const bech32BannerClosed = useSelector(state => state.suite.flags.bech32BannerClosed);
+    const { bech32BannerClosed, taprootBannerClosed } = useSelector(state => state.suite.flags);
     const { goto, setFlag } = useActions({
         goto: routerActions.goto,
         setFlag: suiteActions.setFlag,
     });
-    const bip43 = getBip43Shortcut(props.account.path);
+    const bip43 = getBip43Type(props.account.path);
     const networkSymbol = props.account.symbol.toUpperCase();
     const analytics = useAnalytics();
 
     return (
         <Wrapper>
-            {bip43 === 'bech32' && !bech32BannerClosed && (
+            {bip43 === 'bip84' && !bech32BannerClosed && (
                 <Bech32Banner
                     onClose={() => {
                         setFlag('bech32BannerClosed', true);
                     }}
                 />
             )}
+            {bip43 === 'bip86' && !taprootBannerClosed && (
+                <TaprootBanner
+                    onClose={() => {
+                        setFlag('taprootBannerClosed', true);
+                    }}
+                />
+            )}
             <StyledCard>
-                <StyledImage image="EMPTY_WALLET_NEUE" />
+                <StyledImage image="CLOUDY" />
                 <Title>
                     <Translation id="TR_ACCOUNT_IS_EMPTY_TITLE" />
                 </Title>
