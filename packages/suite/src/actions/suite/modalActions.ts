@@ -7,7 +7,8 @@ import { createDeferred, Deferred, DeferredResponse } from '@suite-utils/deferre
 export type UserContextPayload =
     | {
           type: 'qr-reader';
-          decision: Deferred<{ address: string; amount?: string }>;
+          decision: Deferred<Record<string, string | undefined>>;
+          allowPaste?: boolean;
       }
     | {
           type: 'unverified-address';
