@@ -31,9 +31,8 @@ const Content = ({
             account={selectedAccount}
             showEmptyHeaderPlaceholder={showEmptyHeaderPlaceholder}
         >
-            {showSummary && account.networkType !== 'ripple' && (
-                <TransactionSummary account={account} />
-            )}
+            {(showSummary && account.networkType !== 'ripple') ||
+                (account.networkType !== 'cardano' && <TransactionSummary account={account} />)}
             {children}
         </WalletLayout>
     );
