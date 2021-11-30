@@ -92,6 +92,17 @@ const TokenSelect = ({ output, outputId }: Props) => {
         }
     }, [outputId, tokenWatch, setAmount, getValues, account.networkType, isSetMaxActive]);
 
+    const getShortFingerprint = (fingerprint: string) => {
+        if (fingerprint) {
+            const firstPart = fingerprint.substring(0, 10);
+            const lastPart = fingerprint.substring(fingerprint.length - 10);
+
+            return `${firstPart} ... ${lastPart}`;
+        }
+
+        return null;
+    };
+
     const CardanoOption = ({ tokenInputName, ...optionProps }: any) => (
         <components.Option
             {...optionProps}
@@ -111,15 +122,7 @@ const TokenSelect = ({ output, outputId }: Props) => {
                         optionProps.data.label
                     )}
                 </OptionValueName>
-                <OptionValue>
-                    {optionProps.data.fingerprint &&
-                        `${optionProps.data.fingerprint.substring(
-                            0,
-                            10,
-                        )} ... ${optionProps.data.fingerprint.substring(
-                            optionProps.data.fingerprint.length - 10,
-                        )}`}
-                </OptionValue>
+                <OptionValue>{getShortFingerprint(optionProps.data.fingerprint)}</OptionValue>
             </OptionWrapper>
         </components.Option>
     );
