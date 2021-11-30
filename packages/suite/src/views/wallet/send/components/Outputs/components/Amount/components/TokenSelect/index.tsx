@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { Select } from '@trezor/components';
+import { components } from 'react-select';
+import styled from 'styled-components';
 import { useSendFormContext } from '@wallet-hooks';
 import { Account } from '@wallet-types';
 import { Output } from '@wallet-types/sendForm';
@@ -35,6 +37,20 @@ interface Props {
     output: Partial<Output>;
     outputId: number;
 }
+
+const OptionValueName = styled.div`
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 160px;
+    height: 1.2em;
+    white-space: nowrap;
+    margin: 5px 0;
+`;
+
+const OptionWrapper = styled.div``;
+const OptionValue = styled.div``;
+
 const TokenSelect = ({ output, outputId }: Props) => {
     const {
         account,
@@ -67,6 +83,30 @@ const TokenSelect = ({ output, outputId }: Props) => {
         }
     }, [outputId, tokenWatch, setAmount, getValues, account.networkType, isSetMaxActive]);
 
+    const Option = ({ tokenInputName, ...optionProps }: any) => (
+        <components.Option
+            {...optionProps}
+            innerProps={{
+                ...optionProps.innerProps,
+                'data-test': `${tokenInputName}/option/${optionProps.value}`,
+            }}
+        >
+            <OptionWrapper>
+                <OptionValueName>{optionProps.data.label}</OptionValueName>
+                <OptionValue>
+                    {optionProps.data.value &&
+                        `${optionProps.data.value.substring(
+                            0,
+                            8,
+                        )} ... ${optionProps.data.value.substring(
+                            optionProps.data.value.length - 8,
+                        )}`}
+                    {!optionProps.data.value && 'N/A'}
+                </OptionValue>
+            </OptionWrapper>
+        </components.Option>
+    );
+
     return (
         <Controller
             control={control}
@@ -76,12 +116,13 @@ const TokenSelect = ({ output, outputId }: Props) => {
             render={({ onChange }) => (
                 <Select
                     options={options}
+                    minWidth={account.networkType === 'cardano' ? '180px' : '58px'}
                     isSearchable
                     isDisabled={options.length === 1} // disable when account has no tokens to choose from
                     hideTextCursor
                     value={options.find(o => o.value === tokenValue)}
                     isClearable={false}
-                    minWidth="58px"
+                    components={{ Option }}
                     isClean
                     onChange={(selected: Option) => {
                         // change selected value
