@@ -10,12 +10,14 @@ import { Output } from '@wallet-types/sendForm';
 interface Option {
     label: string;
     value: string | null;
+    fingerprint: string | undefined;
 }
 
 export const buildTokenOptions = (account: Account) => {
     const result: Option[] = [
         {
             value: null,
+            fingerprint: undefined,
             label: account.symbol.toUpperCase(),
         },
     ];
@@ -26,6 +28,7 @@ export const buildTokenOptions = (account: Account) => {
             result.push({
                 value: token.address,
                 label: tokenName.toUpperCase(),
+                fingerprint: token.name,
             });
         });
     }
@@ -49,7 +52,13 @@ const OptionValueName = styled.div`
 `;
 
 const OptionWrapper = styled.div``;
-const OptionValue = styled.div``;
+const OptionValue = styled.div`
+    font-variant-numeric: slashed-zero tabular-nums;
+`;
+
+const OptionEmptyName = styled.div`
+    font-style: italic;
+`;
 
 const TokenSelect = ({ output, outputId }: Props) => {
     const {
@@ -83,7 +92,7 @@ const TokenSelect = ({ output, outputId }: Props) => {
         }
     }, [outputId, tokenWatch, setAmount, getValues, account.networkType, isSetMaxActive]);
 
-    const Option = ({ tokenInputName, ...optionProps }: any) => (
+    const CardanoOption = ({ tokenInputName, ...optionProps }: any) => (
         <components.Option
             {...optionProps}
             innerProps={{
@@ -92,20 +101,31 @@ const TokenSelect = ({ output, outputId }: Props) => {
             }}
         >
             <OptionWrapper>
-                <OptionValueName>{optionProps.data.label}</OptionValueName>
+                <OptionValueName>
+                    {optionProps.data.fingerprint &&
+                    optionProps.data.label.toLowerCase() ===
+                        optionProps.data.fingerprint.toLowerCase() ? (
+                        // eslint-disable-next-line react/jsx-indent
+                        <OptionEmptyName>No name</OptionEmptyName>
+                    ) : (
+                        optionProps.data.label
+                    )}
+                </OptionValueName>
                 <OptionValue>
-                    {optionProps.data.value &&
-                        `${optionProps.data.value.substring(
+                    {optionProps.data.fingerprint &&
+                        `${optionProps.data.fingerprint.substring(
                             0,
-                            8,
-                        )} ... ${optionProps.data.value.substring(
-                            optionProps.data.value.length - 8,
+                            10,
+                        )} ... ${optionProps.data.fingerprint.substring(
+                            optionProps.data.fingerprint.length - 10,
                         )}`}
-                    {!optionProps.data.value && 'N/A'}
                 </OptionValue>
             </OptionWrapper>
         </components.Option>
     );
+
+    const customComponents =
+        account.networkType === 'cardano' ? { Option: CardanoOption } : undefined;
 
     return (
         <Controller
@@ -116,13 +136,13 @@ const TokenSelect = ({ output, outputId }: Props) => {
             render={({ onChange }) => (
                 <Select
                     options={options}
-                    minWidth={account.networkType === 'cardano' ? '180px' : '58px'}
+                    minWidth={account.networkType === 'cardano' ? '200px' : '58px'}
                     isSearchable
                     isDisabled={options.length === 1} // disable when account has no tokens to choose from
                     hideTextCursor
                     value={options.find(o => o.value === tokenValue)}
                     isClearable={false}
-                    components={{ Option }}
+                    components={customComponents}
                     isClean
                     onChange={(selected: Option) => {
                         // change selected value
