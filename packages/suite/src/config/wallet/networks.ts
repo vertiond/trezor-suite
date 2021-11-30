@@ -361,7 +361,7 @@ const networks = [
         name: 'Cardano',
         networkType: 'cardano',
         symbol: 'ada',
-        bip44: "m/1852'/1815'/i'",
+        bip43Path: "m/1852'/1815'/i'",
         decimals: 6,
         testnet: false,
         explorer: {
@@ -374,7 +374,7 @@ const networks = [
         name: 'Cardano Testnet',
         networkType: 'cardano',
         symbol: 'tada',
-        bip44: "m/1852'/1815'/i'",
+        bip43Path: "m/1852'/1815'/i'",
         decimals: 6,
         testnet: true,
         explorer: {
@@ -388,7 +388,7 @@ const networks = [
         networkType: 'cardano',
         accountType: 'legacy',
         symbol: 'ada',
-        bip44: "m/44'/1815'/i'",
+        bip43Path: "m/44'/1815'/i'",
         decimals: 6,
         testnet: false,
         explorer: {

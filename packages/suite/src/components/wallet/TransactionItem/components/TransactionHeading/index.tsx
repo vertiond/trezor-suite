@@ -71,6 +71,7 @@ const TransactionHeading = ({
     const theme = useTheme();
     const symbol = getTxHeaderSymbol(transaction);
     const nTokens = transaction.tokens.length;
+    const isTokenTransaction = transaction.tokens.length;
     const isSingleTokenTransaction = nTokens === 1;
     const target = transaction.targets[0];
     const transfer = transaction.tokens[0];
