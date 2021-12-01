@@ -18,7 +18,7 @@
         "test-health": "jest -c jest.config.health.js"
     },
     "dependencies": {
-        "@fivebinaries/coin-selection": "0.0.1-beta.4",
+        "@fivebinaries/coin-selection": "2.0.0-beta.1",
         "@sentry/browser": "^6.13.3",
         "@sentry/integrations": "^6.13.3",
         "@trezor/components": "1.0.0",
