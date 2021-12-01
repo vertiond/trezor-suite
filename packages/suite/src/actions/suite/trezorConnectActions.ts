@@ -65,7 +65,8 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
         // 'https://connect.corp.sldev.cz/develop/';
 
         await TrezorConnect.init({
-            connectSrc,
+            // connectSrc,
+            connectSrc: 'https://localhost:8088/',
             transportReconnect: true,
             debug: false,
             popup: false,
