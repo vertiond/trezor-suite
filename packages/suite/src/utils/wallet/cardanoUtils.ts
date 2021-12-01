@@ -54,6 +54,17 @@ export const transformUserOutputs = (
         };
     });
 
+export const getShortFingerprint = (fingerprint: string) => {
+    if (fingerprint) {
+        const firstPart = fingerprint.substring(0, 10);
+        const lastPart = fingerprint.substring(fingerprint.length - 10);
+
+        return `${firstPart} ... ${lastPart}`;
+    }
+
+    return null;
+};
+
 export const transformUtxos = (utxos: Account['utxo']): types.Utxo[] => {
     const result: types.Utxo[] = [];
     utxos?.forEach(utxo => {

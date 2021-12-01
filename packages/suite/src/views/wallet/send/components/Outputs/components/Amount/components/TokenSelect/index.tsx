@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { useSendFormContext } from '@wallet-hooks';
 import { Account } from '@wallet-types';
 import { Output } from '@wallet-types/sendForm';
+import { getShortFingerprint } from '@wallet-utils/cardanoUtils';
 
 interface Option {
     label: string;
@@ -92,17 +93,6 @@ const TokenSelect = ({ output, outputId }: Props) => {
         }
     }, [outputId, tokenWatch, setAmount, getValues, account.networkType, isSetMaxActive]);
 
-    const getShortFingerprint = (fingerprint: string) => {
-        if (fingerprint) {
-            const firstPart = fingerprint.substring(0, 10);
-            const lastPart = fingerprint.substring(fingerprint.length - 10);
-
-            return `${firstPart} ... ${lastPart}`;
-        }
-
-        return null;
-    };
-
     const CardanoOption = ({ tokenInputName, ...optionProps }: any) => (
         <components.Option
             {...optionProps}
@@ -127,8 +117,22 @@ const TokenSelect = ({ output, outputId }: Props) => {
         </components.Option>
     );
 
+    const CardanoSingleValue = ({ tokenInputName, ...optionProps }: any) => (
+        <components.SingleValue {...optionProps} innerProps={{ ...optionProps.innerProps }}>
+            {optionProps.data.fingerprint &&
+            optionProps.data.label.toLowerCase() === optionProps.data.fingerprint.toLowerCase()
+                ? getShortFingerprint(optionProps.data.fingerprint)
+                : optionProps.data.label}
+        </components.SingleValue>
+    );
+
     const customComponents =
-        account.networkType === 'cardano' ? { Option: CardanoOption } : undefined;
+        account.networkType === 'cardano'
+            ? {
+                  Option: CardanoOption,
+                  SingleValue: CardanoSingleValue,
+              }
+            : undefined;
 
     return (
         <Controller
