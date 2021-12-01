@@ -108,6 +108,7 @@ export const signTransaction =
     (formValues: FormState, transactionInfo: PrecomposedTransactionCardano) =>
     async (dispatch: Dispatch, getState: GetState) => {
         const { selectedAccount } = getState().wallet;
+        const { value } = getState().wallet.settings.blockfrostCardanoDerivationType;
         const { device } = getState().suite;
 
         if (
@@ -137,6 +138,7 @@ export const signTransaction =
             protocolMagic: getProtocolMagic(account.symbol),
             networkId: getNetworkId(account.symbol),
             fee: transactionInfo.fee,
+            derivationType: value,
         });
 
         if (!res.success) {
