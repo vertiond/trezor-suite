@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext, useContext, useCallback } from 'react';
 import { Props, ContextValues } from '@wallet-types/cardanoStaking';
+import { SUITE } from '@suite-actions/constants';
 import trezorConnect, {
     CardanoCertificate,
     CardanoCertificateType,
@@ -22,7 +23,6 @@ import { isTestnet } from '@suite/utils/wallet/accountUtils';
 export const useCardanoStaking = (props: Props): ContextValues => {
     const URL_MAINNET = 'https://trezor-cardano-mainnet.blockfrost.io/api/v0/pools/';
     const URL_TESTNET = 'https://trezor-cardano-testnet.blockfrost.io/api/v0/pools/';
-
     const { addToast, fetchAndUpdateAccount } = useActions({
         addToast: notificationActions.addToast,
         fetchAndUpdateAccount: accountActions.fetchAndUpdateAccount,
@@ -114,6 +114,8 @@ export const useCardanoStaking = (props: Props): ContextValues => {
 
         const res = await trezorConnect.cardanoSignTransaction({
             signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
+            device: props.device,
+            useEmptyPassphrase: props.device?.useEmptyPassphrase,
             inputs: trezorUtils.transformToTrezorInputs(txPlan.inputs, account.utxo),
             outputs: trezorUtils.transformToTrezorOutputs(
                 txPlan.outputs,
@@ -221,6 +223,7 @@ export const useCardanoStaking = (props: Props): ContextValues => {
         account,
         deposit,
         fee,
+        isLocked: props.locks.includes(SUITE.LOCK_TYPE.DEVICE),
         registeredPoolId: account.networkType === 'cardano' ? account.misc.staking.poolId : null,
         isActive: account.networkType === 'cardano' ? account.misc.staking.isActive : false,
         rewards: account.networkType === 'cardano' ? account.misc.staking.rewards : '0',

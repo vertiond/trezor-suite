@@ -83,7 +83,7 @@ const Text = styled.div`
 `;
 
 const Rewards = () => {
-    const { address, rewards, account, withdraw, loading } = useCardanoStakingContext();
+    const { address, rewards, account, withdraw, loading, isLocked } = useCardanoStakingContext();
     return (
         <StyledCard>
             <StyledH1>
@@ -113,7 +113,7 @@ const Rewards = () => {
             <Right>
                 <Button
                     isLoading={loading}
-                    isDisabled={rewards === '0'}
+                    isDisabled={rewards === '0' || isLocked}
                     icon="T1"
                     onClick={() => withdraw()}
                 >

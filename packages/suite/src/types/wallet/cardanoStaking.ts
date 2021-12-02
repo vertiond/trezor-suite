@@ -4,6 +4,8 @@ import { DerivationType } from '@wallet-types/cardano';
 
 export interface ComponentProps {
     selectedAccount: AppState['wallet']['selectedAccount'];
+    device: AppState['suite']['device'];
+    locks: AppState['suite']['locks'];
     derivationType: DerivationType;
 }
 
@@ -22,6 +24,7 @@ export type ContextValues = {
     trezorPoolId?: string;
     isActive: boolean;
     rewards: string;
+    isLocked: boolean;
     delegate(): void;
     withdraw(): void;
     calculateFeeAndDeposit(action: 'delegate' | 'withdrawal'): void;
