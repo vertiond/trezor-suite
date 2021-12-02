@@ -1,12 +1,15 @@
 import { AppState } from '@suite-types';
 import { Account } from '@wallet-types';
+import { DerivationType } from '@wallet-types/cardano';
 
 export interface ComponentProps {
     selectedAccount: AppState['wallet']['selectedAccount'];
+    derivationType: DerivationType;
 }
 
 export interface Props extends ComponentProps {
     selectedAccount: Extract<ComponentProps['selectedAccount'], { status: 'loaded' }>;
+    derivationType: DerivationType;
 }
 
 export type ContextValues = {

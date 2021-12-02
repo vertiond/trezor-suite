@@ -27,7 +27,6 @@ export const useCardanoStaking = (props: Props): ContextValues => {
         addToast: notificationActions.addToast,
         fetchAndUpdateAccount: accountActions.fetchAndUpdateAccount,
     });
-
     const [trezorPoolId, setTrezorPoolId] = useState<undefined | string>(undefined);
     const [deposit, setDeposit] = useState<undefined | string>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
@@ -123,6 +122,7 @@ export const useCardanoStaking = (props: Props): ContextValues => {
             fee: txPlan.fee,
             protocolMagic: getProtocolMagic(network.symbol),
             networkId: getNetworkId(network.symbol),
+            derivationType: props.derivationType.value,
             ...(certificates.length > 0 ? { certificates } : {}),
             ...(withdrawals.length > 0 ? { withdrawals } : {}),
         });
@@ -137,12 +137,19 @@ export const useCardanoStaking = (props: Props): ContextValues => {
             const signedTx = trezorUtils.signTransaction(txPlan.tx.body, res.payload.witnesses, {
                 testnet: isTestnet(account.symbol),
             });
-            const txHash = await trezorConnect.pushTransaction({
+            const sentTx = await trezorConnect.pushTransaction({
                 tx: signedTx,
                 coin: account.symbol,
             });
-            // TODO:  notification
-            fetchAndUpdateAccount(account);
+
+            if (sentTx.success) {
+                const { txid } = sentTx.payload;
+                addToast({
+                    type: 'raw-tx-sent',
+                    txid,
+                });
+                fetchAndUpdateAccount(account);
+            }
         }
     };
 
@@ -157,6 +164,11 @@ export const useCardanoStaking = (props: Props): ContextValues => {
                 addToast({
                     type: 'cardano-delegate-error',
                     error: error.code,
+                });
+            } else {
+                addToast({
+                    type: 'sign-tx-error',
+                    error: error.message,
                 });
             }
         }
@@ -174,6 +186,11 @@ export const useCardanoStaking = (props: Props): ContextValues => {
                 addToast({
                     type: 'cardano-withdrawal-error',
                     error: error.code,
+                });
+            } else {
+                addToast({
+                    type: 'sign-tx-error',
+                    error: error.message,
                 });
             }
         }

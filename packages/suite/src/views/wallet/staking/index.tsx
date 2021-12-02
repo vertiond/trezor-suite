@@ -9,6 +9,7 @@ import Stake from './components/Stake';
 
 const mapStateToProps = (state: AppState): ComponentProps => ({
     selectedAccount: state.wallet.selectedAccount,
+    derivationType: state.wallet.settings.blockfrostCardanoDerivationType,
 });
 
 const CardanoStakingLoaded = (props: Props) => {
