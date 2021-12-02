@@ -16,7 +16,7 @@ import {
     getNetworkId,
     getChangeAddressParameters,
 } from '@wallet-utils/cardanoUtils';
-import { coinSelection, trezorUtils } from '@fivebinaries/coin-selection';
+import { coinSelection, trezorUtils, CoinSelectionError } from '@fivebinaries/coin-selection';
 import { isTestnet } from '@suite/utils/wallet/accountUtils';
 
 export const useCardanoStaking = (props: Props): ContextValues => {
@@ -31,11 +31,11 @@ export const useCardanoStaking = (props: Props): ContextValues => {
     const [trezorPoolId, setTrezorPoolId] = useState<undefined | string>(undefined);
     const [deposit, setDeposit] = useState<undefined | string>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | undefined>(undefined);
     const [fee, setFee] = useState<undefined | string>(undefined);
     const { account, network } = props.selectedAccount;
     const utxos = transformUtxos(account.utxo);
     const stakingPath = getStakingPath(account.accountType, account.index);
-    const byron = account.accountType !== 'normal';
     const isStakingActive =
         account.networkType === 'cardano' ? account.misc.staking.isActive : false;
 
@@ -81,14 +81,11 @@ export const useCardanoStaking = (props: Props): ContextValues => {
                 prepareCertificates(certificates),
                 withdrawals,
                 account.descriptor,
-                {
-                    byron,
-                },
             );
             console.log('txPlan', txPlan);
             return { txPlan, certificates, withdrawals, changeAddress };
         },
-        [account, byron, getCertificates, stakingPath, utxos],
+        [account, getCertificates, stakingPath, utxos],
     );
 
     const calculateFeeAndDeposit = useCallback(
@@ -150,14 +147,28 @@ export const useCardanoStaking = (props: Props): ContextValues => {
     };
 
     const delegate = async () => {
+        setError(undefined);
         setLoading(true);
-        await signAndPushTransaction('delegate');
+        try {
+            await signAndPushTransaction('delegate');
+        } catch (error) {
+            if (error instanceof CoinSelectionError && error.code === 'UTXO_BALANCE_INSUFFICIENT') {
+                setError('AMOUNT_IS_NOT_ENOUGH');
+            }
+        }
         setLoading(false);
     };
 
     const withdraw = async () => {
+        setError(undefined);
         setLoading(true);
-        await signAndPushTransaction('withdrawal');
+        try {
+            await signAndPushTransaction('withdrawal');
+        } catch (error) {
+            if (error instanceof CoinSelectionError && error.code === 'UTXO_BALANCE_INSUFFICIENT') {
+                setError('AMOUNT_IS_NOT_ENOUGH');
+            }
+        }
         setLoading(false);
     };
 
@@ -180,7 +191,7 @@ export const useCardanoStaking = (props: Props): ContextValues => {
             fetchTrezorPoolId();
         }
     }, [setTrezorPoolId, network, trezorPoolId]);
-
+    console.log('error', error);
     return {
         account,
         deposit,
@@ -194,6 +205,7 @@ export const useCardanoStaking = (props: Props): ContextValues => {
         withdraw,
         loading,
         calculateFeeAndDeposit,
+        error,
     };
 };
 

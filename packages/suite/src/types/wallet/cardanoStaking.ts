@@ -22,4 +22,5 @@ export type ContextValues = {
     delegate(): void;
     withdraw(): void;
     calculateFeeAndDeposit(action: 'delegate' | 'withdrawal'): void;
+    error?: string;
 };
