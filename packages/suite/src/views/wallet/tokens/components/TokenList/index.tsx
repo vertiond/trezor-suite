@@ -106,99 +106,55 @@ const TokenList = ({ tokens, explorerUrl, isTestnet, networkType }: Props) => {
     const theme = useTheme();
     if (!tokens || tokens.length === 0) return null;
 
-    if (networkType === 'cardano') {
-        return (
-            <Wrapper isTestnet={isTestnet} noPadding>
-                {tokens.map(t => {
-                    const noName = !t.symbol || t.symbol.toLowerCase() === t.name?.toLowerCase();
-
-                    return (
-                        <Fragment key={t.address}>
-                            <ColWithoutOverflow isTestnet={isTestnet}>
-                                <TokenNameWrapper>
-                                    <TokenSymbol>{!noName && t.symbol}</TokenSymbol>
-                                    {noName && (
-                                        <TokenName>{getShortFingerprint(t.symbol)}</TokenName>
-                                    )}
-                                </TokenNameWrapper>
-                            </ColWithoutOverflow>
-                            <Col isTestnet={isTestnet} justify="right">
-                                <TokenValue>
-                                    {t.balance && (
-                                        <CryptoAmount
-                                            value={t.balance}
-                                            // @ts-ignore
-                                            symbol={
-                                                noName ? getShortFingerprint(t.symbol) : t.symbol
-                                            }
-                                        />
-                                    )}
-                                </TokenValue>
-                            </Col>
-                            {!isTestnet && (
-                                <Col isTestnet={isTestnet} justify="right">
-                                    <FiatWrapper>
-                                        {t.balance && t.symbol && (
-                                            <FiatValue
-                                                amount={t.balance}
-                                                symbol={t.symbol}
-                                                tokenAddress={t.address}
-                                            />
-                                        )}
-                                    </FiatWrapper>
-                                </Col>
-                            )}
-                            <Col isTestnet={isTestnet} justify="right">
-                                <TrezorLink href={`${explorerUrl}${t.address}`}>
-                                    <Icon
-                                        icon="EXTERNAL_LINK"
-                                        size={16}
-                                        color={theme.TYPE_LIGHT_GREY}
-                                    />
-                                </TrezorLink>
-                            </Col>
-                        </Fragment>
-                    );
-                })}
-            </Wrapper>
-        );
-    }
-
     return (
         <Wrapper isTestnet={isTestnet} noPadding>
-            {tokens.map(t => (
-                <Fragment key={t.address}>
-                    <ColWithoutOverflow isTestnet={isTestnet}>
-                        <TokenNameWrapper>
-                            <TokenSymbol>{t.symbol}</TokenSymbol>
-                            <TokenName> - {t.name}</TokenName>
-                        </TokenNameWrapper>
-                    </ColWithoutOverflow>
-                    <Col isTestnet={isTestnet} justify="right">
-                        <TokenValue>
-                            {t.balance && <CryptoAmount value={t.balance} symbol={t.symbol} />}
-                        </TokenValue>
-                    </Col>
-                    {!isTestnet && (
+            {tokens.map(t => {
+                const noName = !t.symbol || t.symbol.toLowerCase() === t.name?.toLowerCase();
+
+                return (
+                    <Fragment key={t.address}>
+                        <ColWithoutOverflow isTestnet={isTestnet}>
+                            <TokenNameWrapper>
+                                {!noName && <TokenSymbol>{t.symbol}</TokenSymbol>}
+                                {!noName && ` - `}
+                                <TokenName>{t.name}</TokenName>
+                            </TokenNameWrapper>
+                        </ColWithoutOverflow>
                         <Col isTestnet={isTestnet} justify="right">
-                            <FiatWrapper>
-                                {t.balance && t.symbol && (
-                                    <FiatValue
-                                        amount={t.balance}
-                                        symbol={t.symbol}
-                                        tokenAddress={t.address}
+                            <TokenValue>
+                                {t.balance && (
+                                    <CryptoAmount
+                                        value={t.balance}
+                                        symbol={networkType === 'cardano' ? undefined : t.symbol}
                                     />
                                 )}
-                            </FiatWrapper>
+                            </TokenValue>
                         </Col>
-                    )}
-                    <Col isTestnet={isTestnet} justify="right">
-                        <TrezorLink href={`${explorerUrl}${t.address}`}>
-                            <Icon icon="EXTERNAL_LINK" size={16} color={theme.TYPE_LIGHT_GREY} />
-                        </TrezorLink>
-                    </Col>
-                </Fragment>
-            ))}
+                        {!isTestnet && (
+                            <Col isTestnet={isTestnet} justify="right">
+                                <FiatWrapper>
+                                    {t.balance && t.symbol && (
+                                        <FiatValue
+                                            amount={t.balance}
+                                            symbol={t.symbol}
+                                            tokenAddress={t.address}
+                                        />
+                                    )}
+                                </FiatWrapper>
+                            </Col>
+                        )}
+                        <Col isTestnet={isTestnet} justify="right">
+                            <TrezorLink href={`${explorerUrl}${t.address}`}>
+                                <Icon
+                                    icon="EXTERNAL_LINK"
+                                    size={16}
+                                    color={theme.TYPE_LIGHT_GREY}
+                                />
+                            </TrezorLink>
+                        </Col>
+                    </Fragment>
+                );
+            })}
         </Wrapper>
     );
 };
