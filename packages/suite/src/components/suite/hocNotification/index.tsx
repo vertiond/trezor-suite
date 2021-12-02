@@ -338,6 +338,20 @@ const hocNotification = (notification: NotificationEntry, View: React.ComponentT
                 message: 'TR_GUIDE_FEEDBACK_ERROR',
             });
 
+        case 'cardano-delegate-error':
+            return simple(View, {
+                notification,
+                variant: 'success',
+                message: 'TR_ERROR_CARDANO_DELEGATE',
+            });
+
+        case 'cardano-withdrawal-error':
+            return simple(View, {
+                notification,
+                variant: 'error',
+                message: 'TR_ERROR_CARDANO_WITHDRAWAL',
+            });
+
         // Events:
         case DEVICE.CONNECT:
             return withAction(View, {

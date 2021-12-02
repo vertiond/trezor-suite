@@ -6980,4 +6980,12 @@ export default defineMessages({
         id: 'SETTINGS_ADV_CARDANO_DERIVATION_DESCRIPTION',
         defaultMessage: 'Cardano derivation type description',
     },
+    TR_ERROR_CARDANO_DELEGATE: {
+        id: 'TR_ERROR_CARDANO_DELEGATE',
+        defaultMessage: 'Amount is not enough',
+    },
+    TR_ERROR_CARDANO_WITHDRAWAL: {
+        id: 'TR_ERROR_CARDANO_WITHDRAWAL',
+        defaultMessage: 'Amount is not enough',
+    },
 });

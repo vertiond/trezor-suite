@@ -154,6 +154,10 @@ export const useCardanoStaking = (props: Props): ContextValues => {
         } catch (error) {
             if (error instanceof CoinSelectionError && error.code === 'UTXO_BALANCE_INSUFFICIENT') {
                 setError('AMOUNT_IS_NOT_ENOUGH');
+                addToast({
+                    type: 'cardano-delegate-error',
+                    error: error.code,
+                });
             }
         }
         setLoading(false);
@@ -167,6 +171,10 @@ export const useCardanoStaking = (props: Props): ContextValues => {
         } catch (error) {
             if (error instanceof CoinSelectionError && error.code === 'UTXO_BALANCE_INSUFFICIENT') {
                 setError('AMOUNT_IS_NOT_ENOUGH');
+                addToast({
+                    type: 'cardano-withdrawal-error',
+                    error: error.code,
+                });
             }
         }
         setLoading(false);
@@ -191,7 +199,7 @@ export const useCardanoStaking = (props: Props): ContextValues => {
             fetchTrezorPoolId();
         }
     }, [setTrezorPoolId, network, trezorPoolId]);
-    console.log('error', error);
+
     return {
         account,
         deposit,
