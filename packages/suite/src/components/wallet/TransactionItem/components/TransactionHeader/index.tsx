@@ -13,24 +13,27 @@ const TransactionHeader = ({ transaction, isPending }: Props) => {
     const nTokens = transaction.tokens.length;
     const isMultiTokenTransaction = nTokens > 1;
     const symbol = getTxHeaderSymbol(transaction);
+    const transfer = transaction.tokens[0];
 
+    // We have types: sent, recv, self, failed. We miss approve, swap, ...
+    const headingTxType = nTokens ? transfer.type : transaction.type;
     if (isTxUnknown(transaction)) {
         heading = <Translation id="TR_UNKNOWN_TRANSACTION" />;
-    } else if (transaction.type === 'sent') {
+    } else if (headingTxType === 'sent') {
         heading = (
             <Translation
                 id={isPending ? 'TR_SENDING_SYMBOL' : 'TR_SENT_SYMBOL'}
                 values={{ symbol, multiple: isMultiTokenTransaction }}
             />
         );
-    } else if (transaction.type === 'recv') {
+    } else if (headingTxType === 'recv') {
         heading = (
             <Translation
                 id={isPending ? 'TR_RECEIVING_SYMBOL' : 'TR_RECEIVED_SYMBOL'}
                 values={{ symbol, multiple: isMultiTokenTransaction }}
             />
         );
-    } else if (transaction.type === 'self') {
+    } else if (headingTxType === 'self') {
         if (transaction.cardanoSpecific?.subtype === 'withdrawal') {
             heading = <Translation id="TR_REWARDS_WITHDRAWAL" />;
         } else if (transaction.cardanoSpecific?.subtype === 'stake_delegation') {
@@ -47,7 +50,7 @@ const TransactionHeader = ({ transaction, isPending }: Props) => {
                 />
             );
         }
-    } else if (transaction.type === 'failed') {
+    } else if (headingTxType === 'failed') {
         heading = <Translation id="TR_FAILED_TRANSACTION" />;
     } else {
         heading = <Translation id="TR_UNKNOWN_TRANSACTION" />;
