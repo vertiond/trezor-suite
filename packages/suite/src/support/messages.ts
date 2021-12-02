@@ -3182,30 +3182,6 @@ export default defineMessages({
         defaultMessage: 'Failed transaction',
         id: 'TR_FAILED_TRANSACTION',
     },
-    TR_SENDING_TRANSACTION: {
-        defaultMessage: 'Sending {symbol}',
-        id: 'TR_SENDING_TRANSACTION',
-    },
-    TR_SENT_TRANSACTION: {
-        defaultMessage: 'Sent {symbol}',
-        id: 'TR_SENT_TRANSACTION',
-    },
-    TR_SENDING_TO_MYSELF_TRANSACTION: {
-        defaultMessage: 'Sending {symbol} to myself',
-        id: 'TR_SENDING_TO_MYSELF_TRANSACTION',
-    },
-    TR_SENT_TO_MYSELF_TRANSACTION: {
-        defaultMessage: 'Sent {symbol} to myself',
-        id: 'TR_SENT_TO_MYSELF_TRANSACTION',
-    },
-    TR_RECEIVING_TRANSACTION: {
-        defaultMessage: 'Receiving {symbol}',
-        id: 'TR_RECEIVING_TRANSACTION',
-    },
-    TR_RECEIVED_TRANSACTION: {
-        defaultMessage: 'Received {symbol}',
-        id: 'TR_RECEIVED_TRANSACTION',
-    },
     TR_UNKNOWN_ERROR_SEE_CONSOLE: {
         defaultMessage: 'Unknown error. See console logs for details.',
         id: 'TR_UNKNOWN_ERROR_SEE_CONSOLE',

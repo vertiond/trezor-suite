@@ -128,7 +128,6 @@ const TransactionItem = React.memo((props: Props) => {
         type !== 'recv' &&
         type !== 'self' &&
         transaction.fee !== '0';
-    const hasSingleTargetOrTransfer = !isUnknown && targets.length + tokens.length === 1;
 
     const [txItemIsHovered, setTxItemIsHovered] = useState(false);
     const [nestedItemIsHovered, setNestedItemIsHovered] = useState(false);
@@ -276,35 +275,6 @@ const TransactionItem = React.memo((props: Props) => {
                                                         />
                                                     )}
                                                 </React.Fragment>
-                                            ))}
-                                </AnimatePresence>
-                            </>
-                        ) : null}
-
-                        {!isUnknown && tokens.length ? (
-                            <>
-                                {tokens.slice(0, DEFAULT_LIMIT).map((t, i) => (
-                                    <TokenTransfer
-                                        key={i}
-                                        transfer={t}
-                                        transaction={transaction}
-                                        singleRowLayout={hasSingleTargetOrTransfer}
-                                        isFirst={i === 0}
-                                        isLast={i === tokens.length - 1}
-                                    />
-                                ))}
-                                <AnimatePresence initial={false}>
-                                    {limit > 0 &&
-                                        tokens
-                                            .slice(DEFAULT_LIMIT, DEFAULT_LIMIT + limit)
-                                            .map((t, i) => (
-                                                <TokenTransfer
-                                                    key={i}
-                                                    transfer={t}
-                                                    transaction={transaction}
-                                                    useAnimation
-                                                    isLast={i === tokens.length - 1}
-                                                />
                                             ))}
                                 </AnimatePresence>
                             </>
