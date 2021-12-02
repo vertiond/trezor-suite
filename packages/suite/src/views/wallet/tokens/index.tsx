@@ -24,6 +24,7 @@ const Content: React.FC<ContentProps> = ({ selectedAccount, children }) => {
                 isTestnet={isTestnet(account.symbol)}
                 explorerUrl={explorerUrl}
                 tokens={account.tokens}
+                networkType={account.networkType}
             />
 
             {children}

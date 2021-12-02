@@ -54,7 +54,7 @@ export const transformUserOutputs = (
         };
     });
 
-export const getShortFingerprint = (fingerprint: string) => {
+export const getShortFingerprint = (fingerprint?: string) => {
     if (fingerprint) {
         const firstPart = fingerprint.substring(0, 10);
         const lastPart = fingerprint.substring(fingerprint.length - 10);
