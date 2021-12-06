@@ -9,6 +9,72 @@ import { lockDevice } from '@suite-actions/suiteActions';
 import { Dispatch, GetState } from '@suite-types';
 import { isWeb } from '@suite-utils/env';
 
+export const cardanoPatch = () => (_dispatch: Dispatch, getState: GetState) => {
+    // Pass additional parameter `useCardanoDerivation` to Trezor Connect methods
+    // in order to enable cardano derivation on a device
+    const patchedMethods = [
+        'cardanoGetAddress',
+        'cardanoGetNativeScriptHash',
+        'cardanoGetPublicKey',
+        'cardanoSignTransaction',
+        'cipherKeyValue',
+        'composeTransaction',
+        'debugLinkDecision',
+        'debugLinkGetState',
+        'ethereumGetAddress',
+        'ethereumGetPublicKey',
+        'ethereumSignMessage',
+        'ethereumSignTransaction',
+        'ethereumVerifyMessage',
+        'getAccountInfo',
+        'getAddress',
+        'getDeviceState',
+        'getFeatures',
+        'getPublicKey',
+        'nemGetAddress',
+        'nemSignTransaction',
+        'pushTransaction',
+        'rippleGetAddress',
+        'rippleSignTransaction',
+        'signMessage',
+        'signTransaction',
+        'stellarGetAddress',
+        'stellarSignTransaction',
+        'tezosGetAddress',
+        'tezosGetPublicKey',
+        'tezosSignTransaction',
+        'eosGetPublicKey',
+        'eosSignTransaction',
+        'binanceGetAddress',
+        'binanceGetPublicKey',
+        'binanceSignTransaction',
+        'verifyMessage',
+        'resetDevice',
+        'wipeDevice',
+        'applyFlags',
+        'applySettings',
+        'backupDevice',
+        'changePin',
+        'firmwareUpdate',
+        'recoveryDevice',
+        'rebootToBootloader',
+    ] as const;
+    patchedMethods.forEach(key => {
+        // typescript complains about params and return type, need to be "any"
+        const original: any = TrezorConnect[key];
+        if (!original) return;
+        (TrezorConnect[key] as any) = async (params: any) => {
+            const { enabledNetworks } = getState().wallet.settings;
+            const cardanoEnabled = !!enabledNetworks.find(a => a === 'ada' || a === 'tada');
+            const result = await original({
+                ...params,
+                useCardanoDerivation: cardanoEnabled,
+            });
+            return result;
+        };
+    });
+};
+
 export const init = () => async (dispatch: Dispatch, getState: GetState) => {
     // set event listeners and dispatch as
     TrezorConnect.on(DEVICE_EVENT, ({ event: _, ...action }) => {
@@ -59,6 +125,8 @@ export const init = () => async (dispatch: Dispatch, getState: GetState) => {
             return result;
         };
     });
+
+    dispatch(cardanoPatch());
 
     try {
         // const connectSrc = resolveStaticPath('connect/');
