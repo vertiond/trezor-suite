@@ -5660,6 +5660,23 @@
   dependencies:
     tippy.js "^6.3.1"
 
+"@trezor/blockchain-link@1.1.0-beta.1":
+  version "1.1.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@trezor/blockchain-link/-/blockchain-link-1.1.0-beta.1.tgz#646ccf6f5381ce99109f3b1255ebfc94dfc814aa"
+  integrity sha512-hwNHYKUuE9EkCh0qAal+F/q5d9L9hXg+MjQLqDhZmd+TujsmGgjFrYSge3nXYPUFx/kr/sVnsStu2R2F3a7Zgg==
+  dependencies:
+    bignumber.js "^9.0.1"
+    es6-promise "^4.2.8"
+    events "^3.2.0"
+    ripple-lib "1.10.0"
+    tiny-worker "^2.3.0"
+    ws "^7.4.0"
+
+"@trezor/connect-common@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@trezor/connect-common/-/connect-common-0.0.3.tgz#d136453d259d24f9200daf72d0184594d56e92e2"
+  integrity sha512-oc4K/Ve2e1o3R1M0QAexLYN7aOepeSlcO5NVP/cfxBA+36cApZrRSy6kbs3OB2uc15tua5qkmYEDpJ3QSnZarg==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.8.tgz#c1e4e80d6f964fbecb3359c43bd48b40f7cadad9"
@@ -25248,14 +25265,14 @@ trezor-address-validator@^0.4.2:
     jssha "2.3.1"
     lodash "^4.17.15"
 
-trezor-connect@8.2.3-beta.4:
-  version "8.2.3-beta.4"
-  resolved "https://registry.yarnpkg.com/trezor-connect/-/trezor-connect-8.2.3-beta.4.tgz#e13e08e4d7466b7938c6cf3a859aeabd2b13b738"
-  integrity sha512-5xClRwrQcFei+MN/rmmkGRwD3sE5CPIAaeVizn285JmrCZqvTgR0nUC2IH6PNemw0Jz+GH6yna2qfu2e1BwWrA==
+trezor-connect@8.2.3-beta.7:
+  version "8.2.3-beta.7"
+  resolved "https://registry.yarnpkg.com/trezor-connect/-/trezor-connect-8.2.3-beta.7.tgz#6222a1d782ee4e8c50e9ad37e476fd9c1d10684d"
+  integrity sha512-vnBzw5zHk5GC1Q3ykj7XM6L+2R1QvVxRbaycoGoRrvbgSAnm/WtMt70CLJ0oVgOThHceRyA5Xr5gD96VPVCl2Q==
   dependencies:
     "@babel/runtime" "^7.15.4"
-    "@trezor/blockchain-link" "^1.0.17"
-    "@trezor/connect-common" "^0.0.2"
+    "@trezor/blockchain-link" "1.1.0-beta.1"
+    "@trezor/connect-common" "^0.0.3"
     "@trezor/rollout" "^1.2.0"
     "@trezor/utxo-lib" "1.0.0-beta.10"
     bignumber.js "^9.0.1"

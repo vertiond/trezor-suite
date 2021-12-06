@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 import { variables, useTheme, Icon, Card } from '@trezor/components';
 import { FiatValue, FormattedCryptoAmount, TrezorLink } from '@suite-components';
-import { getShortFingerprint } from '@wallet-utils/cardanoUtils';
 import { Account } from '@wallet-types';
 
 const Wrapper = styled(Card)<{ isTestnet?: boolean }>`
