@@ -105,7 +105,7 @@ export const composeTransaction =
     };
 
 export const signTransaction =
-    (formValues: FormState, transactionInfo: PrecomposedTransactionCardano) =>
+    (_formValues: FormState, transactionInfo: PrecomposedTransactionCardano) =>
     async (dispatch: Dispatch, getState: GetState) => {
         const { selectedAccount } = getState().wallet;
         const { value } = getState().wallet.settings.blockfrostCardanoDerivationType;
