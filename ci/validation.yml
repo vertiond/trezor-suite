@@ -5,12 +5,12 @@ lint:
     - yarn build:libs
     - lerna run lint
 
-typescript:
-  stage: validation
-  script:
-    - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
-    - yarn build:libs
-    - lerna run type-check
+# typescript:
+#   stage: validation
+#   script:
+#     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
+#     - yarn build:libs
+#     - lerna run type-check
 
 unit tests:
   stage: validation
