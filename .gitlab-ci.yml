@@ -10,7 +10,7 @@ variables:
 
 stages:
   - setup environment
-  - validation
+  # - validation
   - prebuild
   - build
   - deploy to dev
@@ -22,7 +22,7 @@ stages:
 
 include:
   - ci/environment.yml
-  - ci/validation.yml
+  # - ci/validation.yml
   - ci/prebuild.yml
   - ci/components.yml
   - ci/build.yml
