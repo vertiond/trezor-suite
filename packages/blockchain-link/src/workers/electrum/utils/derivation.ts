@@ -1,75 +1,142 @@
 import { decode } from 'bs58';
-import { payments, bip32 } from '@trezor/utxo-lib';
+import { payments, bip32, networks } from '@trezor/utxo-lib';
 import { fail } from './misc';
 
 const BIP32_VERSIONS = {
-    0x0488b21e: '44', // 76067358, xpub
-    0x049d7cb2: '49', // 77429938, ypub
-    0x04b24746: '84', // 78792518, zpub
+    // 76067358, xpub
+    0x0488b21e: {
+        type: 'pkh',
+        purpose: "44'",
+    },
+    // 77429938, ypub
+    0x049d7cb2: {
+        type: 'shwpkh',
+        purpose: "49'",
+    },
+    // 78792518, zpub
+    0x04b24746: {
+        type: 'wpkh',
+        purpose: "84'",
+    },
 } as const;
 
 type Version = keyof typeof BIP32_VERSIONS;
 
 const validateVersion = (version: number): version is Version => !!BIP32_VERSIONS[version];
 
-const addressFromPubkey = (network: ReturnType<typeof getNetwork>) => (pubkey: Buffer) => {
-    const err = () => fail('Cannot convert pubkey to address');
-    switch (network.bip32.public) {
-        case 0x0488b21e:
-            return payments.p2pkh({ pubkey, network }).address || err();
-        case 0x049d7cb2:
-            return (
-                payments.p2sh({
-                    redeem: payments.p2wpkh({
-                        pubkey,
-                        network,
-                    }),
-                    network,
-                }).address || err()
-            );
-        case 0x04b24746:
-            return payments.p2wpkh({ pubkey, network }).address || err();
+type PaymentType = typeof BIP32_VERSIONS[Version]['type'] | 'tr';
+
+const getPubkeyToPayment = (type: PaymentType) => (pubkey: Buffer) => {
+    switch (type) {
+        case 'pkh':
+            return payments.p2pkh({ pubkey });
+        case 'shwpkh':
+            return payments.p2sh({
+                redeem: payments.p2wpkh({
+                    pubkey,
+                }),
+            });
+        case 'wpkh':
+            return payments.p2wpkh({ pubkey });
+        case 'tr':
+            return payments.p2tr({ pubkey });
         default:
-            throw new Error(`Unknown xpub version: ${network.bip32.public}`);
+            throw new Error(`Unknown payment type '${type}'`);
     }
 };
 
-const getNetwork = (version: Version) => ({
-    messagePrefix: '\x18Bitcoin Signed Message:\n',
-    bech32: 'bc',
-    bip32: {
-        public: version,
-        private: 0x0488ade4,
-    },
-    pubKeyHash: 0x00,
-    scriptHash: 0x05,
-    wif: 0x80,
-});
+const parseDescriptor = (descriptor: string) => {
+    const [_match, _script, _fingerprint, purpose, coinType, account, xpub] =
+        descriptor.match(
+            /^([a-z]+\()+\[([a-z0-9]{8})\/([0-9]{2}'?)\/([01]'?)\/([0-9]+'?)\]([xyz]pub[a-zA-Z0-9]*)\/<0;1>\/\*\)+$/
+        ) || fail(`Descriptor cannot be parsed: ${descriptor}`);
+    return {
+        purpose,
+        coinType,
+        account,
+        xpub,
+    };
+};
 
-type Address = {
-    address: string;
-    path: string;
+const getXpubDefaults = (xpub: string) => {
+    const version = decode(xpub).readUInt32BE();
+    if (!validateVersion(version)) throw new Error(`Unknown xpub version: ${xpub}`);
+    return {
+        version,
+        ...BIP32_VERSIONS[version],
+    };
+};
+
+const getXpubInfo = (xpub: string) => {
+    const { version, purpose, type } = getXpubDefaults(xpub);
+    const node = bip32.fromBase58(xpub, {
+        ...networks.bitcoin,
+        bip32: {
+            ...networks.bitcoin.bip32,
+            public: version,
+        },
+    });
+    const coinType = "0'";
+    // eslint-disable-next-line
+    const account = `${(node.index << 1) >>> 1}'`; // Unsigned to signed conversion
+    return {
+        purpose,
+        coinType,
+        account,
+        paymentType: type,
+        node,
+    };
+};
+
+const getDescriptorInfo = (descriptor: string, paymentType: PaymentType) => {
+    const { xpub, purpose, coinType, account } = parseDescriptor(descriptor);
+    const { node, ...rest } = getXpubInfo(xpub);
+    if (rest.account !== account) {
+        console.warn(`Account indices doesn't match: ${rest.account}, ${account}`);
+    }
+    return {
+        purpose,
+        coinType,
+        account,
+        paymentType,
+        node,
+    };
+};
+
+const recognizeDescriptor = (descriptor: string) => {
+    if (descriptor.startsWith('pkh(')) {
+        return getDescriptorInfo(descriptor, 'pkh');
+    }
+    if (descriptor.startsWith('sh(wpkh(')) {
+        return getDescriptorInfo(descriptor, 'shwpkh');
+    }
+    if (descriptor.startsWith('wpkh(')) {
+        return getDescriptorInfo(descriptor, 'wpkh');
+    }
+    if (descriptor.startsWith('tr(')) {
+        return getDescriptorInfo(descriptor, 'tr');
+    }
+    return getXpubInfo(descriptor);
 };
 
 export const deriveAddresses = (
-    xpub: string,
+    descriptor: string,
     type: 'receive' | 'change',
     from: number,
     count: number
-): Address[] => {
-    const version = decode(xpub).readUInt32BE();
-    if (!validateVersion(version)) throw new Error(`Unknown xpub version: ${version}`);
-    const network = getNetwork(version);
-    const node = bip32.fromBase58(xpub, network);
-    // eslint-disable-next-line
-    const account = (node.index << 1) >>> 1; // Unsigned to signed conversion
+): {
+    address: string;
+    path: string;
+}[] => {
+    const { purpose, coinType, account, node, paymentType } = recognizeDescriptor(descriptor);
+    const getAddress = getPubkeyToPayment(paymentType);
     const change = type === 'receive' ? 0 : 1;
-    const typeNode = node.derive(change);
+    const changeNode = node.derive(change);
     return Array.from(Array(count).keys())
-        .map(i => typeNode.derive(from + i).publicKey)
-        .map(addressFromPubkey(network))
+        .map(i => changeNode.derive(from + i).publicKey)
+        .map(a => getAddress(a).address || fail('Cannot convert pubkey to address'))
         .map((address, i) => ({
             address,
-            path: `m/${BIP32_VERSIONS[version]}'/0'/${account}'/${change}/${from + i}`,
+            path: `m/${purpose}/${coinType}/${account}/${change}/${from + i}`,
         }));
 };
