@@ -1,9 +1,27 @@
 import { arrayToDic, flatten, distinct, sum } from './misc';
 import { scriptToScripthash, btcToSat } from './transform';
 import type { Transaction as BlockbookTransaction } from '../../../types/blockbook';
-import type { ElectrumAPI, TransactionVerbose, TxIn, TxCoinbase } from '../../../types/electrum';
+import type {
+    ElectrumAPI,
+    TransactionVerbose,
+    TxIn,
+    TxCoinbase,
+    TxOut,
+} from '../../../types/electrum';
 
-const parseAddresses = ({ address, addresses }: { address?: string; addresses?: string[] }) => {
+const transformOpReturn = (hex: string) =>
+    hex.startsWith('6a') // OP_RETURN
+        ? `OP_RETURN (${Buffer.from(hex.substring(4), 'hex').toString('ascii')})`
+        : undefined;
+
+const parseAddresses = ({ address, addresses, type, hex }: TxOut['scriptPubKey']) => {
+    if (type === 'nulldata') {
+        const opReturn = transformOpReturn(hex);
+        return {
+            addresses: opReturn ? [opReturn] : [],
+            isAddress: false,
+        };
+    }
     const addrs = !address ? addresses || [] : [address];
     return {
         addresses: addrs,
