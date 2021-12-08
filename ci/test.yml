@@ -20,6 +20,7 @@
     - docker login $CI_DEPENDENCY_PROXY_SERVER -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD
   script:
     - yarn install --pure-lockfile --cache-folder .yarn --prefer-offline
+    - yarn workspace @trezor/utils build:libs
     - docker-compose pull
     - docker-compose up -d trezor-user-env-unix
     - docker-compose run test-run
