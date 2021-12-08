@@ -80,10 +80,7 @@ const getAccountBalanceHistory: Api<Req, Res> = async (
         );
     }
 
-    const txs = await getTransactions(
-        client,
-        history.map(({ tx_hash }) => tx_hash).filter(distinct)
-    ).then(txs =>
+    const txs = await getTransactions(client, history).then(txs =>
         txs
             .filter(
                 ({ blockTime }) =>

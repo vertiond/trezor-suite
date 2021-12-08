@@ -7,6 +7,7 @@ import type {
     TxIn,
     TxCoinbase,
     TxOut,
+    HistoryTx,
 } from '../../../types/electrum';
 
 const transformOpReturn = (hex: string) =>
@@ -75,8 +76,13 @@ const formatTransaction =
 
 export const getTransactions = async (
     client: ElectrumAPI,
-    txids: string[]
+    history: HistoryTx[]
 ): Promise<BlockbookTransaction[]> => {
+    const txids = history.map(({ tx_hash }) => tx_hash).filter(distinct);
+
+    // TODO optimize blockchain.transaction.get to not use verbose mode but parse
+    // binary data locally instead. Then the transaction could be cached indefinitely.
+
     const origTxs = await Promise.all(
         txids.map(txid => client.request('blockchain.transaction.get', txid, true))
     ).then(txs => arrayToDic(txs, ({ txid }) => txid));

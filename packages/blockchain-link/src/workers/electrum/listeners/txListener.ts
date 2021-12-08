@@ -28,7 +28,7 @@ const txListener = (client: ElectrumAPI, common: WorkerCommon) => {
         const history = await client.request('blockchain.scripthash.get_history', scripthash);
         const recent = history.reduce<HistoryTx | undefined>(mostRecent, undefined);
         if (!recent) return;
-        const [tx] = await getTransactions(client, [recent.tx_hash]);
+        const [tx] = await getTransactions(client, [recent]);
         common.response({
             id: -1,
             type: RESPONSES.NOTIFICATION,
