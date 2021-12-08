@@ -5,11 +5,13 @@ import {
     discovery,
     AddressHistory,
     getTransactions,
+    sum,
 } from '../utils';
 import { transformTransaction } from '../../blockbook/utils';
 import type { ElectrumAPI } from '../../../types/electrum';
 import type { GetAccountInfo as Req } from '../../../types/messages';
 import type { GetAccountInfo as Res } from '../../../types/responses';
+import type { VinVout } from '../../../types/blockbook';
 import type { Address } from '../../../types';
 
 const PAGE_DEFAULT = 0;
@@ -42,9 +44,7 @@ const getBalances =
         );
 
 const getAccountInfo: Api<Req, Res> = async (client, payload) => {
-    const { descriptor, details, page, pageSize } = payload;
-
-    // basic | tokens | tokenBalances are identical for BTC for ADDRESS ONLY
+    const { descriptor, details = 'basic', page, pageSize } = payload;
 
     const parsed = tryGetScripthash(descriptor);
     if (parsed.valid) {
@@ -89,19 +89,6 @@ const getAccountInfo: Api<Req, Res> = async (client, payload) => {
         };
     }
 
-    const transformAddressInfo = ({ address, path, history, confirmed }: AddressInfo): Address => ({
-        address,
-        path,
-        transfers: history.length,
-        ...(details && ['tokenBalances', 'txids', 'txs'].includes(details) && history.length
-            ? {
-                  balance: confirmed.toString(), // TODO or confirmed + unconfirmed?
-                  sent: 'TODO', // TODO lot of requests needed
-                  received: 'TODO', // TODO lot of requests needed
-              }
-            : {}),
-    });
-
     const receive = await discovery(client, descriptor, 'receive').then(getBalances(client));
     const change = await discovery(client, descriptor, 'change').then(getBalances(client));
     const batch = receive.concat(change);
@@ -112,25 +99,50 @@ const getAccountInfo: Api<Req, Res> = async (client, payload) => {
     const history = flatten(batch.map(({ history }) => history));
     const historyUnconfirmed = history.filter(r => r.height <= 0).length;
 
-    const addresses =
-        details === 'tokens' ||
-        details === 'tokenBalances' ||
-        details === 'txids' ||
-        details === 'txs'
-            ? {
-                  change: change.map(transformAddressInfo),
-                  unused: receive.filter(recv => !recv.history.length).map(transformAddressInfo),
-                  used: receive.filter(recv => recv.history.length).map(transformAddressInfo),
-              }
-            : undefined;
+    const transformAddressInfo = ({ address, path, history, confirmed }: AddressInfo): Address => ({
+        address,
+        path,
+        transfers: history.length,
+        balance: confirmed.toString(), // TODO or confirmed + unconfirmed?
+    });
 
-    const transactions =
-        details === 'txs'
-            ? await getTransactions(
-                  client,
-                  history.map(({ tx_hash }) => tx_hash)
-              ).then(txs => txs.map(tx => transformTransaction(descriptor, addresses, tx)))
-            : undefined;
+    const addresses = {
+        change: change.map(transformAddressInfo),
+        unused: receive.filter(recv => !recv.history.length).map(transformAddressInfo),
+        used: receive.filter(recv => recv.history.length).map(transformAddressInfo),
+    };
+
+    const transactions = ['tokenBalances', 'txids', 'txs'].includes(details)
+        ? await getTransactions(
+              client,
+              history.map(({ tx_hash }) => tx_hash)
+          ).then(txs => txs.map(tx => transformTransaction(descriptor, addresses, tx)))
+        : [];
+
+    const sumAddressValues = (
+        address: string,
+        getVinVouts: (tr: ReturnType<typeof transformTransaction>) => VinVout[]
+    ) =>
+        flatten(
+            transactions.map(tx =>
+                getVinVouts(tx)
+                    .filter(({ addresses }) => addresses?.includes(address))
+                    .map(({ value }) => (value ? Number.parseFloat(value) : 0))
+            )
+        ).reduce(sum, 0);
+
+    const extendAddressInfo = ({ address, path, transfers, balance }: Address): Address => ({
+        address,
+        path,
+        transfers,
+        ...(['tokenBalances', 'txids', 'txs'].includes(details) && transfers
+            ? {
+                  balance,
+                  sent: sumAddressValues(address, tx => tx.details.vin).toString(),
+                  received: sumAddressValues(address, tx => tx.details.vout).toString(),
+              }
+            : {}),
+    });
 
     return {
         descriptor,
@@ -140,9 +152,16 @@ const getAccountInfo: Api<Req, Res> = async (client, payload) => {
         history: {
             total: history.length - historyUnconfirmed,
             unconfirmed: historyUnconfirmed,
-            transactions,
+            transactions: details === 'txs' ? transactions : undefined,
         },
-        addresses,
+        addresses:
+            details !== 'basic'
+                ? {
+                      change: addresses.change.map(extendAddressInfo),
+                      unused: addresses.unused.map(extendAddressInfo),
+                      used: addresses.used.map(extendAddressInfo),
+                  }
+                : undefined,
     };
 };
 
