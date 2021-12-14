@@ -194,3 +194,32 @@ rollout test integration manual:
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
     - yarn workspace @trezor/rollout test:integration
+
+# @trezor/transport
+
+# todo:
+# transport test integration:
+#   stage: integration testing
+#   before_script:
+#     - yarn install --frozen-lockfile --cache-folder .yarn --prefer-offline
+#     - yarn workspace @trezor/transport build:lib
+#   script:
+#     - ./docker/docker-transport-test.sh
+
+# todo: compose might be overkill here
+transport with compose:
+  stage: integration testing
+  variables:
+    COMPOSE_FILE: ./docker/docker-compose.transport-ci.yml
+  script:
+    - yarn install --pure-lockfile --cache-folder .yarn --prefer-offline
+    - yarn workspace @trezor/transport build:lib
+    - docker-compose pull
+    - docker-compose up -d trezor-user-env-unix
+    - sleep 5
+    - git submodule add --force https://github.com/trezor/trezor-common.git trezor-common
+    - yarn pbjs -t json -p ./trezor-common/protob -o ./packages/integration-tests/projects/transport/messages.json --keep-case messages-bitcoin.proto messages-bootloader.proto messages-common.proto messages-crypto.proto messages-debug.proto messages-management.proto
+    - docker-compose run test-run
+  after_script:
+    - docker-compose down
+    - docker network prune -f

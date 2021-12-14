@@ -3,16 +3,17 @@ module.exports = {
     rootDir: './',
     moduleFileExtensions: ['js'],
     testMatch: [
-        '**/e2e/tests/*.integration.js',
-        '**/e2e/examples/*.integration.js'
+        '**/tests/*.integration.js',
     ],
     modulePathIgnorePatterns: ['node_modules', 'src/types'],
     setupFilesAfterEnv: [
-        '<rootDir>/e2e/common.setup.js'],
+        '<rootDir>/common.setup.js'],
     transformIgnorePatterns: [
+        // todo: ??/
         'node_modules/(?!(node-fetch|fetch-blob|data-uri-to-buffer|formdata-polyfill)/)',
     ],
     transform: {
+        // todo: ??
         '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
     },
     collectCoverage: false,
