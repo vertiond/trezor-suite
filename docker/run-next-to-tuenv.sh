@@ -37,7 +37,6 @@ waitForEnv() {
     # there is no official support for websockets in curl
     # trezor-user-env websocket server will return HTTP/1.1 426 Upgrade Required error with "Upgrade: websocket" header
   until (curl -i -s -I http://localhost:9001 | grep 'websocket'); do
-    curl -i -I http://localhost:9001
     if [ ${counter} -eq ${max_attempts} ]; then
       echo "trezor-user-env is not running. exiting"
       exit 1

@@ -14,6 +14,8 @@ const controller = new Controller({
     url: 'ws://localhost:9001/',
 });
 
+jest.setTimeout(30000);
+
 describe('bridge', () => {
     beforeEach(async () => {
         await setup(controller);

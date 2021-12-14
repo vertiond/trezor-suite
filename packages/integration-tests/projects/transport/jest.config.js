@@ -7,15 +7,8 @@ module.exports = {
     ],
     modulePathIgnorePatterns: ['node_modules', 'src/types'],
     setupFilesAfterEnv: [
-        '<rootDir>/common.setup.js'],
-    transformIgnorePatterns: [
-        // todo: ??/
-        'node_modules/(?!(node-fetch|fetch-blob|data-uri-to-buffer|formdata-polyfill)/)',
+        '<rootDir>/common.setup.js'
     ],
-    transform: {
-        // todo: ??
-        '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
-    },
     collectCoverage: false,
     verbose: true,
     bail: true,
