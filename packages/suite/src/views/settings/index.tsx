@@ -375,9 +375,7 @@ const Settings = () => {
                                 removeDatabase();
                                 if (window.desktopApi) {
                                     // Reset the desktop-specific store.
-                                    // todo: maybe only if some checkbox is checked?
-                                    await window.desktopApi.clearUserData();
-                                    // window.desktopApi.clearStore();
+                                    window.desktopApi.clearStore();
                                     // relaunch desktop app
                                     window.desktopApi.appRestart();
                                 } else {

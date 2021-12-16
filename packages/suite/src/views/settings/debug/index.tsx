@@ -101,6 +101,25 @@ const DebugSettings = () => {
                         </ActionButton>
                     </ActionColumn>
                 </SectionItem>
+                {!isWeb() && (
+                    <SectionItem>
+                        <TextColumn
+                            title="Wipe app data"
+                            description="Clicking this button restarts your application and wipes all your data including labels."
+                        />
+                        <ActionColumn>
+                            <ActionButton
+                                variant="danger"
+                                onClick={async () => {
+                                    await window.desktopApi!.clearUserData();
+                                    window.desktopApi!.appRestart();
+                                }}
+                            >
+                                Wipe data!
+                            </ActionButton>
+                        </ActionColumn>
+                    </SectionItem>
+                )}
             </Section>
             <Section title="Invity">
                 <SectionItem>
