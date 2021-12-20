@@ -14,8 +14,6 @@ const defaults = {
     needs_backup: false,
 };
 
-console.log(process.env);
-
 const url = process.env.URL || 'http://localhost:8082/';
 const HEADLESS = process.env.HEADLESS === 'true';
 const SCREENSHOTS_DIR = './packages/connect-explorer/screenshots';
@@ -148,6 +146,8 @@ const wait = (timeout) => {
 const log = (...val) => {
     console.log(`[===]`, ...val);
 }
+
+log(process.env);
 
 (async () => {
     try {
