@@ -19,9 +19,6 @@ const HEADLESS = process.env.HEADLESS === 'true';
 const SCREENSHOTS_DIR = './packages/connect-explorer/screenshots';
 const CI_JOB_URL = process.env.CI_JOB_URL || '.';
 
-// todo:
-// verifyMessage
-
 const setups = [
     {
         device: {
