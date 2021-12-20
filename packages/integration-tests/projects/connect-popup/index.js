@@ -51,7 +51,6 @@ const setups = [
                     { name: 'check-address', confirm: ['device'] }
                 ],
             },
-            // todo: forbidden key path at the moment
             {
                 method: 'getAddress-multiple',
                 views: [
@@ -64,6 +63,7 @@ const setups = [
                     { name: 'export-account-info', confirm: ['host'] },
                 ],
             },
+            // todo: flakiness kicks in once I enable these. Need to investigate.
             // {
             //     method: 'composeTransaction',
             //     views: [
@@ -125,8 +125,6 @@ const setups = [
     //                 },
     //             ],
     //         },
-
-
     //     ]
     // }
 ]
@@ -328,9 +326,11 @@ const buildOverview = () => {
     methods.forEach(method => {
         const methodPath = path.join(SCREENSHOTS_DIR, method);
         const screenshots = fs.readdirSync(methodPath);
-        html+= `<div><h1>${method}</h1></div>`;
+        html += `<div><h1>${method}</h1></div>`;
         screenshots.forEach(screenshot => {
             const screenshotPath = `${CI_JOB_URL}/${methodPath}/${screenshot}`;
+            // https://gitlab.com/satoshilabs/trezor/trezor-suite/-/jobs/1843753200 /artifacts/raw /packages/connect-explorer/screenshots/composeTransaction/1-request.png
+            // https://gitlab.com/satoshilabs/trezor/trezor-suite/-/jobs/1843753200                /packages/connect-explorer/screenshots/composeTransaction/1-request.png
             html += `
                 <div>
                 <img src="${screenshotPath.replace('/packages/connect-explorer', '/artifacts/raw/packages/connect-explorer')}" />
@@ -339,9 +339,7 @@ const buildOverview = () => {
         })
     });
 
-    // https://gitlab.com/satoshilabs/trezor/trezor-suite/-/jobs/1843753200 /artifacts/raw /packages/connect-explorer/screenshots/composeTransaction/1-request.png
-    // https://gitlab.com/satoshilabs/trezor/trezor-suite/-/jobs/1843753200                /packages/connect-explorer/screenshots/composeTransaction/1-request.png
-    
+
     fs.appendFileSync('connect-popup-overview.html', `
         <html>
             <head>
@@ -352,12 +350,6 @@ const buildOverview = () => {
             </body>
         </html>
     `);
-
-    // src={`${data.jobUrl}${screenshot.path.replace(
-    //     "trezor-suite",
-    //     "artifacts/raw"
-    //   )}`}
-
 }
 
 // todo: special cases
