@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { createDeferred } from '@suite-utils/deferred';
+import { createDeferred } from '@trezor/utils';
 
 type TimeoutType = ReturnType<typeof setTimeout>; // resolves to Timeout type in react-native, number otherwise
 
@@ -14,7 +14,7 @@ export const useAsyncDebounce = () => {
             // clear previous timeout
             if (timeout.current) clearTimeout(timeout.current);
             // set new timeout
-            const timeoutDfd = createDeferred();
+            const timeoutDfd = createDeferred(-1);
             // @ts-ignore needed with @types/react-native 0.63.45, could be a bug
             const newTimeout = setTimeout(timeoutDfd.resolve, 300);
             // @ts-ignore needed with @types/react-native 0.63.45, could be a bug

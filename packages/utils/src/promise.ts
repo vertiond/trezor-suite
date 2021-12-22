@@ -1,8 +1,5 @@
-export function create<T>(id: number | string): Deferred<T> {
-    // intentionally ignore below lines in test coverage, they will be overridden in promise creation
-    /* istanbul ignore next */
+export const createDeferred = <T>(id: number | string) => {
     let localResolve: (t: T) => void = () => {};
-    /* istanbul ignore next */
     let localReject: (e?: Error) => void = () => {};
 
     const promise: Promise<T> = new Promise((resolve, reject) => {
@@ -16,7 +13,7 @@ export function create<T>(id: number | string): Deferred<T> {
         reject: localReject,
         promise,
     };
-}
+};
 
 export interface Deferred<T> {
     id: number | string;
@@ -24,3 +21,6 @@ export interface Deferred<T> {
     resolve: (t: T) => void;
     reject: (e: Error) => void;
 }
+
+// unwrap promise response from Deferred
+export type DeferredResponse<D> = D extends Deferred<infer R> ? R : never;

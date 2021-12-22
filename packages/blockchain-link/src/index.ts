@@ -1,11 +1,13 @@
 import { EventEmitter } from 'events';
+import { createDeferred } from '@trezor/utils';
 import { CustomError } from './constants/errors';
 import { MESSAGES, RESPONSES } from './constants';
-import { create as createDeferred, Deferred } from './utils/deferred';
 import { BlockchainSettings } from './types';
 import * as ResponseTypes from './types/responses';
 import * as MessageTypes from './types/messages';
 import { Events } from './types/events';
+
+import type { Deferred } from '@trezor/utils';
 
 const workerWrapper = (factory: BlockchainSettings['worker']): Worker => {
     if (typeof factory === 'function') return factory();

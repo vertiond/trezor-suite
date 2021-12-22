@@ -2,7 +2,7 @@
 
 import { getPrefixedURL } from '@suite-utils/router';
 import { METADATA } from '@suite-actions/constants';
-import { Deferred, createDeferred } from '@suite-utils/deferred';
+import { Deferred, createDeferred } from '@trezor/utils';
 import { urlHashParams, urlSearchParams } from '@suite-utils/metadata';
 
 /**
@@ -142,7 +142,7 @@ const getWebHandlerInstance = (
  */
 export const extractCredentialsFromAuthorizationFlow = (url: string) => {
     const originalParams = urlHashParams(url);
-    const dfd: Deferred<Credentials> = createDeferred();
+    const dfd: Deferred<Credentials> = createDeferred(-1);
 
     const { desktopApi } = window;
 

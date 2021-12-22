@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { DISCOVERY } from '@wallet-actions/constants';
 import { STORAGE } from '@suite-actions/constants';
-import { Deferred, createDeferred } from '@suite-utils/deferred';
+import { Deferred, createDeferred } from '@trezor/utils';
 import { ObjectValues } from '@suite/types/utils';
 import { Action as SuiteAction } from '@suite-types';
 import { WalletAction, Network } from '@wallet-types';
@@ -46,7 +46,7 @@ const start = (draft: State, payload: PartialDiscovery) => {
         draft[index] = {
             ...draft[index],
             ...payload,
-            running: createDeferred(),
+            running: createDeferred(-1),
         };
     }
 };

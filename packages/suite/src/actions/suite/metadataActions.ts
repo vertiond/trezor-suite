@@ -1,6 +1,6 @@
 import TrezorConnect from 'trezor-connect';
+import { createDeferred } from '@trezor/utils';
 import { METADATA } from '@suite-actions/constants';
-import { createDeferred } from '@suite-utils/deferred';
 import { Dispatch, GetState } from '@suite-types';
 import {
     MetadataProviderType,
@@ -216,7 +216,7 @@ export const disableMetadata = () => (dispatch: Dispatch) => {
 };
 
 export const initProvider = () => (dispatch: Dispatch) => {
-    const decision = createDeferred<boolean>();
+    const decision = createDeferred<boolean>(-1);
     dispatch(modalActions.openModal({ type: 'metadata-provider', decision }));
     return decision.promise;
 };
