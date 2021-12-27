@@ -148,7 +148,7 @@ suite-desktop build mac manual:
   except:
     <<: *run_everything_rules
   tags:
-    - darwin
+    - darwin_arm
   variables:
     artifact: ${DESKTOP_APP_NAME}*
     platform: mac
@@ -189,6 +189,8 @@ suite-desktop build linux manual:
   when: manual
   except:
     <<: *run_everything_rules
+  tags:
+    - darwin_arm
   variables:
     artifact: ${DESKTOP_APP_NAME}*
     platform: linux
@@ -230,6 +232,8 @@ suite-desktop build windows manual:
   except:
     <<: *run_everything_rules
   image: $CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX/electronuserland/builder:wine
+  tags:
+    - darwin_arm
   variables:
     artifact: ${DESKTOP_APP_NAME}*
     platform: win
