@@ -90,9 +90,9 @@ const suite =
                 // Set or clear Tor backends when Suite is ready
                 const { tor } = api.getState().suite;
                 if (tor) {
-                    await api.dispatch(walletSettingsActions.setTorBlockbookUrls());
+                    await api.dispatch(walletSettingsActions.torifyBackends());
                 } else {
-                    api.dispatch(walletSettingsActions.clearTorBlockbookUrl());
+                    api.dispatch(walletSettingsActions.detorifyBackends());
                 }
                 break;
             }
@@ -120,9 +120,9 @@ const suite =
                 }
 
                 if (action.payload) {
-                    await api.dispatch(walletSettingsActions.setTorBlockbookUrls());
+                    await api.dispatch(walletSettingsActions.torifyBackends());
                 } else {
-                    api.dispatch(walletSettingsActions.clearTorBlockbookUrl());
+                    api.dispatch(walletSettingsActions.detorifyBackends());
                 }
                 break;
             }

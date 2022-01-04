@@ -34,6 +34,7 @@ const walletMiddleware =
             api.dispatch(transactionActions.add(account.history.transactions || [], account, 1));
         }
 
+        /*
         if (action.type === WALLET_SETTINGS.CLEAR_TOR_BLOCKBOOK_URLS) {
             const torCoins = api
                 .getState()
@@ -41,6 +42,7 @@ const walletMiddleware =
                 .map(b => b.coin);
             api.dispatch(blockchainActions.clearCustomBackend(torCoins));
         }
+        */
 
         // propagate action to reducers
         next(action);
@@ -55,8 +57,10 @@ const walletMiddleware =
 
         // Update custom backends
         if (
-            action.type === WALLET_SETTINGS.ADD_BLOCKBOOK_URL ||
-            action.type === WALLET_SETTINGS.REMOVE_BLOCKBOOK_URL
+            // action.type === WALLET_SETTINGS.ADD_BLOCKBOOK_URL ||
+            // action.type === WALLET_SETTINGS.REMOVE_BLOCKBOOK_URL ||
+            action.type === WALLET_SETTINGS.SET_BACKEND ||
+            action.type === WALLET_SETTINGS.REMOVE_BACKEND
         ) {
             api.dispatch(blockchainActions.setCustomBackend(action.payload.coin));
         }
