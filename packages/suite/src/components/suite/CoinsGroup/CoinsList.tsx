@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Network } from '@wallet-types';
 import { Coin, Translation } from '@suite-components';
 import { getUnavailabilityMessage } from '@suite-utils/device';
-import { useDevice } from '@suite-hooks';
+import { useDevice, useSelector } from '@suite-hooks';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -19,6 +19,10 @@ interface Props {
 }
 
 const CoinsList = ({ onToggleFn, networks, selectedNetworks }: Props) => {
+    const { backends } = useSelector(state => ({
+        backends: state.wallet.settings.backends,
+    }));
+
     const { device, isLocked } = useDevice();
     if (!device) return null;
 
@@ -48,6 +52,7 @@ const CoinsList = ({ onToggleFn, networks, selectedNetworks }: Props) => {
                     >
                         <Coin
                             symbol={symbol}
+                            backend={backends[symbol]}
                             name={name}
                             label={label}
                             selected={isSelected}

@@ -13,10 +13,11 @@ interface Props {
     networks: Network[];
     enabledNetworks: Network['symbol'][];
     testnet: boolean;
+    className?: string;
 }
 
-const CoinsGroup = ({ onToggleFn, networks, enabledNetworks, testnet }: Props) => (
-    <CoinsGroupWrapper>
+const CoinsGroup = ({ onToggleFn, networks, enabledNetworks, testnet, className }: Props) => (
+    <CoinsGroupWrapper className={className}>
         <CoinsCount
             networks={networks}
             enabledNetworks={enabledNetworks}

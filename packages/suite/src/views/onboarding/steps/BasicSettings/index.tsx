@@ -28,10 +28,6 @@ const BasicSettings = () => {
     const mainnetNetworks = NETWORKS.filter(n => !n.accountType && !n.testnet);
     const testnetNetworks = NETWORKS.filter(n => !n.accountType && n?.testnet === true);
 
-    const setupNetworks = [...mainnetNetworks, ...testnetNetworks].filter(
-        n => enabledMainnetNetworks.includes(n.symbol) || enabledTestnetNetworks.includes(n.symbol),
-    );
-
     const canCompleteSetup = enabledNetworks.length;
     const { goToNextStep } = useOnboarding();
     return (
@@ -43,7 +39,7 @@ const BasicSettings = () => {
             heading={<Translation id="TR_ONBOARDING_COINS_STEP" />}
             description={<Translation id="TR_ONBOARDING_COINS_STEP_DESCRIPTION" />}
             outerActions={
-                <AdvancedSetup networks={setupNetworks}>
+                <AdvancedSetup>
                     <OnboardingButtonCta
                         data-test="@onboarding/coins/continue-button"
                         onClick={() => {

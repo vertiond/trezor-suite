@@ -14,6 +14,10 @@ const Separator = styled.hr`
     border-top: 1px solid ${props => props.theme.STROKE_GREY};
 `;
 
+const StyledCoinsGroup = styled(CoinsGroup)`
+    margin-top: 30px;
+`;
+
 interface Props extends OnboardingStepBoxProps {
     testnetNetworks: Network[];
     mainnetNetworks: Network[];
@@ -41,13 +45,13 @@ const BasicSettingsStepBox = ({
     return (
         <OnboardingStepBox image="COINS" {...props}>
             <Separator />
-            <CoinsGroup
+            <StyledCoinsGroup
                 onToggleFn={changeCoinVisibility}
                 networks={mainnetNetworks}
                 enabledNetworks={enabledMainnetNetworks}
                 testnet={false}
             />
-            <CoinsGroup
+            <StyledCoinsGroup
                 onToggleFn={changeCoinVisibility}
                 networks={testnetNetworks}
                 enabledNetworks={enabledTestnetNetworks}

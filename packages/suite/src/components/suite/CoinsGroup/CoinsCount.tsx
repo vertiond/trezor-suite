@@ -6,7 +6,7 @@ import { Translation } from '@suite-components';
 import { useDevice } from '@suite-hooks';
 
 const Wrapper = styled.div`
-    margin: 31px 0 27px 0;
+    margin-bottom: 27px;
     align-self: flex-start;
     font-size: ${variables.FONT_SIZE.NORMAL};
     font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};

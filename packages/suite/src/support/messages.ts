@@ -5764,6 +5764,10 @@ export default defineMessages({
         id: 'TR_ADD_NEW_BLOCKBOOK_BACKEND',
         defaultMessage: 'Add new',
     },
+    TR_CUSTOM_BACKEND: {
+        id: 'TR_CUSTOM_BACKEND',
+        defaultMessage: 'Custom backend',
+    },
     TR_CUSTOM_BACKEND_INVALID_URL: {
         id: 'TR_CUSTOM_BACKEND_INVALID_URL',
         defaultMessage: 'Invalid URL',
