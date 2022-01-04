@@ -52,6 +52,7 @@ import Coin from './Coin';
 import CoinsGroup from './CoinsGroup';
 import CoinsList from './CoinsGroup/CoinsList';
 import CharacterCount from './CharacterCount';
+import StatusLight from './StatusLight';
 
 export {
     Backdrop,
@@ -112,5 +113,6 @@ export {
     CoinsGroup,
     CoinsList,
     CharacterCount,
+    StatusLight,
 };
 export type { ImageProps, ModalProps };
