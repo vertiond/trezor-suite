@@ -48,6 +48,7 @@ const Option = styled.div<{ isSelected: boolean }>`
     color: ${props => props.theme.TYPE_LIGHT_GREY};
     cursor: pointer;
     font-weight: ${variables.FONT_WEIGHT.DEMI_BOLD};
+    justify-content: center;
 
     ${props =>
         props.isSelected &&
@@ -60,7 +61,6 @@ const Option = styled.div<{ isSelected: boolean }>`
 
     @media (max-width: ${variables.SCREEN_SIZE.SM}) {
         height: 40px;
-        justify-content: center;
         width: 100%;
         flex: auto;
     }
