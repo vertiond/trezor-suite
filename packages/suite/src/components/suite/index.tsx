@@ -52,6 +52,7 @@ import Coin from './Coin';
 import CoinsGroup from './CoinsGroup';
 import CoinsList from './CoinsGroup/CoinsList';
 import CharacterCount from './CharacterCount';
+import TooltipSymbol from './TooltipSymbol';
 import StatusLight from './StatusLight';
 
 export {
@@ -113,6 +114,7 @@ export {
     CoinsGroup,
     CoinsList,
     CharacterCount,
+    TooltipSymbol,
     StatusLight,
 };
 export type { ImageProps, ModalProps };
