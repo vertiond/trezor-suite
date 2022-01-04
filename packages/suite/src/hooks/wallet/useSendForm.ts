@@ -47,6 +47,7 @@ const getStateFromProps = (props: UseSendFormProps) => {
         isLoading: false,
         isDirty: false,
         online: props.online,
+        metadataEnabled: props.metadataEnabled,
     };
 };
 

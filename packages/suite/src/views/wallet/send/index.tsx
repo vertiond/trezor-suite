@@ -57,6 +57,8 @@ const Send: React.FC = ({ children }) => {
         fees: state.wallet.fees,
         online: state.suite.online,
         sendRaw: state.wallet.send.sendRaw,
+        // todo: maybe "Add label" button should be available even if not connected and trigger connection procedure?
+        metadataEnabled: state.metadata.enabled && !!state.metadata.provider,
     }));
 
     const { selectedAccount } = props;

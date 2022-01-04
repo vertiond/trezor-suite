@@ -59,6 +59,7 @@ const Address = ({ output, outputId, outputsCount }: Props) => {
         getDefaultValue,
         errors,
         setValue,
+        metadataEnabled,
     } = useSendFormContext();
     const { openQrModal } = useActions({ openQrModal: scanQrRequest });
 
@@ -68,14 +69,28 @@ const Address = ({ output, outputId, outputsCount }: Props) => {
     const addressError = outputError ? outputError.address : undefined;
     const addressValue = getDefaultValue(inputName, output.address || '');
     const recipientId = outputId + 1;
+    const isLabelEnabled = getDefaultValue(`outputs[${outputId}].labelEnabled`, false);
+    const options = getDefaultValue('options', []);
+    const broadcastEnabled = options.includes('broadcast');
 
     return (
         <Input
             state={getInputState(addressError, addressValue)}
             monospace
-            // innerAddon={
-            //     <AddLabel onClick={() => setValue(`outputs[${outputId}].labelInput`, 'enabled')} />
-            // }
+            innerAddon={
+                metadataEnabled && broadcastEnabled && !isLabelEnabled ? (
+                    <Button
+                        variant="tertiary"
+                        icon="TAG"
+                        onClick={() => {
+                            setValue(`outputs[${outputId}].labelEnabled`, true);
+                            composeTransaction(`outputs[${outputId}].amount`);
+                        }}
+                    >
+                        <Translation id="RECIPIENT_ADD_LABEL" />
+                    </Button>
+                ) : null
+            }
             label={
                 <Label>
                     <Left>

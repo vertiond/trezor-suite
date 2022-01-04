@@ -6,6 +6,7 @@ import { variables } from '@trezor/components';
 import Address from './components/Address';
 import Amount from './components/Amount';
 import OpReturn from './components/OpReturn';
+import Metadata from './components/Metadata';
 import { ANIMATION } from '@suite-config';
 
 const Wrapper = styled.div``;
@@ -94,6 +95,9 @@ const Outputs = ({ disableAnim }: Props) => {
                                             outputId={index}
                                             outputsCount={outputs.length}
                                         />
+                                    </Row>
+                                    <Row>
+                                        <Metadata outputId={index} />
                                     </Row>
                                     <Row>
                                         <Amount output={outputs[index]} outputId={index} />
