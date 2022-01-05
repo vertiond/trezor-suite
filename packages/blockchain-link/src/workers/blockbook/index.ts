@@ -56,7 +56,7 @@ const connect = async (): Promise<Connection> => {
         await connection.connect();
         api = connection;
     } catch (error) {
-        common.debug('Websocket connection failed');
+        common.debug('Websocket connection failed', error);
         api = undefined;
         // connection error. remove endpoint
         endpoints.splice(0, 1);

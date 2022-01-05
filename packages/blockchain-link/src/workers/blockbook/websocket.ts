@@ -187,8 +187,14 @@ export default class Socket extends EventEmitter {
         // create deferred promise
         const dfd = createDeferred<void>(-1);
 
-        // initialize connection
-        const ws = new WebSocket(url);
+        // initialize connection,
+        // options are not used in web builds (see ./src/utils/ws)
+        const ws = new WebSocket(url, {
+            headers: {
+                Origin: 'https://node.trezor.io',
+                'User-Agent': 'Trezor Suite',
+            },
+        });
         if (typeof ws.setMaxListeners === 'function') {
             ws.setMaxListeners(Infinity);
         }
