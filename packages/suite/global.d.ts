@@ -38,6 +38,8 @@ interface DesktopApi {
     clearStore: () => void;
     // Udev rules
     installUdevRules: () => Promise<{ success: true } | { success: false; error: string }>;
+    // TrezorConnect
+    TrezorConnect: (method: string, ...params: any[]) => Promise<any>;
 }
 
 interface Window {

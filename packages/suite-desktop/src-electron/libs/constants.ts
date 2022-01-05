@@ -25,6 +25,7 @@ export const MODULES = [
     'auto-updater',
     'store',
     'udev-install',
+    'trezor-connect-ipc',
 ];
 
 // Modules only used in prod mode

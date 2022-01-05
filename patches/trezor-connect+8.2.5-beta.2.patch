@@ -1,0 +1,56 @@
+diff --git a/node_modules/trezor-connect/lib/env/node/index.js b/node_modules/trezor-connect/lib/env/node/index.js
+index a038a2a..34c817e 100644
+--- a/node_modules/trezor-connect/lib/env/node/index.js
++++ b/node_modules/trezor-connect/lib/env/node/index.js
+@@ -88,6 +88,8 @@ var handleMessage = function handleMessage(message) {
+     return;
+   }
+ 
++  if (type === _constants.POPUP.CANCEL_POPUP_REQUEST) return;
++
+   _log.log('handleMessage', message);
+ 
+   switch (event) {
+diff --git a/node_modules/trezor-connect/lib/env/node/workers.js b/node_modules/trezor-connect/lib/env/node/workers.js
+index 48f571e..a487924 100644
+--- a/node_modules/trezor-connect/lib/env/node/workers.js
++++ b/node_modules/trezor-connect/lib/env/node/workers.js
+@@ -16,7 +16,7 @@ exports.ReactNativeUsbPlugin = ReactNativeUsbPlugin;
+ var BlockbookWorker = function BlockbookWorker() {
+   return new _tinyWorker["default"](function () {
+     // $FlowIssue
+-    require('@trezor/blockchain-link/build/node/blockbook-worker'); // eslint-disable-line global-require
++    require('@trezor/blockchain-link/lib/workers/blockbook'); // eslint-disable-line global-require
+ 
+   });
+ };
+@@ -26,7 +26,7 @@ exports.BlockbookWorker = BlockbookWorker;
+ var RippleWorker = function RippleWorker() {
+   return new _tinyWorker["default"](function () {
+     // $FlowIssue
+-    require('@trezor/blockchain-link/build/node/ripple-worker'); // eslint-disable-line global-require
++    require('@trezor/blockchain-link/lib/workers/ripple'); // eslint-disable-line global-require
+ 
+   });
+ };
+@@ -36,7 +36,7 @@ exports.RippleWorker = RippleWorker;
+ var BlockfrostWorker = function BlockfrostWorker() {
+   return new _tinyWorker["default"](function () {
+     // $FlowIssue
+-    require('@trezor/blockchain-link/build/node/blockfrost-worker'); // eslint-disable-line global-require
++    require('@trezor/blockchain-link/lib/workers/blockfrost'); // eslint-disable-line global-require
+ 
+   });
+ };
+diff --git a/node_modules/trezor-connect/lib/typescript/events.d.ts b/node_modules/trezor-connect/lib/typescript/events.d.ts
+index 665e505..4459cae 100644
+--- a/node_modules/trezor-connect/lib/typescript/events.d.ts
++++ b/node_modules/trezor-connect/lib/typescript/events.d.ts
+@@ -65,6 +65,7 @@ export interface MessageWithoutPayload {
+         | typeof UI.INSUFFICIENT_FUNDS
+         | typeof UI.CLOSE_UI_WINDOW
+         | typeof UI.LOGIN_CHALLENGE_REQUEST;
++    payload?: typeof undefined;
+ }
+ 
+ export type DeviceMessage =

@@ -26,6 +26,39 @@ const validChannels = [
     'protocol/open',
 ];
 
+// ipc listeners manager
+// ipcRenderer.on listener callback contains additional param at position 0. (Electron.IpcRendererEvent)
+// suite is not expecting this param therefore "real" listener needs to be wrapped by a function where it's omitted.
+// both "real" and "wrapped" listeners references are stored and used in remove listener process.
+
+type IpcListener = {
+    type: string;
+    listener: (...args: any[]) => any; // Real listener function
+    ipcListener: Parameters<typeof ipcRenderer.on>[1]; // ipc listener function (wrapper for real listener)
+};
+
+const ipcListeners: IpcListener[] = [];
+
+const addIpcListener = (type: string, fn: IpcListener['listener']) => {
+    const listener: IpcListener = {
+        type,
+        listener: fn,
+        ipcListener: (_, ...args) => fn(...args),
+    };
+    ipcRenderer.on(listener.type, listener.ipcListener);
+    ipcListeners.push(listener);
+};
+
+const removeIpcListener = (type: string, fn: IpcListener['listener']) => {
+    const listener = ipcListeners.find(
+        item => item.type === type && item.listener.toString() === fn.toString(),
+    );
+    if (listener) {
+        ipcRenderer.off(listener.type, listener.ipcListener);
+        ipcListeners.splice(ipcListeners.indexOf(listener), 1);
+    }
+};
+
 contextBridge.exposeInMainWorld('desktopApi', {
     on: (channel: string, func: (...args: any[]) => any) => {
         if (validChannels.includes(channel)) {
@@ -80,4 +113,15 @@ contextBridge.exposeInMainWorld('desktopApi', {
 
     // Udev rules
     installUdevRules: () => ipcRenderer.invoke('udev/install'),
+
+    // TrezorConnect
+    TrezorConnect: (method: string, ...args: any[]) => {
+        if (method === 'on') {
+            addIpcListener(`trezor-connect-event/${args[0]}`, args[1]);
+        } else if (method === 'off') {
+            removeIpcListener(`trezor-connect-event/${args[0]}`, args[1]);
+        } else {
+            return ipcRenderer.invoke('trezor-connect-call', [method, ...args]);
+        }
+    },
 });
