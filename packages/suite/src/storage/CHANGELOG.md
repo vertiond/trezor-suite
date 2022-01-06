@@ -1,5 +1,8 @@
 # Storage changelog
 
+## 25
+-   added VTC bech32 accounts
+
 ## 24
 -   added form drafts
 
