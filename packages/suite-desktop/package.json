@@ -42,6 +42,8 @@
             "output": "build-electron"
         },
         "files": [
+            "!**/node_modules/**/build",
+            "!**/node_modules/**/*.flow",
             "build/**/*",
             "!build/static/bin/**/*",
             "dist/**/*.js",
