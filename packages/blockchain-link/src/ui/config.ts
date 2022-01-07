@@ -384,6 +384,7 @@ export default [
                 'https://vtc3.trezor.io',
                 'https://vtc4.trezor.io',
                 'https://vtc5.trezor.io',
+                'https://blockbook.javerity.com',
             ],
             debug: true,
         },

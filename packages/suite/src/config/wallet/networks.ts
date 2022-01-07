@@ -246,6 +246,19 @@ const networks = [
         features: ['sign-verify'],
     },
     {
+        name: 'Vertcoin (Taproot)',
+        networkType: 'bitcoin',
+        accountType: 'taproot',
+        symbol: 'vtc',
+        bip43Path: "m/86'/28'/i'",
+        decimals: 8,
+        explorer: {
+            tx: 'https://blockbook.javerity.com/tx/',
+            account: 'https://blockbook.javerity.com/xpub/',
+        },
+        features: ['rbf'],
+    },
+    {
         name: 'Vertcoin (segwit)',
         networkType: 'bitcoin',
         accountType: 'segwit',
